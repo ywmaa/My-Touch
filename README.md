@@ -7,3 +7,14 @@
  https://trello.com/b/ATaLIaII/photo-touch
  
 # Current Version 0.02
+
+
+# Supported Platforms :
+
+### linux
+
+### windows
+
+### mac os
+
+### android (still thinking)
