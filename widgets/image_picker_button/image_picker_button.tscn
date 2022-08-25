@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://widgets/image_picker_button/image_picker_button.gd" id="2"]
+
+[node name="ImagePicker" type="TextureButton"]
+margin_right = 64.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 64, 64 )
+rect_clip_content = true
+expand = true
+stretch_mode = 5
+script = ExtResource( 2 )
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 2.0
+autostart = true
+
+[connection signal="pressed" from="." to="." method="_on_ImagePicker_pressed"]
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

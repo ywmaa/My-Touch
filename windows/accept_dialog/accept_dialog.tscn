@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://i3tice4ur1ru"]
+
+[ext_resource type="Script" path="res://windows/accept_dialog/accept_dialog.gd" id="1"]
+
+[node name="AcceptDialog" type="AcceptDialog"]
+size = Vector2i(95, 78)
+visible = true
+script = ExtResource("1")
+
+[connection signal="confirmed" from="." to="." method="_on_AcceptDialog_confirmed"]
+[connection signal="custom_action" from="." to="." method="_on_AcceptDialog_custom_action"]

@@ -1,0 +1,105 @@
+[gd_scene load_steps=10 format=3 uid="uid://ckbcywdm3kr40"]
+
+[ext_resource type="Script" path="res://material_maker/panels/layers/layers_tree.gd" id="1"]
+[ext_resource type="Script" path="res://material_maker/panels/layers/layers.gd" id="2"]
+[ext_resource type="Texture2D" path="res://icons/icons.tres" id="3"]
+
+[sub_resource type="AtlasTexture" id="1"]
+atlas = ExtResource("3")
+region = Rect2(32, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="2"]
+atlas = ExtResource("3")
+region = Rect2(48, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="3"]
+atlas = ExtResource("3")
+region = Rect2(64, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="4"]
+atlas = ExtResource("3")
+region = Rect2(80, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="5"]
+atlas = ExtResource("3")
+region = Rect2(96, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="6"]
+atlas = ExtResource("3")
+region = Rect2(0, 0, 16, 16)
+
+[node name="Layers" type="VBoxContainer"]
+script = ExtResource("2")
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+offset_right = 116.0
+offset_bottom = 16.0
+size_flags_horizontal = 3
+
+[node name="Add" type="TextureButton" parent="Buttons"]
+offset_right = 16.0
+offset_bottom = 16.0
+size_flags_horizontal = 3
+texture_normal = SubResource("1")
+stretch_mode = 3
+
+[node name="Duplicate" type="TextureButton" parent="Buttons"]
+offset_left = 20.0
+offset_right = 36.0
+offset_bottom = 16.0
+size_flags_horizontal = 3
+texture_normal = SubResource("2")
+stretch_mode = 3
+
+[node name="Remove" type="TextureButton" parent="Buttons"]
+offset_left = 40.0
+offset_right = 56.0
+offset_bottom = 16.0
+size_flags_horizontal = 3
+texture_normal = SubResource("3")
+stretch_mode = 3
+
+[node name="Up" type="TextureButton" parent="Buttons"]
+offset_left = 60.0
+offset_right = 76.0
+offset_bottom = 16.0
+size_flags_horizontal = 3
+texture_normal = SubResource("4")
+stretch_mode = 3
+
+[node name="Down" type="TextureButton" parent="Buttons"]
+offset_left = 80.0
+offset_right = 96.0
+offset_bottom = 16.0
+size_flags_horizontal = 3
+texture_normal = SubResource("5")
+stretch_mode = 3
+
+[node name="Config" type="TextureButton" parent="Buttons"]
+offset_left = 100.0
+offset_right = 116.0
+offset_bottom = 16.0
+size_flags_horizontal = 3
+texture_normal = SubResource("6")
+stretch_mode = 3
+
+[node name="Tree" type="Tree" parent="."]
+offset_top = 20.0
+offset_right = 116.0
+offset_bottom = 20.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_mode = 0
+columns = 2
+hide_root = true
+script = ExtResource("1")
+
+[connection signal="pressed" from="Buttons/Add" to="." method="_on_Add_pressed"]
+[connection signal="pressed" from="Buttons/Duplicate" to="." method="_on_Duplicate_pressed"]
+[connection signal="pressed" from="Buttons/Remove" to="." method="_on_Remove_pressed"]
+[connection signal="pressed" from="Buttons/Up" to="." method="_on_Up_pressed"]
+[connection signal="pressed" from="Buttons/Down" to="." method="_on_Down_pressed"]
+[connection signal="pressed" from="Buttons/Config" to="." method="_on_Config_pressed"]
+[connection signal="cell_selected" from="Tree" to="Tree" method="_on_Tree_cell_selected"]
+[connection signal="gui_input" from="Tree" to="Tree" method="_on_Tree_gui_input"]
+[connection signal="item_edited" from="Tree" to="Tree" method="_on_Tree_item_edited"]

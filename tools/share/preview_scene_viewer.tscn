@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://tools/share/preview_viewport.tscn" id="1"]
+
+[sub_resource type="ViewportTexture" id=1]
+viewport_path = NodePath("PreviewViewport")
+
+[node name="PreviewSceneViewer" type="Node"]
+
+[node name="TextureRect" type="TextureRect" parent="."]
+margin_right = 512.0
+margin_bottom = 512.0
+texture = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PreviewViewport" parent="." instance=ExtResource( 1 )]
+hdr = true
+render_target_update_mode = 3

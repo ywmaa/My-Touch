@@ -1,0 +1,112 @@
+[gd_scene load_steps=6 format=3 uid="uid://dhi5uspfra24x"]
+
+[ext_resource type="Script" path="res://panels/reference/reference_panel.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://cir533sf8niyf" path="res://panels/reference/color_slot.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://panels/reference/gradient_slot.tscn" id="3"]
+
+[sub_resource type="Shader" id="1"]
+code = "shader_type canvas_item;
+
+uniform sampler2D image;
+uniform vec2 canvas_size;
+uniform vec2 image_size;
+uniform float scale;
+uniform vec2 center = vec2(0.5);
+
+void fragment() {
+	vec2 ratio = canvas_size/image_size;
+	vec2 uv = center+(UV-0.5)*scale*ratio/min(ratio.x, ratio.y);
+	COLOR = mix(vec4(0.0), texture(image, uv), step(length(uv-clamp(uv, vec2(0.0), vec2(1.0))), 0.0001));
+}"
+
+[sub_resource type="ShaderMaterial" id="3"]
+shader = SubResource("1")
+canvas_size = null
+center = null
+image_size = null
+scale = null
+
+[node name="ReferencePanel" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Image" type="ColorRect" parent="VBoxContainer"]
+material = SubResource("3")
+offset_right = 1280.0
+offset_bottom = 712.0
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Image"]
+anchor_right = 1.0
+mouse_filter = 2
+
+[node name="Prev" type="Button" parent="VBoxContainer/Image/HBoxContainer"]
+offset_right = 18.0
+offset_bottom = 31.0
+text = "<"
+
+[node name="Control" type="Control" parent="VBoxContainer/Image/HBoxContainer"]
+offset_left = 22.0
+offset_right = 1258.0
+offset_bottom = 31.0
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Next" type="Button" parent="VBoxContainer/Image/HBoxContainer"]
+offset_left = 1262.0
+offset_right = 1280.0
+offset_bottom = 31.0
+text = ">"
+
+[node name="Colors" type="HBoxContainer" parent="VBoxContainer"]
+offset_top = 716.0
+offset_right = 1280.0
+offset_bottom = 716.0
+
+[node name="ColorSlot1" parent="VBoxContainer/Colors" instance=ExtResource("2")]
+offset_right = 252.0
+size_flags_horizontal = 3
+
+[node name="ColorSlot2" parent="VBoxContainer/Colors" instance=ExtResource("2")]
+offset_left = 256.0
+offset_right = 509.0
+size_flags_horizontal = 3
+
+[node name="ColorSlot3" parent="VBoxContainer/Colors" instance=ExtResource("2")]
+offset_left = 513.0
+offset_right = 766.0
+size_flags_horizontal = 3
+
+[node name="ColorSlot4" parent="VBoxContainer/Colors" instance=ExtResource("2")]
+offset_left = 770.0
+offset_right = 1023.0
+size_flags_horizontal = 3
+
+[node name="ColorSlot5" parent="VBoxContainer/Colors" instance=ExtResource("2")]
+offset_left = 1027.0
+offset_right = 1280.0
+size_flags_horizontal = 3
+
+[node name="GradientSlot" parent="VBoxContainer" instance=ExtResource("3")]
+offset_top = 720.0
+offset_right = 1280.0
+offset_bottom = 720.0
+
+[node name="ContextMenu" type="PopupMenu" parent="."]
+size = Vector2i(173, 100)
+item_count = 2
+item_0/text = "Load Reference"
+item_0/id = 0
+item_1/text = "Remove Reference"
+item_1/id = 1
+
+[connection signal="gui_input" from="VBoxContainer/Image" to="." method="_on_Image_gui_input"]
+[connection signal="resized" from="VBoxContainer/Image" to="." method="_on_Image_resized"]
+[connection signal="pressed" from="VBoxContainer/Image/HBoxContainer/Prev" to="." method="change_image" binds= [-1]]
+[connection signal="pressed" from="VBoxContainer/Image/HBoxContainer/Next" to="." method="change_image" binds= [1]]
+[connection signal="index_pressed" from="ContextMenu" to="." method="_on_ContextMenu_index_pressed"]

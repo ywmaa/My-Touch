@@ -1,25 +1,47 @@
-[gd_scene load_steps=2 format=3 uid="uid://8w67718v7rk"]
+[gd_scene load_steps=5 format=3 uid="uid://8w67718v7rk"]
 
+[ext_resource type="Theme" uid="uid://264mxj3r6c6v" path="res://theme/dark.tres" id="1_gmhfm"]
 [ext_resource type="Script" path="res://editor.gd" id="1_ix08l"]
+[ext_resource type="Script" path="res://Layout.gd" id="2_o50ww"]
+[ext_resource type="Script" path="res://tabs.gd" id="4_ejxk4"]
 
-[node name="Editor" type="Control"]
+[node name="Editor" type="Panel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+theme = ExtResource("1_gmhfm")
 script = ExtResource("1_ix08l")
 
-[node name="TabContainer" type="TabContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-tab_alignment = 1
-metadata/_edit_layout_mode = 1
+offset_right = -12.0
+offset_bottom = -12.0
 
-[node name="PhotoEditing" type="Control" parent="TabContainer"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 31.0
+[node name="TopBar" type="HBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 25)
+offset_right = 1268.0
+offset_bottom = 25.0
 
-[node name="LayersList" type="ItemList" parent="TabContainer/PhotoEditing"]
+[node name="Menu" type="HBoxContainer" parent="VBoxContainer/TopBar"]
+custom_minimum_size = Vector2(1011, 25)
+offset_right = 1268.0
+offset_bottom = 25.0
+size_flags_horizontal = 3
+
+[node name="Layout" type="HSplitContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(1268, 679)
+offset_top = 29.0
+offset_right = 1268.0
+offset_bottom = 708.0
+size_flags_vertical = 3
+split_offset = -1118
+script = ExtResource("2_o50ww")
+
+[node name="PhotoEditing" type="Control" parent="VBoxContainer/Layout"]
+visible = false
+offset_bottom = 691.0
+
+[node name="LayersList" type="ItemList" parent="VBoxContainer/Layout/PhotoEditing"]
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -29,8 +51,9 @@ grow_vertical = 2
 select_mode = 1
 auto_height = true
 metadata/_edit_layout_mode = 1
+metadata/_edit_use_anchors_ = true
 
-[node name="ToolsList" type="ItemList" parent="TabContainer/PhotoEditing"]
+[node name="ToolsList" type="ItemList" parent="VBoxContainer/Layout/PhotoEditing"]
 anchor_bottom = 1.0
 offset_right = 81.0
 grow_vertical = 2
@@ -44,27 +67,92 @@ item_2/text = "scale"
 item_2/disabled = true
 item_3/text = "new"
 metadata/_edit_layout_mode = 1
+metadata/_edit_use_anchors_ = true
 
-[node name="Canvas" type="Control" parent="TabContainer/PhotoEditing"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -878.0
-offset_top = -516.5
-offset_right = 790.0
-offset_bottom = 519.5
-grow_horizontal = 2
-grow_vertical = 2
-metadata/_edit_layout_mode = 1
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Layout/PhotoEditing"]
+offset_left = 634.0
+offset_top = 339.5
+offset_right = 674.0
+offset_bottom = 379.5
+metadata/_edit_use_anchors_ = true
 
-[node name="TextureRect" type="TextureRect" parent="TabContainer/PhotoEditing/Canvas"]
+[node name="Left" type="VSplitContainer" parent="VBoxContainer/Layout"]
+custom_minimum_size = Vector2(124, 679)
+offset_right = 124.0
+offset_bottom = 679.0
+size_flags_horizontal = 3
+split_offset = 312
+
+[node name="Top" type="TabContainer" parent="VBoxContainer/Layout/Left"]
+custom_minimum_size = Vector2(124, 349)
+offset_right = 124.0
+offset_bottom = 349.0
+drag_to_rearrange_enabled = true
+use_hidden_tabs_for_min_size = true
+
+[node name="Bottom" type="TabContainer" parent="VBoxContainer/Layout/Left"]
+custom_minimum_size = Vector2(124, 322)
+offset_top = 357.0
+offset_right = 124.0
+offset_bottom = 679.0
+drag_to_rearrange_enabled = true
+use_hidden_tabs_for_min_size = true
+
+[node name="SplitRight" type="HSplitContainer" parent="VBoxContainer/Layout"]
+custom_minimum_size = Vector2(1136, 679)
+offset_left = 132.0
+offset_right = 1268.0
+offset_bottom = 679.0
+
+[node name="ProjectsPanel" type="Control" parent="VBoxContainer/Layout/SplitRight"]
+offset_right = 980.0
+offset_bottom = 679.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 6.5
+
+[node name="Projects" type="Panel" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel"]
+custom_minimum_size = Vector2(986, 684)
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("4_ejxk4")
+
+[node name="Tabs" type="TabBar" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects"]
+custom_minimum_size = Vector2(950, 24)
 offset_right = 40.0
 offset_bottom = 40.0
+tab_close_display_policy = 1
+drag_to_rearrange_enabled = true
 
-[node name="Export" type="Control" parent="TabContainer"]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="CrashRecoveryTimer" type="Timer" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects"]
+wait_time = 15.0
+autostart = true
 
-[connection signal="multi_selected" from="TabContainer/PhotoEditing/LayersList" to="." method="_on_layers_list_multi_selected"]
-[connection signal="item_selected" from="TabContainer/PhotoEditing/ToolsList" to="." method="_on_tools_list_item_selected"]
+[node name="Right" type="VSplitContainer" parent="VBoxContainer/Layout/SplitRight"]
+custom_minimum_size = Vector2(147, 349)
+offset_left = 989.0
+offset_right = 1136.0
+offset_bottom = 679.0
+size_flags_horizontal = 10
+split_offset = 312
+
+[node name="Top" type="TabContainer" parent="VBoxContainer/Layout/SplitRight/Right"]
+custom_minimum_size = Vector2(124, 349)
+offset_right = 147.0
+offset_bottom = 349.0
+drag_to_rearrange_enabled = true
+use_hidden_tabs_for_min_size = true
+
+[node name="Bottom" type="TabContainer" parent="VBoxContainer/Layout/SplitRight/Right"]
+custom_minimum_size = Vector2(124, 322)
+offset_top = 357.0
+offset_right = 147.0
+offset_bottom = 679.0
+drag_to_rearrange_enabled = true
+use_hidden_tabs_for_min_size = true
+
+[connection signal="multi_selected" from="VBoxContainer/Layout/PhotoEditing/LayersList" to="." method="_on_layers_list_multi_selected"]
+[connection signal="item_selected" from="VBoxContainer/Layout/PhotoEditing/ToolsList" to="." method="_on_tools_list_item_selected"]
+[connection signal="tab_changed" from="VBoxContainer/Layout/Left/Top" to="VBoxContainer/Layout" method="_on_tab_changed"]
+[connection signal="tab_changed" from="VBoxContainer/Layout/Left/Bottom" to="VBoxContainer/Layout" method="_on_tab_changed"]
+[connection signal="tab_changed" from="VBoxContainer/Layout/SplitRight/Right/Top" to="VBoxContainer/Layout" method="_on_tab_changed"]
+[connection signal="tab_changed" from="VBoxContainer/Layout/SplitRight/Right/Bottom" to="VBoxContainer/Layout" method="_on_tab_changed"]

@@ -1,0 +1,67 @@
+[gd_scene load_steps=6 format=3 uid="uid://cyxv48g0ivki0"]
+
+[ext_resource type="Script" path="res://material_maker/panels/hierarchy/hierarchy_panel.gd" id="1"]
+[ext_resource type="Texture2D" path="res://icons/icons.tres" id="2"]
+
+[sub_resource type="AtlasTexture" id="1"]
+atlas = ExtResource("2")
+region = Rect2(32, 48, 16, 16)
+
+[sub_resource type="AtlasTexture" id="2"]
+atlas = ExtResource("2")
+region = Rect2(16, 48, 16, 16)
+
+[sub_resource type="AtlasTexture" id="3"]
+atlas = ExtResource("2")
+region = Rect2(0, 32, 16, 16)
+
+[node name="Hierarchy" type="VBoxContainer"]
+script = ExtResource("1")
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+offset_right = 84.0
+offset_bottom = 24.0
+
+[node name="Expand" type="Button" parent="HBoxContainer"]
+offset_right = 24.0
+offset_bottom = 24.0
+hint_tooltip = "Expand all"
+icon = SubResource("1")
+
+[node name="Collapse" type="Button" parent="HBoxContainer"]
+offset_left = 28.0
+offset_right = 52.0
+offset_bottom = 24.0
+hint_tooltip = "Collapse all"
+icon = SubResource("2")
+
+[node name="Space" type="Control" parent="HBoxContainer"]
+offset_left = 56.0
+offset_right = 56.0
+offset_bottom = 24.0
+
+[node name="PreviewMenu" type="MenuButton" parent="HBoxContainer"]
+offset_left = 60.0
+offset_right = 84.0
+offset_bottom = 24.0
+icon = SubResource("3")
+
+[node name="Tree" type="Tree" parent="."]
+offset_top = 28.0
+offset_right = 84.0
+offset_bottom = 28.0
+size_flags_vertical = 3
+allow_reselect = true
+
+[node name="Delay" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[connection signal="pressed" from="HBoxContainer/Expand" to="." method="_on_Expand_pressed"]
+[connection signal="pressed" from="HBoxContainer/Collapse" to="." method="_on_Collapse_pressed"]
+[connection signal="item_activated" from="Tree" to="." method="_on_Hierarchy_item_double_clicked"]
+[connection signal="item_double_clicked" from="Tree" to="." method="_on_Hierarchy_item_double_clicked"]
+[connection signal="timeout" from="Delay" to="." method="_on_Delay_timeout"]

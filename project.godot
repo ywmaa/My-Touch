@@ -8,18 +8,32 @@
 
 config_version=5
 
+_global_script_classes=[{
+"base": "Control",
+"class": &"MMNodeLink",
+"language": &"GDScript",
+"path": "res://widgets/linked_widgets/link.gd"
+}]
+_global_script_class_icons={
+"MMNodeLink": ""
+}
+
 [application]
 
-config/name="Photo Touch"
+config/name="My Touch"
 run/main_scene="res://editor.tscn"
 config/features=PackedStringArray("4.0", "Vulkan Mobile")
-run/low_processor_mode=true
 config/icon="res://icon.png"
+config/actual_release="0.1"
+
+[autoload]
+
+mt_globals="*res://globals.tscn"
 
 [display]
 
-window/size/viewport_width=1920
-window/size/viewport_height=1080
+window/size/viewport_width=1280
+window/size/viewport_height=720
 
 [input]
 
@@ -46,5 +60,4 @@ undo={
 
 [rendering]
 
-driver/threads/thread_model=2
 vulkan/rendering/back_end=1
