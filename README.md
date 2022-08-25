@@ -6,7 +6,7 @@
 # Roadmap
  https://trello.com/b/ATaLIaII/photo-touch
  
-# Current Version 0.5
+# Current Version 0.0.5
 
 
 # Supported Platforms :
