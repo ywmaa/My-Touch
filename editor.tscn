@@ -172,7 +172,6 @@ drag_to_rearrange_enabled = true
 use_hidden_tabs_for_min_size = true
 
 [node name="UndoRedoLabel" type="Label" parent="."]
-visible = false
 modulate = Color(1, 1, 1, 0)
 anchor_left = 0.5
 anchor_right = 0.5

@@ -1,7 +1,10 @@
 extends Panel
 
 enum tool_mode {none,move_image,rotate_image,scale_image}
+enum coordinates {xy,x,y}
 
+var direction : coordinates = coordinates.xy
+	
 var last_mode : tool_mode = tool_mode.none
 var current_mode : tool_mode = tool_mode.none:
 	get: return current_mode
@@ -63,35 +66,62 @@ var mouse_position_delta : Vector2
 
 
 func _process(delta):
-	mouse_position_delta = get_global_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
-	match current_mode:
-		tool_mode.move_image:
-			if selected_layer:
-				selected_layer.position += mouse_position_delta
-		tool_mode.rotate_image:
-			if selected_layer:
-				selected_layer.rotation = selected_layer.global_position.angle_to_point(get_local_mouse_position())
-		tool_mode.scale_image:
-			if selected_layer:
-				selected_layer.scale += mouse_position_delta * delta
-
-	previous_mouse_position = get_global_mouse_position()
-
-
-
-func _input(event): #handle shortcuts
-	if event.is_action_pressed("toggle_fullscreen"):
-		OS.window_fullscreen = !OS.window_fullscreen
-	if Input.is_action_pressed("undo"):
-		undo()
+	
+	#handle shortcuts
 	if Input.is_action_just_pressed("move"):
 		tool_shortcut(tool_mode.move_image)
 	if Input.is_action_just_pressed("rotate"):
 		tool_shortcut(tool_mode.rotate_image)
 	if Input.is_action_just_pressed("scale"):
 		tool_shortcut(tool_mode.scale_image)
+	if Input.is_action_just_pressed("lock_x"):
+		if direction == coordinates.x:
+			direction = coordinates.xy
+		else:
+			direction = coordinates.x
+	if Input.is_action_just_pressed("lock_y"):
+		if direction == coordinates.y:
+			direction = coordinates.xy
+		else:
+			direction = coordinates.y
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		current_mode = tool_mode.none
+		direction = coordinates.xy
+	
+	
+	
+	mouse_position_delta = get_global_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
+	match current_mode:
+		tool_mode.move_image:
+			if selected_layer:
+				match direction:
+					coordinates.xy:
+						selected_layer.position += mouse_position_delta
+					coordinates.x:
+						selected_layer.position.x += mouse_position_delta.x
+					coordinates.y:
+						selected_layer.position.y += mouse_position_delta.y
+		tool_mode.rotate_image:
+			if selected_layer:
+				selected_layer.rotation = selected_layer.global_position.angle_to_point(get_local_mouse_position())
+		tool_mode.scale_image:
+			if selected_layer:
+				match direction:
+					coordinates.xy:
+						selected_layer.scale += mouse_position_delta * delta
+					coordinates.x:
+						selected_layer.scale.x += mouse_position_delta.x * delta
+					coordinates.y:
+						selected_layer.scale.y += mouse_position_delta.y * delta
+
+	previous_mouse_position = get_global_mouse_position()
+
+
+
+func _input(event): 
+	if event.is_action_pressed("toggle_fullscreen"):
+		OS.window_fullscreen = !OS.window_fullscreen
+
 
 
 func tool_shortcut(index): # handle tools list
@@ -144,22 +174,43 @@ func select_layer(layer):
 #	selected_layer = Canvas.get_node(str(LayersList.get_item_text(index)))
 
 var undo_history = []
+var redo_history = []
 @export var undo_limit : int = 32
 var undo_saved_step : int = 0
 func add_to_undo_history(data:Array): # syntax : [object,str(property_name),value]
-	print("history added")
+	redo_history.clear()
 	undo_history.append(data)
 	if undo_history.size() > undo_limit:
 		undo_history.pop_front()
+	print("history added")
+	get_node("/root/Editor/UndoRedoLabel").show_step(undo_history.size())
 func undo():
-	if undo_history.size() <= 0:
+	if !can_undo():
 		print("nothing to undo")
 		return
 	var tween : Tween = get_tree().create_tween()
+	var redo_data = [undo_history.back()[0],undo_history.back()[1],undo_history.back()[2]]
+	redo_history.append(redo_data)
 	tween.tween_property(undo_history.back()[0],undo_history.back()[1],undo_history.back()[2],0.01)
 	undo_history.pop_back()
-func redo(): # todo
-	pass
+	print("undo")
+	
+func can_undo() -> bool:
+	return !(undo_history.size() == 0)
+
+func redo():
+	if !can_redo():
+		print("nothing to redo")
+		return
+	var tween : Tween = get_tree().create_tween()
+	var undo_data = [redo_history.back()[0],redo_history.back()[1],redo_history.back()[2]]
+	undo_history.append(undo_data)
+	tween.tween_property(redo_history.back()[0],redo_history.back()[1],redo_history.back()[2],0.01)
+	redo_history.pop_back()
+	print("redo")
+
+func can_redo() -> bool:
+	return !(redo_history.size() == 0)
 
 func _exit_tree():
 	save_config()

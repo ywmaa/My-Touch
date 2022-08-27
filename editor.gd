@@ -78,10 +78,10 @@ func _ready() -> void:
 	on_config_changed()
 
 	# Restore the window position/size if values are present in the configuration cache
-#	if mt_globals.config.has_section_key("window", "screen"):
-#		DisplayServer.window_set_current_screen(mt_globals.config.get_value("window", "screen"))
-#	if mt_globals.config.has_section_key("window", "maximized"):
-#		DisplayServer.window_set_mode(mt_globals.config.get_value("window", "maximized"))
+	if mt_globals.config.has_section_key("window", "screen"):
+		DisplayServer.window_set_current_screen(mt_globals.config.get_value("window", "screen"))
+	if mt_globals.config.has_section_key("window", "maximized"):
+		DisplayServer.window_set_mode(mt_globals.config.get_value("window", "maximized"))
 	
 	if !Window.MODE_MAXIMIZED:
 		if mt_globals.config.has_section_key("window", "position"):
@@ -94,22 +94,6 @@ func _ready() -> void:
 	if mt_globals.config.has_section_key("window", "theme"):
 		theme_name = mt_globals.config.get_value("window", "theme")
 	set_app_theme(theme_name)
-	# In HTML5 export, copy all examples to the filesystem
-	if OS.get_name() == "HTML5":
-		print("Copying samples")
-		var dir : Directory = Directory.new()
-		dir.make_dir("/examples")
-		dir.open("res://examples/")
-		dir.list_dir_begin()
-		while true:
-			var f = dir.get_next()
-			if f == "":
-				break
-			if f.ends_with(".mt"):
-				print(f)
-				dir.copy("res://examples/"+f, "/examples/"+f)
-		print("Done")
-
 
 
 	# Set a minimum window size to prevent UI elements from collapsing on each other.
@@ -145,14 +129,13 @@ func on_config_changed() -> void:
 		TranslationServer.set_locale(locale)
 		get_tree().call_group("updated_from_locale", "update_from_locale")
 	
-	var scale = mt_globals.get_config("ui_scale")
-	if scale <= 0:
+	var ui_scale = mt_globals.get_config("ui_scale")
+	if ui_scale <= 0:
 		# If scale is set to 0 (auto), scale everything if the display requires it (crude hiDPI support).
 		# This prevents UI elements from being too small on hiDPI displays.
-		scale = 2 if DisplayServer.screen_get_dpi() >= 192 and DisplayServer.window_get_size().x >= 2048 else 1
+		ui_scale = 2 if DisplayServer.screen_get_dpi() >= 192 and DisplayServer.window_get_size().x >= 2048 else 1
+#	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_DISABLED, SceneTree.STRETCH_ASPECT_IGNORE, Vector2(), ui_scale)
 
-	
-#	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_DISABLED, SceneTree.STRETCH_ASPECT_IGNORE, Vector2(), scale)
 func create_menu_show_panels(menu : PopupMenu) -> void:
 	menu.clear()
 	var panels = layout.get_panel_list()
@@ -171,15 +154,6 @@ func get_panel(panel_name : String) -> Control:
 
 func get_current_project() -> Control:
 	return projects.get_current_tab_control()
-
-func _exit_tree() -> void:
-	
-	# Save the window position and size to remember it when restarting the application
-	mt_globals.config.set_value("window", "screen", DisplayServer.window_get_current_screen())
-	mt_globals.config.set_value("window", "maximized", DisplayServer.WINDOW_MODE_MAXIMIZED || DisplayServer.WINDOW_MODE_FULLSCREEN)
-	mt_globals.config.set_value("window", "position", DisplayServer.window_get_position())
-	mt_globals.config.set_value("window", "size", DisplayServer.window_get_size())
-	layout.save_config()
 
 
 func _notification(what : int) -> void:
@@ -234,6 +208,12 @@ func quit() -> void:
 			quitting = false
 			return
 	dim_window()
+	# Save the window position and size to remember it when restarting the application
+	mt_globals.config.set_value("window", "screen", DisplayServer.window_get_current_screen())
+	mt_globals.config.set_value("window", "maximized", DisplayServer.window_get_mode())
+	mt_globals.config.set_value("window", "position", DisplayServer.window_get_position())
+	mt_globals.config.set_value("window", "size", DisplayServer.window_get_size())
+	layout.save_config()
 	get_tree().quit()
 	quitting = false
 
@@ -245,6 +225,27 @@ func dim_window() -> void:
 # -----------------------------------------------------------------------
 #                             Edit menu
 # -----------------------------------------------------------------------
+func edit_undo() -> void:
+	var project = get_current_project()
+	if project != null:
+		project.undo()
+
+func edit_undo_is_disabled() -> bool:
+	var project = get_current_project()
+	if project != null:
+		return !project.can_undo()
+	return true
+
+func edit_redo() -> void:
+	var project = get_current_project()
+	if project != null:
+		project.redo()
+
+func edit_redo_is_disabled() ->  bool:
+	var project = get_current_project()
+	if project != null:
+		return !project.can_redo()
+	return true
 
 func set_app_theme(theme_name : String) -> void:
 	theme = load("res://theme/"+theme_name+".tres")

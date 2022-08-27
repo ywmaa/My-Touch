@@ -1,12 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://dg35jlqxnf8qy"]
+[gd_scene load_steps=2 format=3 uid="uid://dg35jlqxnf8qy"]
 
 [ext_resource type="Script" path="res://panels/graph/graph.gd" id="1_wei5b"]
-[ext_resource type="Script" path="res://panels/graph/UndoRedo.gd" id="2_kpgfr"]
 
 [node name="graph" type="Panel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_wei5b")
-
-[node name="UndoRedo" type="Node" parent="."]
-script = ExtResource("2_kpgfr")

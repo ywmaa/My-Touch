@@ -52,11 +52,11 @@ func do_update(update_text : bool = true) -> void:
 
 func get_modifiers(event):
 	var new_modifiers = 0
-	if event.shift:
+	if event.shift_pressed:
 		new_modifiers |= 1
-	if event.control:
+	if event.ctrl_pressed:
 		new_modifiers |= 2
-	if event.alt:
+	if event.alt_pressed:
 		new_modifiers |= 4
 	return new_modifiers
 
@@ -70,7 +70,7 @@ func _gui_input(event : InputEvent) -> void:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.is_pressed():
-			if event.doubleclick:
+			if event.double_click:
 				await get_tree().process_frame
 				select_all()
 			else:
@@ -98,11 +98,11 @@ func _gui_input(event : InputEvent) -> void:
 			last_position = event.position.x
 			var delta : float = last_position-start_position
 			var current_step = step
-			if event.control:
+			if event.ctrl_pressed:
 				delta *= 0.2
-			elif event.shift:
+			elif event.shift_pressed:
 				delta *= 5.0
-			if event.alt:
+			if event.alt_pressed:
 				current_step *= 0.01
 			var v : float = start_value+sign(delta)*pow(abs(delta)*0.005, 2)*abs(max_value - min_value)
 			if current_step != 0:
