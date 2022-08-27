@@ -78,10 +78,10 @@ func _ready() -> void:
 	on_config_changed()
 
 	# Restore the window position/size if values are present in the configuration cache
-	if mt_globals.config.has_section_key("window", "screen"):
-		DisplayServer.window_set_current_screen(mt_globals.config.get_value("window", "screen"))
-	if mt_globals.config.has_section_key("window", "maximized"):
-		DisplayServer.window_set_mode(mt_globals.config.get_value("window", "maximized"))
+#	if mt_globals.config.has_section_key("window", "screen"):
+#		DisplayServer.window_set_current_screen(mt_globals.config.get_value("window", "screen"))
+#	if mt_globals.config.has_section_key("window", "maximized"):
+#		DisplayServer.window_set_mode(mt_globals.config.get_value("window", "maximized"))
 	
 	if !Window.MODE_MAXIMIZED:
 		if mt_globals.config.has_section_key("window", "position"):
@@ -134,7 +134,7 @@ func _ready() -> void:
 #	get_tree().connect("files_dropped", self, "on_files_dropped")
 #
 func on_config_changed() -> void:
-	DisplayServer.window_set_vsync_mode(mt_globals.get_config("vsync"))
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if mt_globals.get_config("vsync") else DisplayServer.VSYNC_DISABLED)
 	# Convert FPS to microseconds per frame.
 	# Clamp the FPS to reasonable values to avoid locking up the UI.
 # warning-ignore:narrowing_conversion
@@ -192,8 +192,8 @@ func _notification(what : int) -> void:
 			# Return to the normal FPS limit when the window is focused.
 # warning-ignore:narrowing_conversion
 			OS.low_processor_usage_mode_sleep_usec = (1.0 / clamp(mt_globals.get_config("fps_limit"), FPS_LIMIT_MIN, FPS_LIMIT_MAX)) * 1_000_000
-		DisplayServer.WINDOW_EVENT_CLOSE_REQUEST:
-			await get_tree().idle_frame
+		1006: # NOTIFICATION_WM_QUIT_REQUEST
+			await get_tree().process_frame
 			quit()
 
 # -----------------------------------------------------------------------
@@ -218,12 +218,13 @@ func quit() -> void:
 	if quitting:
 		return
 	quitting = true
+	var dialog = preload("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
+	dialog.dialog_text = "Quit My Touch?"
+	dialog.add_cancel_button("Cancel")
+	add_child(dialog)
 	if mt_globals.get_config("confirm_quit"):
-		var dialog = preload("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
-		dialog.dialog_text = "Quit My Touch?"
-		dialog.add_cancel_button("Cancel")
-		add_child(dialog)
 		var result = await dialog.ask()
+		print(result)
 		if result == "cancel":
 			quitting = false
 			return

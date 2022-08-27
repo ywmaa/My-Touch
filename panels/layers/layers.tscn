@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://material_maker/panels/layers/layers_tree.gd" id="1"]
 [ext_resource type="Script" path="res://material_maker/panels/layers/layers.gd" id="2"]
-[ext_resource type="Texture2D" path="res://theme/icons/icons.tres" id="2_maptw"]
+[ext_resource type="Texture2D" uid="uid://dihbga5fd0iob" path="res://theme/icons/icons.tres" id="2_maptw"]
 
 [sub_resource type="AtlasTexture" id="1"]
 atlas = ExtResource("2_maptw")

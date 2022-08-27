@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=125 format=3]
+[gd_resource type="Theme" load_steps=125 format=3 uid="uid://dl7dg81sapu26"]
 
 [ext_resource type="FontFile" path="res://theme/font.tres" id="1_wrg1w"]
 [ext_resource type="Texture2D" uid="uid://dasip4t1uva83" path="res://theme/dark/checkbox_checked.png" id="2_w18e2"]
@@ -14,7 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://c8nsrpe5j2mox" path="res://theme/dark/graphedit_more.png" id="12_dd1pj"]
 [ext_resource type="Texture2D" uid="uid://do181x88jm3sw" path="res://theme/dark/graphedit_reset.png" id="13_w32mi"]
 [ext_resource type="Texture2D" uid="uid://due6bypdgxktc" path="res://theme/dark/graphedit_snap.png" id="14_2tiia"]
-[ext_resource type="FontFile" path="res://theme/fonts/DroidSansFallback.ttf" id="15_q7pbt"]
+[ext_resource type="FontFile" uid="uid://5bgis1cvfybw" path="res://theme/fonts/DroidSansFallback.ttf" id="15_q7pbt"]
 [ext_resource type="Texture2D" uid="uid://b57mtcm4pf1wc" path="res://theme/dark/graphnode_close.png" id="16_fxgx8"]
 [ext_resource type="Texture2D" uid="uid://ccbwv05pr2hh1" path="res://theme/dark/graphnode_port.png" id="17_1tqxu"]
 [ext_resource type="Texture2D" uid="uid://bg5gtuqpndriv" path="res://theme/dark/graphnode_resizer.png" id="18_vvq0p"]

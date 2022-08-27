@@ -1,6 +1,6 @@
-[gd_resource type="ProxyTexture" load_steps=3 format=3]
+[gd_resource type="ProxyTexture" load_steps=3 format=3 uid="uid://dihbga5fd0iob"]
 
-[ext_resource type="Texture2D" path="res://theme/icons/icons.svg" id="1"]
+[ext_resource type="Texture2D" uid="uid://smcayrpruaar" path="res://theme/icons/icons.svg" id="1"]
 
 [sub_resource type="GDScript" id="GDScript_11rat"]
 script/source = "extends ProxyTexture

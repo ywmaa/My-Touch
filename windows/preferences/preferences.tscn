@@ -7,6 +7,10 @@
 
 [node name="Preferences" type="PopupPanel"]
 size = Vector2i(355, 405)
+visible = true
+exclusive = true
+unresizable = false
+borderless = false
 script = ExtResource("2")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
@@ -211,3 +215,10 @@ offset_left = 91.0
 offset_right = 151.0
 offset_bottom = 31.0
 text = "Cancel"
+
+[connection signal="about_to_popup" from="." to="." method="_on_Preferences_about_to_show"]
+[connection signal="popup_hide" from="." to="." method="queue_free"]
+[connection signal="minimum_size_changed" from="VBoxContainer" to="." method="_on_VBoxContainer_minimum_size_changed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Apply" to="." method="_on_Apply_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/OK" to="." method="_on_OK_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Cancel" to="." method="_on_Cancel_pressed"]
