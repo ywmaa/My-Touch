@@ -1,6 +1,6 @@
 [gd_resource type="AtlasTexture" load_steps=2 format=3]
 
-[ext_resource type="Texture" path="res://icons/icons.tres" id="1"]
+[ext_resource type="Texture" path="res://theme/icons/icons.tres" id="1"]
 
 [resource]
 flags = 7

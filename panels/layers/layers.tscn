@@ -1,31 +1,31 @@
-[gd_scene load_steps=10 format=3 uid="uid://ckbcywdm3kr40"]
+[gd_scene load_steps=10 format=3 uid="uid://bl3eyxekgo6ue"]
 
 [ext_resource type="Script" path="res://material_maker/panels/layers/layers_tree.gd" id="1"]
 [ext_resource type="Script" path="res://material_maker/panels/layers/layers.gd" id="2"]
-[ext_resource type="Texture2D" path="res://icons/icons.tres" id="3"]
+[ext_resource type="Texture2D" path="res://theme/icons/icons.tres" id="2_maptw"]
 
 [sub_resource type="AtlasTexture" id="1"]
-atlas = ExtResource("3")
+atlas = ExtResource("2_maptw")
 region = Rect2(32, 160, 16, 16)
 
 [sub_resource type="AtlasTexture" id="2"]
-atlas = ExtResource("3")
+atlas = ExtResource("2_maptw")
 region = Rect2(48, 160, 16, 16)
 
 [sub_resource type="AtlasTexture" id="3"]
-atlas = ExtResource("3")
+atlas = ExtResource("2_maptw")
 region = Rect2(64, 160, 16, 16)
 
 [sub_resource type="AtlasTexture" id="4"]
-atlas = ExtResource("3")
+atlas = ExtResource("2_maptw")
 region = Rect2(80, 160, 16, 16)
 
 [sub_resource type="AtlasTexture" id="5"]
-atlas = ExtResource("3")
+atlas = ExtResource("2_maptw")
 region = Rect2(96, 160, 16, 16)
 
 [sub_resource type="AtlasTexture" id="6"]
-atlas = ExtResource("3")
+atlas = ExtResource("2_maptw")
 region = Rect2(0, 0, 16, 16)
 
 [node name="Layers" type="VBoxContainer"]

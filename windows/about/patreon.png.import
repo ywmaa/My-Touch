@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bsk0ih8y5aoho"
-path="res://.godot/imported/patreon.png-aab773564093d5c2ef9e484ae42ae21e.ctex"
+uid="uid://idn7mtrc7awy"
+path="res://.godot/imported/patreon.png-b2d0fa1900b89bea6e64d5a85cf92573.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://material_maker/windows/about/patreon.png"
-dest_files=["res://.godot/imported/patreon.png-aab773564093d5c2ef9e484ae42ae21e.ctex"]
+source_file="res://windows/about/patreon.png"
+dest_files=["res://.godot/imported/patreon.png-b2d0fa1900b89bea6e64d5a85cf92573.ctex"]
 
 [params]
 

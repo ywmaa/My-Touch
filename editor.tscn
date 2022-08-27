@@ -1,9 +1,50 @@
-[gd_scene load_steps=5 format=3 uid="uid://8w67718v7rk"]
+[gd_scene load_steps=8 format=3 uid="uid://8w67718v7rk"]
 
-[ext_resource type="Theme" uid="uid://264mxj3r6c6v" path="res://theme/dark.tres" id="1_gmhfm"]
+[ext_resource type="Theme" path="res://theme/dark.tres" id="1_gmhfm"]
 [ext_resource type="Script" path="res://editor.gd" id="1_ix08l"]
 [ext_resource type="Script" path="res://Layout.gd" id="2_o50ww"]
 [ext_resource type="Script" path="res://tabs.gd" id="4_ejxk4"]
+
+[sub_resource type="GDScript" id="6"]
+script/source = "extends Label
+
+func show_step(step : int):
+	text = \"Undo/Redo action added (%d)\" % step
+	$AnimationPlayer.stop()
+	$AnimationPlayer.play(\"show\")
+"
+
+[sub_resource type="Animation" id="7"]
+resource_name = "show"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_21bw6"]
+_data = {
+"show": SubResource("7")
+}
 
 [node name="Editor" type="Panel"]
 anchor_right = 1.0
@@ -39,41 +80,21 @@ script = ExtResource("2_o50ww")
 
 [node name="PhotoEditing" type="Control" parent="VBoxContainer/Layout"]
 visible = false
-offset_bottom = 691.0
-
-[node name="LayersList" type="ItemList" parent="VBoxContainer/Layout/PhotoEditing"]
-anchor_left = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -164.0
-grow_horizontal = 0
-grow_vertical = 2
-select_mode = 1
-auto_height = true
-metadata/_edit_layout_mode = 1
-metadata/_edit_use_anchors_ = true
+offset_bottom = 679.0
 
 [node name="ToolsList" type="ItemList" parent="VBoxContainer/Layout/PhotoEditing"]
 anchor_bottom = 1.0
 offset_right = 81.0
 grow_vertical = 2
 auto_height = true
-item_count = 4
+item_count = 3
 item_0/text = "move"
 item_0/disabled = true
 item_1/text = "rotate"
 item_1/disabled = true
 item_2/text = "scale"
 item_2/disabled = true
-item_3/text = "new"
 metadata/_edit_layout_mode = 1
-metadata/_edit_use_anchors_ = true
-
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Layout/PhotoEditing"]
-offset_left = 634.0
-offset_top = 339.5
-offset_right = 674.0
-offset_bottom = 379.5
 metadata/_edit_use_anchors_ = true
 
 [node name="Left" type="VSplitContainer" parent="VBoxContainer/Layout"]
@@ -150,9 +171,27 @@ offset_bottom = 679.0
 drag_to_rearrange_enabled = true
 use_hidden_tabs_for_min_size = true
 
-[connection signal="multi_selected" from="VBoxContainer/Layout/PhotoEditing/LayersList" to="." method="_on_layers_list_multi_selected"]
+[node name="UndoRedoLabel" type="Label" parent="."]
+visible = false
+modulate = Color(1, 1, 1, 0)
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -94.0
+offset_right = 94.0
+offset_bottom = 33.0
+text = "Undo/Redo action added"
+script = SubResource("6")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="UndoRedoLabel"]
+libraries = {
+"": SubResource("AnimationLibrary_21bw6")
+}
+
 [connection signal="item_selected" from="VBoxContainer/Layout/PhotoEditing/ToolsList" to="." method="_on_tools_list_item_selected"]
 [connection signal="tab_changed" from="VBoxContainer/Layout/Left/Top" to="VBoxContainer/Layout" method="_on_tab_changed"]
 [connection signal="tab_changed" from="VBoxContainer/Layout/Left/Bottom" to="VBoxContainer/Layout" method="_on_tab_changed"]
+[connection signal="active_tab_rearranged" from="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects/Tabs" to="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects" method="move_active_tab_to"]
+[connection signal="tab_changed" from="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects/Tabs" to="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects" method="set_current_tab"]
+[connection signal="tab_close_pressed" from="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects/Tabs" to="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects" method="close_tab"]
 [connection signal="tab_changed" from="VBoxContainer/Layout/SplitRight/Right/Top" to="VBoxContainer/Layout" method="_on_tab_changed"]
 [connection signal="tab_changed" from="VBoxContainer/Layout/SplitRight/Right/Bottom" to="VBoxContainer/Layout" method="_on_tab_changed"]

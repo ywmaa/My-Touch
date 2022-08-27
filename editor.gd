@@ -12,7 +12,7 @@ var need_update : bool = false
 
 @onready var layout = $VBoxContainer/Layout
 var library
-var hierarchy
+var tools
 var brushes
 
 const FPS_LIMIT_MIN = 20
@@ -22,10 +22,10 @@ const IDLE_FPS_LIMIT_MAX = 100
 
 const RECENT_FILES_COUNT = 15
 
-const THEMES = [ "Dark", "Default", "Light" ]
+const THEMES = [ "Dark", "Blue", "Light" ]
 
 const MENU = [
-	{ menu="File/New Canvas", command="new_canvas", shortcut="Control+N" },
+	{ menu="File/New Canvas", command="new_project", shortcut="Control+N" },
 	{ menu="File/Load", command="load_project", shortcut="Control+O" },
 	{ menu="File/Load recent", submenu="load_recent", standalone_only=true },
 	{ menu="File/-" },
@@ -62,14 +62,7 @@ const MENU = [
 	{ menu="View/Show or Hide side panels", command="toggle_side_panels", shortcut="Control+Space" },
 	{ menu="View/Panels", submenu="show_panels" },
 
-	{ menu="Tools/Create", submenu="create" },
-	{ menu="Tools/-" },
-	{ menu="Tools/Create a screenshot of the current graph", command="generate_graph_screenshot", mode="material" },
-	{ menu="Tools/Paint project settings", command="paint_project_settings", mode="paint" },
-	#{ menu="Tools", command="generate_screenshots", description="Generate screenshots for the library nodes", mode="material" },
-
 	{ menu="Help/User manual", command="show_doc", shortcut="F1" },
-	{ menu="Help/Show selected library item documentation", command="show_library_item_doc", shortcut="Control+F1" },
 	{ menu="Help/Report a bug", command="bug_report" },
 	{ menu="Help/" },
 	{ menu="Help/About", command="about" }
@@ -126,7 +119,7 @@ func _ready() -> void:
 
 
 	layout.load_panels()
-	hierarchy = get_panel("Hierarchy")
+	tools = get_panel("Tools")
 #
 #	# Load recent projects
 #	load_recents()
@@ -134,7 +127,7 @@ func _ready() -> void:
 	# Create menus
 	mt_globals.menu_manager.create_menus(MENU, self, $VBoxContainer/TopBar/Menu)
 
-#	new_project()
+	new_project()
 #
 #	do_load_projects(OS.get_cmdline_args())
 #
@@ -158,35 +151,8 @@ func on_config_changed() -> void:
 		# This prevents UI elements from being too small on hiDPI displays.
 		scale = 2 if DisplayServer.screen_get_dpi() >= 192 and DisplayServer.window_get_size().x >= 2048 else 1
 
-#	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_DISABLED, SceneTree.STRETCH_ASPECT_IGNORE, Vector2(), scale)
-
-func _exit_tree() -> void:
 	
-	# Save the window position and size to remember it when restarting the application
-	mt_globals.config.set_value("window", "screen", DisplayServer.window_get_current_screen())
-	mt_globals.config.set_value("window", "maximized", DisplayServer.WINDOW_MODE_MAXIMIZED || DisplayServer.WINDOW_MODE_FULLSCREEN)
-	mt_globals.config.set_value("window", "position", DisplayServer.window_get_position())
-	mt_globals.config.set_value("window", "size", DisplayServer.window_get_size())
-	layout.save_config()
-
-func set_app_theme(theme_name : String) -> void:
-	theme = load("res://theme/"+theme_name+".tres")
-
-func _on_SetTheme_id_pressed(id) -> void:
-	var theme_name : String = THEMES[id].to_lower()
-	set_app_theme(theme_name)
-	mt_globals.config.set_value("window", "theme", theme_name)
-
-func create_menu_set_theme(menu) -> void:
-	menu.clear()
-	for t in THEMES:
-		menu.add_item(t)
-	if !menu.is_connected("id_pressed", _on_SetTheme_id_pressed):
-		menu.connect("id_pressed", _on_SetTheme_id_pressed)
-
-
-
-
+#	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_DISABLED, SceneTree.STRETCH_ASPECT_IGNORE, Vector2(), scale)
 func create_menu_show_panels(menu : PopupMenu) -> void:
 	menu.clear()
 	var panels = layout.get_panel_list()
@@ -206,46 +172,14 @@ func get_panel(panel_name : String) -> Control:
 func get_current_project() -> Control:
 	return projects.get_current_tab_control()
 
-
-
-# -----------------------------------------------------------------------
-#                             Help menu
-# -----------------------------------------------------------------------
-
-func bug_report() -> void:
-	OS.shell_open("https://github.com/ywmaa/Photo-Touch/issues")
-
-func about() -> void:
-	var about_box = preload("res://windows/about/about.tscn").instantiate()
-	add_child(about_box)
-	about_box.connect("popup_hide", about_box.queue_free)
-	about_box.popup_centered()
-func quit() -> void:
-	if quitting:
-		return
-	quitting = true
-	var dialog = preload("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
-	dialog.dialog_text = "Quit My Touch?"
-	dialog.add_cancel_button("Cancel")
-	add_child(dialog)
-	if mt_globals.get_config("confirm_quit"):
-		var result = await dialog.ask()
-		if result == "cancel":
-			quitting = false
-			return
-	if mt_globals.get_config("confirm_close_project"):
-		var result = $VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects.check_save_tabs()
-		if !result:
-			quitting = false
-			return
-	dim_window()
-	get_tree().quit()
-	quitting = false
-
-func dim_window() -> void:
-	# Darken the UI to denote that the application is currently exiting
-	# (it won't respond to user input in this state).
-	modulate = Color(0.5, 0.5, 0.5)
+func _exit_tree() -> void:
+	
+	# Save the window position and size to remember it when restarting the application
+	mt_globals.config.set_value("window", "screen", DisplayServer.window_get_current_screen())
+	mt_globals.config.set_value("window", "maximized", DisplayServer.WINDOW_MODE_MAXIMIZED || DisplayServer.WINDOW_MODE_FULLSCREEN)
+	mt_globals.config.set_value("window", "position", DisplayServer.window_get_position())
+	mt_globals.config.set_value("window", "size", DisplayServer.window_get_size())
+	layout.save_config()
 
 
 func _notification(what : int) -> void:
@@ -261,161 +195,119 @@ func _notification(what : int) -> void:
 		DisplayServer.WINDOW_EVENT_CLOSE_REQUEST:
 			await get_tree().idle_frame
 			quit()
-		
+
+# -----------------------------------------------------------------------
+#                             File menu
+# -----------------------------------------------------------------------
+
+func new_project() -> void:
+	var graph_edit = new_graph_panel()
+#	graph_edit.new_canvas()
+	graph_edit.update_tab_title()
+
+func new_graph_panel() -> Panel:
+	var graph_edit = preload("res://panels/graph/graph.tscn").instantiate()
+	projects.add_child(graph_edit)
+	projects.current_tab = graph_edit.get_index()
+	return graph_edit
+
+func close_project() -> void:
+	projects.close_tab()
+
+func quit() -> void:
+	if quitting:
+		return
+	quitting = true
+	if mt_globals.get_config("confirm_quit"):
+		var dialog = preload("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
+		dialog.dialog_text = "Quit My Touch?"
+		dialog.add_cancel_button("Cancel")
+		add_child(dialog)
+		var result = await dialog.ask()
+		if result == "cancel":
+			quitting = false
+			return
+	if mt_globals.get_config("confirm_close_project"):
+		var result = await $VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects.check_save_tabs()
+		if !result:
+			quitting = false
+			return
+	dim_window()
+	get_tree().quit()
+	quitting = false
+
+func dim_window() -> void:
+	# Darken the UI to denote that the application is currently exiting
+	# (it won't respond to user input in this state).
+	modulate = Color(0.5, 0.5, 0.5)
+
+# -----------------------------------------------------------------------
+#                             Edit menu
+# -----------------------------------------------------------------------
+
+func set_app_theme(theme_name : String) -> void:
+	theme = load("res://theme/"+theme_name+".tres")
+
+func _on_SetTheme_id_pressed(id) -> void:
+	var theme_name : String = THEMES[id].to_lower()
+	set_app_theme(theme_name)
+	mt_globals.config.set_value("window", "theme", theme_name)
+
+func create_menu_set_theme(menu) -> void:
+	menu.clear()
+	for t in THEMES:
+		menu.add_item(t)
+	if !menu.is_connected("id_pressed", _on_SetTheme_id_pressed):
+		menu.connect("id_pressed", _on_SetTheme_id_pressed)
+
+func edit_preferences() -> void:
+	var dialog = load("res://windows/preferences/preferences.tscn").instantiate()
+	add_child(dialog)
+	dialog.connect("config_changed", on_config_changed)
+	dialog.edit_preferences(mt_globals.config)
+
+
+# -----------------------------------------------------------------------
+#                             View menu
+# -----------------------------------------------------------------------
+
+func toggle_side_panels() -> void:
+	$VBoxContainer/Layout.toggle_side_panels()
+# -----------------------------------------------------------------------
+#                             Help menu
+# -----------------------------------------------------------------------
+func get_doc_dir() -> String:
+	var base_dir = MTPaths.get_resource_dir().replace("\\", "/")
+	# In release builds, documentation is expected to be located in
+	# a subdirectory of the program directory
+	var release_doc_path = base_dir.plus_file("doc")
+	# In development, documentation is part of the project files.
+	# We can use a globalized `res://` path here as the project isn't exported.
+	var devel_doc_path = ProjectSettings.globalize_path("res://doc/_build/html")
+	for p in [ release_doc_path, devel_doc_path ]:
+		var file = File.new()
+		if file.file_exists(p+"/index.html"):
+			return p
+	return ""
+
+func show_doc() -> void:
+	var doc_dir = get_doc_dir()
+	if doc_dir != "":
+		OS.shell_open(doc_dir+"/index.html")
+
+func bug_report() -> void:
+	OS.shell_open("https://github.com/ywmaa/My-Touch/issues")
+
+func about() -> void:
+	var about_box = preload("res://windows/about/about.tscn").instantiate()
+	add_child(about_box)
+	about_box.connect("popup_hide", about_box.queue_free)
+	about_box.popup_centered()
 
 
 
-#
-#
-#
-#
-#
-#enum tool_mode {none,move_image,rotate_image,scale_image,new}
-#
-#@onready var LayersList : ItemList = get_node("TabContainer/PhotoEditing/LayersList")
-#@onready var ToolsList : ItemList = get_node("TabContainer/PhotoEditing/ToolsList")
-#@onready var Canvas : Control = get_node("TabContainer/PhotoEditing/Canvas")
-#
-#var last_mode : tool_mode = tool_mode.none
-#var current_mode : tool_mode = tool_mode.none:
-#	get: return current_mode
-#	set(new_mode):
-#		last_mode = current_mode
-#		current_mode = new_mode
-#
-#var selected_layer :
-#	get: return selected_layer
-#	set(layer):
-#		selected_layer = layer
-#		if selected_layer:
-#			activate_layer_related_tools(true)
-#		else:
-#			activate_layer_related_tools(false)
-#var layers := []
-#
-#
-#
-#
-#
-## Called every frame. 'delta' is the elapsed time since the previous frame.
-#var previous_mouse_position : Vector2
-#var mouse_position_delta : Vector2
-#@export var smooth_mode : bool = false
-#
-#
-#func _process(delta):
-#	mouse_position_delta = get_global_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
-#	match current_mode:
-#		tool_mode.move_image:
-#			if selected_layer:
-#				selected_layer.position += mouse_position_delta
-#		tool_mode.rotate_image:
-#			if selected_layer:
-#				selected_layer.rotation = selected_layer.global_position.angle_to_point(get_local_mouse_position())
-#		tool_mode.scale_image:
-#			if selected_layer:
-#				selected_layer.scale += mouse_position_delta * delta
-#		tool_mode.new:
-#			add_new_image()
-#
-#	previous_mouse_position = get_global_mouse_position()
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#func _input(event): #handle shortcuts
-#	if event.is_action_pressed("toggle_fullscreen"):
-#		OS.window_fullscreen = !OS.window_fullscreen
-#	if Input.is_action_pressed("undo"):
-#		undo()
-#	if Input.is_action_just_pressed("move"):
-#		select_tool_shortcuts(0)
-#	if Input.is_action_just_pressed("rotate"):
-#		select_tool_shortcuts(1)
-#	if Input.is_action_just_pressed("scale"):
-#		select_tool_shortcuts(2)
-#	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-#		deselect_all_tools()
-#
-#
-#func select_tool_shortcuts(index):
-#	ToolsList.select(index)
-#	_on_tools_list_item_selected(index)
-#
-#func _on_tools_list_item_selected(index): # handle tools list
-#	match index:
-#		0:
-#			if selected_layer:
-#				add_to_undo_history([selected_layer, "position", selected_layer.position])
-#				current_mode = tool_mode.move_image
-#		1:
-#			if selected_layer:
-#				add_to_undo_history([selected_layer, "rotation", selected_layer.rotation])
-#				current_mode = tool_mode.rotate_image
-#		2:
-#			if selected_layer:
-#				add_to_undo_history([selected_layer, "scale", selected_layer.scale])
-#				current_mode = tool_mode.scale_image
-#		3:
-#			current_mode = tool_mode.new
-#
-#func deselect_all_tools():
-#	ToolsList.deselect_all()
-#	current_mode = tool_mode.none
-#
-#func activate_layer_related_tools(state:bool):
-#	ToolsList.set_item_disabled(0,!state) 
-#	ToolsList.set_item_disabled(1,!state) 
-#	ToolsList.set_item_disabled(2,!state) 
-#
-#
-#
-#func add_new_image():
-#	var new_layer : TextureRect = TextureRect.new()
-#	new_layer.texture = load("res://icon.png")
-#	Canvas.add_child(new_layer)
-#	new_layer.position = get_global_mouse_position()
-#	LayersList.add_item(str(new_layer.name))
-#	layers.append(new_layer)
-#	new_layer.connect("mouse_entered",func(): select_layer(layers.find(new_layer)))
-#	deselect_all_tools()
-#
-#func select_layer(index):
-#	LayersList.select(index)
-#	_on_layers_list_multi_selected(index,true)
-#
-#func _on_layers_list_multi_selected(index, selected):
-#	selected_layer = Canvas.get_node(str(LayersList.get_item_text(index)))
-#
-#
-#
-#
-#
-#
-#
-#var undo_history = []
-#@export var undo_limit : int = 32
-#var undo_saved_step : int = 0
-#func add_to_undo_history(data:Array): # syntax : [object,str(property_name),value]
-#	print("history added")
-#	undo_history.append(data)
-#	if undo_history.size() > undo_limit:
-#		undo_history.pop_front()
-#func undo():
-#	if undo_history.size() <= 0:
-#		print("nothing to undo")
-#		return
-#	var tween : Tween = get_tree().create_tween()
-#	tween.tween_property(undo_history.back()[0],undo_history.back()[1],undo_history.back()[2],0.01)
-#	undo_history.pop_back()
-#func redo(): # todo
-#	pass
+
+
 
 
 

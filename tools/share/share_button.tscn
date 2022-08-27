@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture" path="res://tools/share/broken_link.tres" id="1"]
 [ext_resource type="Script" path="res://tools/share/share_button.gd" id="2"]
-[ext_resource type="Texture" uid="uid://tv3xec306ftg" path="res://icons/icons.tres" id="4"]
+[ext_resource type="Texture" path="res://theme/icons/icons.tres" id="4"]
 
 [sub_resource type="AtlasTexture" id=1]
 flags = 4

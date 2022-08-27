@@ -6,11 +6,9 @@ extends Window
 
 const CONTRIBUTORS = [
 	{ name="ywmaa", contribution="Lead developer" },
-	{ name="material maker", contribution="using its open source code" },
 ]
 
 const PATRONS = [
-	"join"
 ]
 
 func _ready() -> void:

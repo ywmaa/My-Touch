@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d4es6j4nr7mi2"
-path="res://.godot/imported/youtube.png-d1e177893d3242d8514834629872c666.ctex"
+path="res://.godot/imported/youtube.png-b5541dce6d851c8eb63974f1f4a5140d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://material_maker/windows/about/youtube.png"
-dest_files=["res://.godot/imported/youtube.png-d1e177893d3242d8514834629872c666.ctex"]
+source_file="res://windows/about/youtube.png"
+dest_files=["res://.godot/imported/youtube.png-b5541dce6d851c8eb63974f1f4a5140d.ctex"]
 
 [params]
 

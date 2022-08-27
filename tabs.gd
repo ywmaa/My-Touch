@@ -8,6 +8,7 @@ var current_tab = -1 :
 		if current_tab >= 0 && current_tab < $Tabs.get_tab_count():
 			node = get_child(current_tab)
 			node.visible = false
+			node.selected_layer = null
 		current_tab = t
 		node = get_child(current_tab)
 		node.visible = true
@@ -40,7 +41,6 @@ func get_tab(i : int) -> Control:
 func check_save_tabs() -> bool:
 	for i in range($Tabs.get_tab_count()):
 		var result = await check_save_tab(i)
-		result = await result.completed
 		if !result:
 			return false
 	return true
@@ -60,12 +60,10 @@ func check_save_tab(tab) -> bool:
 		dialog.add_button("Discard changes", true, "discard")
 		dialog.add_cancel("Cancel")
 		get_parent().add_child(dialog)
-		var result = dialog.ask()
-		result = await result.completed
+		var result = await dialog.ask()
 		match result:
 			"ok":
 				var status = mt_globals.main_window.save_project(tab_control)
-				result = await result.completed
 				if !status:
 					return false
 			"cancel":
@@ -104,9 +102,6 @@ func set_tab_title(index, title) -> void:
 func get_current_tab_control() -> Node:
 	return get_child(current_tab)
 
-func _on_Tabs_tab_changed(tab) -> void:
-	current_tab = tab
-
 func _on_Projects_resized() -> void:
 	$Tabs.get_rect().size.x = get_rect().size.x
 
@@ -136,3 +131,7 @@ func _gui_input(event: InputEvent) -> void:
 			current_tab = wrapi(current_tab - 1, 0, $Tabs.get_tab_count())
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			current_tab = wrapi(current_tab + 1, 0, $Tabs.get_tab_count())
+
+
+func set_current_tab(tab):
+	current_tab = tab

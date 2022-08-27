@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cea7i2k2monoj"
-path="res://.godot/imported/twitter.png-5713ebb508d9818a21de209cd12e11a4.ctex"
+path="res://.godot/imported/twitter.png-82cf785faf944844c7b58349859a702b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://material_maker/windows/about/twitter.png"
-dest_files=["res://.godot/imported/twitter.png-5713ebb508d9818a21de209cd12e11a4.ctex"]
+source_file="res://windows/about/twitter.png"
+dest_files=["res://.godot/imported/twitter.png-82cf785faf944844c7b58349859a702b.ctex"]
 
 [params]
 

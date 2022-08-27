@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://cgn15fwtbn2yw"]
+
+[ext_resource type="Script" path="res://panels/tools/tools_panel.gd" id="1_bwlv0"]
+
+[node name="Tools" type="VBoxContainer"]
+script = ExtResource("1_bwlv0")
+
+[node name="Tree" type="Tree" parent="."]
+clip_contents = false
+custom_minimum_size = Vector2(70, 0)
+offset_right = 70.0
+size_flags_vertical = 3
+allow_reselect = true
+
+[connection signal="item_activated" from="Tree" to="." method="_on_tree_item_activated"]
+[connection signal="item_double_clicked" from="Tree" to="." method="_on_tree_item_double_clicked"]

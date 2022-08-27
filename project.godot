@@ -13,9 +13,15 @@ _global_script_classes=[{
 "class": &"MMNodeLink",
 "language": &"GDScript",
 "path": "res://widgets/linked_widgets/link.gd"
+}, {
+"base": "RefCounted",
+"class": &"MTPaths",
+"language": &"GDScript",
+"path": "res://paths.gd"
 }]
 _global_script_class_icons={
-"MMNodeLink": ""
+"MMNodeLink": "",
+"MTPaths": ""
 }
 
 [application]

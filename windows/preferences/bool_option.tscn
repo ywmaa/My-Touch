@@ -1,13 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=2 format=3 uid="uid://blsyon6gx5t0d"]
 
 [ext_resource type="Script" path="res://windows/preferences/bool_option.gd" id="1"]
 
 [node name="BooleanOption" type="CheckBox"]
-margin_right = 308.0
-margin_bottom = 24.0
 text = "Confirm when quitting the application"
 flat = true
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+script = ExtResource("1")

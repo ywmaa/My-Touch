@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://widgets/port_group_button/port_group_button.gd" id="1"]
-[ext_resource type="Texture" path="res://icons/port_group_0.tres" id="2"]
+[ext_resource type="Texture" path="res://theme/icons/port_group_0.tres" id="2"]
 
 [node name="PortGroupButton" type="TextureButton" groups=["port_group_button"]]
 margin_right = 16.0

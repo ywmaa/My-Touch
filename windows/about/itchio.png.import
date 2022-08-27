@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cp12dubxif6qc"
-path="res://.godot/imported/itchio.png-0674b77fd8530e8c1a87c77c0fb16f47.ctex"
+path="res://.godot/imported/itchio.png-d964fd8c8fb604df0750508d3cb84382.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://material_maker/windows/about/itchio.png"
-dest_files=["res://.godot/imported/itchio.png-0674b77fd8530e8c1a87c77c0fb16f47.ctex"]
+source_file="res://windows/about/itchio.png"
+dest_files=["res://.godot/imported/itchio.png-d964fd8c8fb604df0750508d3cb84382.ctex"]
 
 [params]
 

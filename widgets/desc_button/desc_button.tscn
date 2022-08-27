@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3]
 
-[ext_resource type="Texture" uid="uid://tv3xec306ftg" path="res://icons/icons.tres" id="1"]
+[ext_resource type="Texture" path="res://theme/icons/icons.tres" id="1"]
 [ext_resource type="Script" path="res://widgets/desc_button/desc_button.gd" id="2"]
 
 [sub_resource type="AtlasTexture" id=1]

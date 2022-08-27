@@ -7,7 +7,7 @@ const PANEL_POSITIONS = {
 	BottomRight="SplitRight/Right/Bottom"
 }
 const PANELS = [
-	{ name="Hierarchy", scene=preload("res://panels/hierarchy/hierarchy_panel.tscn"), position="TopRight" },
+	{ name="Tools", scene=preload("res://panels/tools/tools_panel.tscn"), position="TopLeft" },
 #	{ name="Reference", scene=preload("res://panels/reference/reference_panel.tscn"), position="BottomLeft" },
 	{ name="Layers", scene=preload("res://panels/layers/layers.tscn"), position="BottomRight" },
 ]
@@ -17,7 +17,7 @@ const HIDE_PANELS = {
 
 var panels = {}
 var previous_width : float
-var current_mode : String = "photo editing"
+var current_mode : String = "photo_editing"
 
 func _ready() -> void:
 	previous_width = get_rect().size.x
