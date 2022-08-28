@@ -99,7 +99,9 @@ func move_active_tab_to(idx_to) -> void:
 func set_tab_title(index, title) -> void:
 	$Tabs.set_tab_title(index, title)
 
-func get_current_tab_control() -> Node:
+func get_current_tab_control():
+	if get_child_count() < 2:
+		return null
 	return get_child(current_tab)
 
 func _on_Projects_resized() -> void:

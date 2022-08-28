@@ -117,6 +117,10 @@ func _ready() -> void:
 #
 #	get_tree().connect("files_dropped", self, "on_files_dropped")
 #
+
+func _enter_tree() -> void:
+	mt_globals.main_window = self
+	
 func on_config_changed() -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if mt_globals.get_config("vsync") else DisplayServer.VSYNC_DISABLED)
 	# Convert FPS to microseconds per frame.
@@ -152,9 +156,14 @@ func _on_ShowPanels_id_pressed(id) -> void:
 func get_panel(panel_name : String) -> Control:
 	return layout.get_panel(panel_name)
 
-func get_current_project() -> Control:
+func get_current_project():
 	return projects.get_current_tab_control()
-
+	
+func get_current_graph_edit() -> MTGraph:
+	var graph_edit = projects.get_current_tab_control()
+	if graph_edit != null and graph_edit.has_method("get_graph_edit"):
+		return graph_edit.get_graph_edit()
+	return null
 
 func _notification(what : int) -> void:
 	match what:
@@ -179,7 +188,7 @@ func new_project() -> void:
 #	graph_edit.new_canvas()
 	graph_edit.update_tab_title()
 
-func new_graph_panel() -> Panel:
+func new_graph_panel():
 	var graph_edit = preload("res://panels/graph/graph.tscn").instantiate()
 	projects.add_child(graph_edit)
 	projects.current_tab = graph_edit.get_index()
@@ -272,6 +281,9 @@ func edit_preferences() -> void:
 # -----------------------------------------------------------------------
 #                             View menu
 # -----------------------------------------------------------------------
+func view_center() -> void:
+	var graph_edit : MTGraph = get_current_graph_edit()
+	graph_edit.center_view()
 
 func toggle_side_panels() -> void:
 	$VBoxContainer/Layout.toggle_side_panels()

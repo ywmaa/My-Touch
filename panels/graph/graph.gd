@@ -1,5 +1,5 @@
-extends Panel
-
+extends ScrollContainer
+class_name MTGraph
 enum tool_mode {none,move_image,rotate_image,scale_image}
 enum coordinates {xy,x,y}
 
@@ -33,30 +33,32 @@ var save_path = null :
 var need_save : bool = false
 var need_save_crash_recovery : bool = false
 
-@onready var undoredo = $UndoRedo
-var undoredo_move_node_selection_changed : bool = true
 
 signal save_path_changed
 signal graph_changed
+signal new_layer_added(layer)
 signal activate_layer_related_tools(state:bool)
 
-# Called when the node enters the scene tree for the first time.
+
+func add_new_layer(new_layer):
+	get_node("Canvas").add_child(new_layer)
+	layers.append(new_layer)
+	emit_signal("new_layer_added",new_layer)
+	mt_globals.main_window.get_panel("Layers").set_layers(layers,selected_layer)
+	mt_globals.main_window.get_panel("Layers").tree.connect("selection_changed",selection_changed)
+	# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	
+	
 	OS.low_processor_usage_mode = true
 	
 	#default layer
 	var new_layer : TextureRect = TextureRect.new()
 	new_layer.texture = default_icon
-
-	add_child(new_layer)
-#	new_layer.position = get_global_mouse_position()
-	print(new_layer)
-	layers.append(new_layer)
 	
-	new_layer.connect("mouse_entered", select_layer.bind(new_layer))
-#	center_view()
+	add_new_layer(new_layer)
 
-#	hierarchy.update_from_graph_edit(get_current_graph_edit())
+	center_view()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -64,9 +66,16 @@ var previous_mouse_position : Vector2
 var mouse_position_delta : Vector2
 @export var smooth_mode : bool = false
 
+func is_inside_panel(rect):
+	return get_rect().encloses(rect)
+
 
 func _process(delta):
 	
+	if Input.is_action_just_pressed("mouse_left"):
+		for child in get_node("Canvas").get_children():
+			if child.get_global_rect().has_point(get_global_mouse_position()):
+				select_layer(child)
 	#handle shortcuts
 	if Input.is_action_just_pressed("move"):
 		tool_shortcut(tool_mode.move_image)
@@ -87,10 +96,12 @@ func _process(delta):
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		current_mode = tool_mode.none
 		direction = coordinates.xy
-	
-	
-	
+
 	mouse_position_delta = get_global_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
+	if current_mode == tool_mode.none:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	match current_mode:
 		tool_mode.move_image:
 			if selected_layer:
@@ -167,11 +178,12 @@ func new_project() -> void:
 #	deselect_all_tools()
 #
 func select_layer(layer):
-	selected_layer = layer
-	print(selected_layer)
+		selected_layer = layer
+		mt_globals.main_window.get_panel("Layers").set_layers(layers,selected_layer)
 
-#func _on_layers_list_multi_selected(index, selected):
-#	selected_layer = Canvas.get_node(str(LayersList.get_item_text(index)))
+func selection_changed(old_selected, new_selected: TreeItem):
+	print(new_selected.get_text(0))
+	selected_layer = get_node("Canvas").get_node(new_selected.get_text(0))
 
 var undo_history = []
 var redo_history = []
@@ -353,10 +365,11 @@ func remove_crash_recovery_file() -> void:
 func center_view() -> void:
 	var center = Vector2(0, 0)
 	var layers_count = 0
-	for c in get_children():
+	for c in get_node("Canvas").get_children():
 		if c:
-			center += c.offset + 0.5*c.rect_size
+			center += c.position + 0.5*c.get_rect().size
 			layers_count += 1
 	if layers_count > 0:
 		center /= layers_count
-#		scroll_offset = center - 0.5*rect_size
+		scroll_horizontal = (center - 0.5*get_rect().size).x
+		scroll_vertical = (center - 0.5*get_rect().size).y

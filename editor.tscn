@@ -131,22 +131,27 @@ offset_bottom = 679.0
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 6.5
 
+[node name="CrashRecoveryTimer" type="Timer" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel"]
+wait_time = 15.0
+autostart = true
+
 [node name="Projects" type="Panel" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel"]
 custom_minimum_size = Vector2(986, 684)
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 6.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("4_ejxk4")
+metadata/_edit_layout_mode = 1
 
 [node name="Tabs" type="TabBar" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects"]
 custom_minimum_size = Vector2(950, 24)
-offset_right = 40.0
+offset_right = 950.0
 offset_bottom = 40.0
 tab_close_display_policy = 1
 drag_to_rearrange_enabled = true
-
-[node name="CrashRecoveryTimer" type="Timer" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects"]
-wait_time = 15.0
-autostart = true
 
 [node name="Right" type="VSplitContainer" parent="VBoxContainer/Layout/SplitRight"]
 custom_minimum_size = Vector2(147, 349)

@@ -4,24 +4,24 @@ var layers = null
 var selected_item : TreeItem = null
 var just_selected : bool = false
 
-const ICON_LAYER_PAINT = preload("res://material_maker/panels/layers/icons/layer_paint.tres")
-const ICON_LAYER_PROC = preload("res://material_maker/panels/layers/icons/layer_proc.tres")
-const ICON_LAYER_MASK = preload("res://material_maker/panels/layers/icons/layer_mask.tres")
+const ICON_LAYER_PAINT = preload("res://panels/layers/icons/layer_paint.tres")
+const ICON_LAYER_PROC = preload("res://panels/layers/icons/layer_proc.tres")
+const ICON_LAYER_MASK = preload("res://panels/layers/icons/layer_mask.tres")
 const ICONS = [ ICON_LAYER_PAINT, ICON_LAYER_PROC, ICON_LAYER_MASK ]
 
-const BUTTON_SHOWN = preload("res://material_maker/panels/layers/icons/visible.tres")
-const BUTTON_HIDDEN = preload("res://material_maker/panels/layers/icons/not_visible.tres")
+const BUTTON_SHOWN = preload("res://panels/layers/icons/visible.tres")
+const BUTTON_HIDDEN = preload("res://panels/layers/icons/not_visible.tres")
 
 signal selection_changed(old_selected, new_selected)
 
 func _ready():
 	set_column_expand(1, false)
-	set_column_min_width(1, 30)
+	set_column_custom_minimum_width(1, 30)
 
 func _make_custom_tooltip(for_text):
 	if for_text == "":
 		return null
-	var panel = preload("res://material_maker/panels/layers/layer_tooltip.tscn").instance()
+	var panel = preload("res://panels/layers/layer_tooltip.tscn").instance()
 	var item : TreeItem = instance_from_id(int(for_text)) as TreeItem
 	panel.set_layer(item.get_meta("layer"))
 	return panel
@@ -35,15 +35,14 @@ func do_update_from_layers(layers_array : Array, item : TreeItem, selected_layer
 	for l in layers_array:
 		var new_item = create_item(item)
 		new_item.set_text(0, l.name)
-		new_item.set_icon(0, ICONS[l.get_layer_type()])
-		new_item.add_button(1, BUTTON_HIDDEN if l.hidden else BUTTON_SHOWN, 0)
-		new_item.set_editable(0, false)
-		new_item.set_meta("layer", l)
-		new_item.set_tooltip(0, str(new_item.get_instance_id()))
+#		new_item.set_icon(0, ICONS[l.get_layer_type()])
+#		new_item.add_button(1, BUTTON_HIDDEN if l.hidden else BUTTON_SHOWN, 0)
+#		new_item.set_editable(0, false)
+#		new_item.set_meta("layer", l)
+#		new_item.set_tooltip(0, str(new_item.get_instance_id()))
 		if l == selected_layer:
 			new_item.select(0)
 			selected_item = new_item
-		do_update_from_layers(l.layers, new_item, selected_layer)
 
 func get_drag_data(_position : Vector2):
 	var layer = get_selected().get_meta("layer")
@@ -105,7 +104,7 @@ func _on_Tree_cell_selected():
 		emit_signal("selection_changed", selected_item, get_selected())
 
 func _on_Tree_gui_input(event):
-	if event is InputEventMouseButton and event.button_index == BUTTON_LEFT and !event.pressed and selected_item != null and just_selected:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !event.pressed and selected_item != null and just_selected:
 		selected_item.set_editable(0, true)
 		just_selected = false
 
