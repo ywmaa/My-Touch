@@ -3,6 +3,7 @@ class_name MTGraph
 enum tool_mode {none,move_image,rotate_image,scale_image}
 enum coordinates {xy,x,y}
 
+@onready var canvas = get_node("SubViewportContainer/Canvas")
 var direction : coordinates = coordinates.xy
 	
 var last_mode : tool_mode = tool_mode.none
@@ -41,7 +42,7 @@ signal activate_layer_related_tools(state:bool)
 
 
 func add_new_layer(new_layer):
-	get_node("Canvas").add_child(new_layer)
+	canvas.add_child(new_layer)
 	layers.append(new_layer)
 	emit_signal("new_layer_added",new_layer)
 	mt_globals.main_window.get_panel("Layers").set_layers(layers,selected_layer)
@@ -73,7 +74,11 @@ func is_inside_panel(rect):
 func _process(delta):
 	
 	if Input.is_action_just_pressed("mouse_left"):
-		for child in get_node("Canvas").get_children():
+		for child in canvas.get_children():
+			if child is Camera2D:
+				continue
+			
+			print(child.get_global_transform_with_canvas())
 			if child.get_global_rect().has_point(get_global_mouse_position()):
 				select_layer(child)
 	#handle shortcuts
@@ -183,7 +188,7 @@ func select_layer(layer):
 
 func selection_changed(old_selected, new_selected: TreeItem):
 	print(new_selected.get_text(0))
-	selected_layer = get_node("Canvas").get_node(new_selected.get_text(0))
+	selected_layer = canvas.get_node(new_selected.get_text(0))
 
 var undo_history = []
 var redo_history = []
@@ -365,7 +370,9 @@ func remove_crash_recovery_file() -> void:
 func center_view() -> void:
 	var center = Vector2(0, 0)
 	var layers_count = 0
-	for c in get_node("Canvas").get_children():
+	for c in canvas.get_children():
+		if c is Camera2D:
+			continue
 		if c:
 			center += c.position + 0.5*c.get_rect().size
 			layers_count += 1

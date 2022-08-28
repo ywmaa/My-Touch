@@ -23,6 +23,7 @@ const IDLE_FPS_LIMIT_MAX = 100
 const RECENT_FILES_COUNT = 15
 
 const THEMES = [ "Dark", "Blue", "Light" ]
+const EXPORT_TYPES = [ "png", "jpeg"]
 
 const MENU = [
 	{ menu="File/New Canvas", command="new_project", shortcut="Control+N" },
@@ -193,6 +194,57 @@ func new_graph_panel():
 	projects.add_child(graph_edit)
 	projects.current_tab = graph_edit.get_index()
 	return graph_edit
+func create_menu_export(menu : PopupMenu):
+	menu.clear()
+	for E in EXPORT_TYPES:
+		menu.add_item(E)
+	if !menu.is_connected("id_pressed", _on_export_id_pressed):
+		menu.connect("id_pressed", _on_export_id_pressed)
+func _on_export_id_pressed(id) -> void:
+	var export_name : String = EXPORT_TYPES[id].to_lower()
+	match export_name:
+		"png":
+			export_png_image()
+		"jpeg":
+			export_jpeg_image()
+func export_png_image():
+	# Prompt for a target PNG file
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	add_child(dialog)
+	dialog.min_size = Vector2(500, 500)
+	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+	dialog.add_filter("*.png;PNG image file")
+	var files = await dialog.select_files()
+	if files.size() != 1:
+		return
+	# Generate the image
+	var graph_edit : MTGraph = get_current_graph_edit()
+	graph_edit.canvas.transparent_bg = true
+	await get_tree().create_timer(0.1).timeout
+	await get_tree().process_frame
+	var image : Image = Image.new()
+	image = graph_edit.canvas.get_texture().get_image()
+	image.save_png(files[0])
+	graph_edit.canvas.transparent_bg = false
+	
+func export_jpeg_image():
+	# Prompt for a target PNG file
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	add_child(dialog)
+	dialog.min_size = Vector2(500, 500)
+	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+	dialog.add_filter("*.jpeg;JPEG image file")
+	var files = await dialog.select_files()
+	if files.size() != 1:
+		return
+	# Generate the image
+	var graph_edit : MTGraph = get_current_graph_edit()
+	await get_tree().process_frame
+	var image : Image = Image.new()
+	image = graph_edit.canvas.get_texture().get_image()
+	image.save_png(files[0])
 
 func close_project() -> void:
 	projects.close_tab()

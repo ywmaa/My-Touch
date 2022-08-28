@@ -7,18 +7,20 @@ signal open_directory(dirpath)
 
 func _ready():
 	if mt_globals.config.has_section_key("file_dialog", "recents"):
-		var parse_result = JSON.new().parse(mt_globals.config.get_value("file_dialog", "recents"))
+		var json = JSON.new()
+		var parse_result = json.parse(mt_globals.config.get_value("file_dialog", "recents"))
 		if parse_result != null:
-			recents = parse_result.result
+			recents = json.get_data()
 	if mt_globals.config.has_section_key("file_dialog", "favorites"):
-		var parse_result = JSON.new().parse(mt_globals.config.get_value("file_dialog", "favorites"))
+		var json = JSON.new()
+		var parse_result = json.parse(mt_globals.config.get_value("file_dialog", "favorites"))
 		if parse_result != null:
-			favorites = parse_result.result
+			favorites = json.get_data()
 	update_lists()
 
 func _exit_tree():
-	mt_globals.config.set_value("file_dialog", "recents", JSON.new().print(recents))
-	mt_globals.config.set_value("file_dialog", "favorites", JSON.new().print(favorites))
+	mt_globals.config.set_value("file_dialog", "recents", JSON.new().stringify(recents))
+	mt_globals.config.set_value("file_dialog", "favorites", JSON.new().stringify(favorites))
 
 func add_recent(file_path : String):
 	if recents.find(file_path) != -1:
