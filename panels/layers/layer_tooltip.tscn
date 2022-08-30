@@ -1,34 +1,31 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=2 format=3 uid="uid://bhh3s3lu1c547"]
 
-[ext_resource path="res://material_maker/panels/layers/layer_tooltip.gd" type="Script" id=1]
+[sub_resource type="GDScript" id="GDScript_55rgs"]
+script/source = "extends PanelContainer
+
+func set_layer(l) -> void:
+	$VBoxContainer/LayerName.text = l.name
+	var thumbnail_scene = preload(\"res://panels/layers/layer_tooltip_thumbnail.tscn\")
+	var t = thumbnail_scene.instantiate()
+	t.init(l)
+	$VBoxContainer/Thumbnails.add_child(t)
+"
 
 [node name="LayerTooltip" type="PanelContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_right = -1176.0
-margin_bottom = -679.0
-rect_min_size = Vector2( 104, 41 )
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+script = SubResource("GDScript_55rgs")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-margin_left = 7.0
-margin_top = 7.0
-margin_right = 97.0
-margin_bottom = 34.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
+offset_right = 1280.0
+offset_bottom = 720.0
 
 [node name="LayerName" type="Label" parent="VBoxContainer"]
-margin_right = 90.0
-margin_bottom = 14.0
+offset_right = 1280.0
+offset_bottom = 26.0
 text = "Layer name"
-align = 1
 
 [node name="Thumbnails" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 18.0
-margin_right = 90.0
-margin_bottom = 18.0
+offset_top = 30.0
+offset_right = 1280.0
+offset_bottom = 30.0

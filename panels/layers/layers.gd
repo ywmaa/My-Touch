@@ -5,14 +5,17 @@ var layers
 
 @onready var tree = $Tree
 
-
-func set_layers(layers,selected_layer) -> void:
+func _process(delta):
+	set_layers(mt_globals.main_window.get_current_graph_edit().layers)
+func set_layers(layers) -> void:
 	layers = layers
 	tree.layers = layers
-	tree.update_from_layers(layers, selected_layer)
+	tree.update_from_layers(layers.layers, layers.selected_layers)
 
-func _on_Tree_selection_changed(_old_selected : TreeItem, new_selected : TreeItem) -> void:
-	layers.select_layer(new_selected.get_meta("layer"))
+func _on_Tree_selection_changed(new_selected) -> void:
+	layers.selected_layers.clear()
+	for item in new_selected:
+		layers.select_layer(item.get_meta("layer"))
 
 func _on_Add_pressed():
 	var menu = preload("res://panels/layers/add_layer_menu.tscn").instantiate()
@@ -31,7 +34,6 @@ func _on_Duplicate_pressed():
 	var current = tree.get_selected()
 	if current != null:
 		layers.duplicate_layer(current.get_meta("layer"))
-	layers.get_parent().initialize_layers_history()
 
 func _on_Remove_pressed():
 	var current = tree.get_selected()

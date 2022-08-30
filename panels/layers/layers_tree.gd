@@ -1,7 +1,7 @@
 extends Tree
 
 var layers = null
-var selected_item : TreeItem = null
+var selected_items : Array[TreeItem]
 var just_selected : bool = false
 
 const ICON_LAYER_PAINT = preload("res://panels/layers/icons/layer_paint.tres")
@@ -12,7 +12,7 @@ const ICONS = [ ICON_LAYER_PAINT, ICON_LAYER_PROC, ICON_LAYER_MASK ]
 const BUTTON_SHOWN = preload("res://panels/layers/icons/visible.tres")
 const BUTTON_HIDDEN = preload("res://panels/layers/icons/not_visible.tres")
 
-signal selection_changed(old_selected, new_selected)
+signal selection_changed(new_selected)
 
 func _ready():
 	set_column_expand(1, false)
@@ -21,33 +21,33 @@ func _ready():
 func _make_custom_tooltip(for_text):
 	if for_text == "":
 		return null
-	var panel = preload("res://panels/layers/layer_tooltip.tscn").instance()
-	var item : TreeItem = instance_from_id(int(for_text)) as TreeItem
+	var panel = preload("res://panels/layers/layer_tooltip.tscn").instantiate()
+	var item : TreeItem = instance_from_id(for_text.to_int()) as TreeItem
 	panel.set_layer(item.get_meta("layer"))
 	return panel
 
-func update_from_layers(layers_array : Array, selected_layer) -> void:
-	selected_item = null
+func update_from_layers(layers_array : Array, selected_layers) -> void:
+	selected_items.clear()
 	clear()
-	do_update_from_layers(layers_array, create_item(), selected_layer)
+	do_update_from_layers(layers_array, create_item(), selected_layers)
 
-func do_update_from_layers(layers_array : Array, item : TreeItem, selected_layer) -> void:
+func do_update_from_layers(layers_array : Array, item : TreeItem, selected_layers) -> void:
 	for l in layers_array:
-		var new_item = create_item(item)
+		var new_item = create_item()
 		new_item.set_text(0, l.name)
-#		new_item.set_icon(0, ICONS[l.get_layer_type()])
-#		new_item.add_button(1, BUTTON_HIDDEN if l.hidden else BUTTON_SHOWN, 0)
-#		new_item.set_editable(0, false)
-#		new_item.set_meta("layer", l)
-#		new_item.set_tooltip(0, str(new_item.get_instance_id()))
-		if l == selected_layer:
+		new_item.set_icon(0, ICONS[l.type])
+		new_item.add_button(1, BUTTON_HIDDEN if l.hidden else BUTTON_SHOWN)
+#		new_item.set_editable(0, true)
+		new_item.set_meta("layer", l)
+		new_item.set_tooltip(0, str(new_item.get_instance_id()))
+		if l in selected_layers:
 			new_item.select(0)
-			selected_item = new_item
+			selected_items.append(new_item)
 
 func get_drag_data(_position : Vector2):
-	var layer = get_selected().get_meta("layer")
+	var l = get_selected().get_meta("layer")
 	var label : Label = Label.new()
-	label.text = layer.name
+	label.text = l.name
 	set_drag_preview(label)
 	return get_selected()
 
@@ -91,25 +91,45 @@ func drop_data(position : Vector2, data):
 					print("Cannot move item")
 		_on_layers_changed()
 
-func _on_Tree_button_pressed(item : TreeItem, _column : int, _id : int):
-	var layer = item.get_meta("layer")
-	layer.hidden = !layer.hidden
+func _on_tree_button_clicked(item, column, id, mouse_button_index):
+	var l = item.get_meta("layer")
+	l.hidden = !l.hidden
 	_on_layers_changed()
 
-func _on_Tree_cell_selected():
-	just_selected = true
-	if selected_item != null:
-		selected_item.set_editable(0, false)
-	if selected_item != get_selected():
-		emit_signal("selection_changed", selected_item, get_selected())
-
-func _on_Tree_gui_input(event):
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and !event.pressed and selected_item != null and just_selected:
-		selected_item.set_editable(0, true)
-		just_selected = false
+#func _on_Tree_gui_input(event):
+#	if event is InputEventMouseButton and event.double_click == true:
+#		for selected_item in selected_items:
+#			selected_item.set_editable(0, true)
+#		just_selected = false
 
 func _on_Tree_item_edited():
-	selected_item.get_meta("layer").name = selected_item.get_text(0)
+	for selected_item in selected_items:
+		selected_item.get_meta("layer").name = selected_item.get_text(0)
 
 func _on_layers_changed():
 	layers._on_layers_changed()
+
+
+
+func _on_tree_nothing_selected():
+	selected_items = []
+	emit_signal("selection_changed", selected_items)
+
+
+func _on_tree_multi_selected(item, column, selected):
+	
+	if selected:
+		if !selected_items.has(item):
+			selected_items.append(item)
+	else:
+		selected_items.erase(item)
+#	if !selected_items.is_empty():
+#		for selected_item in selected_items:
+#			selected_item.set_editable(0, true)
+	emit_signal("selection_changed", selected_items)
+
+
+
+
+
+

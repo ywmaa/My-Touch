@@ -3,7 +3,8 @@ class_name MTGraph
 enum tool_mode {none,move_image,rotate_image,scale_image}
 enum coordinates {xy,x,y}
 
-@onready var canvas = get_node("SubViewportContainer/Canvas")
+
+@onready var canvas : SubViewport = get_node("SubViewportContainer/Canvas")
 var direction : coordinates = coordinates.xy
 	
 var last_mode : tool_mode = tool_mode.none
@@ -13,15 +14,8 @@ var current_mode : tool_mode = tool_mode.none:
 		last_mode = current_mode
 		current_mode = new_mode
 
-var selected_layer :
-	get: return selected_layer
-	set(layer):
-		selected_layer = layer
-		if selected_layer:
-			emit_signal("activate_layer_related_tools",true)
-		else:
-			emit_signal("activate_layer_related_tools",false)
-var layers := []
+
+var layers : layers_object = layers_object.new()
 var default_icon = preload("res://icon.png")
 var save_path = null : 
 	set(path):
@@ -37,28 +31,24 @@ var need_save_crash_recovery : bool = false
 
 signal save_path_changed
 signal graph_changed
-signal new_layer_added(layer)
+
 signal activate_layer_related_tools(state:bool)
 
 
-func add_new_layer(new_layer):
-	canvas.add_child(new_layer)
-	layers.append(new_layer)
-	emit_signal("new_layer_added",new_layer)
-	mt_globals.main_window.get_panel("Layers").set_layers(layers,selected_layer)
-	mt_globals.main_window.get_panel("Layers").tree.connect("selection_changed",selection_changed)
+func set_current():
+	mt_globals.main_window.get_panel("Layers").set_layers(layers)
 	# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	
+	layers.canvas = canvas
 	
 	OS.low_processor_usage_mode = true
 	
 	#default layer
-	var new_layer : TextureRect = TextureRect.new()
-	new_layer.texture = default_icon
-	
-	add_new_layer(new_layer)
-
+	var new_layer : base_layer = base_layer.new()
+	new_layer.image.texture = default_icon
+	new_layer.name = "new_layer"
+	new_layer.type = base_layer.layer_type.image
+	layers.add_layer(new_layer)
 	center_view()
 
 
@@ -67,20 +57,29 @@ var previous_mouse_position : Vector2
 var mouse_position_delta : Vector2
 @export var smooth_mode : bool = false
 
-func is_inside_panel(rect):
-	return get_rect().encloses(rect)
-
 
 func _process(delta):
-	
+
+	if Input.is_action_pressed("ui_up"):
+		canvas.get_camera_2d().position.y += -1.0
+	if Input.is_action_pressed("ui_down"):
+		canvas.get_camera_2d().position.y += 1.0
+	if Input.is_action_pressed("ui_left"):
+		canvas.get_camera_2d().position.x += -1.0
+	if Input.is_action_pressed("ui_right"):
+		canvas.get_camera_2d().position.x += 1.0
+	#zoom
+	if Input.is_action_pressed("ui_text_scroll_up"):
+		canvas.get_camera_2d().zoom += Vector2(0.1,0.1)
+	if Input.is_action_pressed("ui_text_scroll_down"):
+		canvas.get_camera_2d().zoom -= Vector2(0.1,0.1)
 	if Input.is_action_just_pressed("mouse_left"):
 		for child in canvas.get_children():
 			if child is Camera2D:
 				continue
-			
-			print(child.get_global_transform_with_canvas())
-			if child.get_global_rect().has_point(get_global_mouse_position()):
-				select_layer(child)
+			if child.get_rect().has_point(canvas.get_mouse_position()):
+#				print(child)
+				layers.select_layer_name(child.name)
 	#handle shortcuts
 	if Input.is_action_just_pressed("move"):
 		tool_shortcut(tool_mode.move_image)
@@ -101,7 +100,11 @@ func _process(delta):
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		current_mode = tool_mode.none
 		direction = coordinates.xy
-
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		if current_mode != tool_mode.none:
+			current_mode = tool_mode.none
+			direction = coordinates.xy
+			undo()
 	mouse_position_delta = get_global_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
 	if current_mode == tool_mode.none:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -109,26 +112,29 @@ func _process(delta):
 		Input.mouse_mode = Input.MOUSE_MODE_CONFINED
 	match current_mode:
 		tool_mode.move_image:
-			if selected_layer:
-				match direction:
-					coordinates.xy:
-						selected_layer.position += mouse_position_delta
-					coordinates.x:
-						selected_layer.position.x += mouse_position_delta.x
-					coordinates.y:
-						selected_layer.position.y += mouse_position_delta.y
+			if layers.selected_layers:
+				for selected in layers.selected_layers:
+					match direction:
+						coordinates.xy:
+							selected.image.position += mouse_position_delta
+						coordinates.x:
+							selected.image.position.x += mouse_position_delta.x
+						coordinates.y:
+							selected.image.position.y += mouse_position_delta.y
 		tool_mode.rotate_image:
-			if selected_layer:
-				selected_layer.rotation = selected_layer.global_position.angle_to_point(get_local_mouse_position())
+			if layers.selected_layers:
+				for selected in layers.selected_layers:
+					selected.image.rotation = selected.image.global_position.angle_to_point(get_local_mouse_position())
 		tool_mode.scale_image:
-			if selected_layer:
-				match direction:
-					coordinates.xy:
-						selected_layer.scale += mouse_position_delta * delta
-					coordinates.x:
-						selected_layer.scale.x += mouse_position_delta.x * delta
-					coordinates.y:
-						selected_layer.scale.y += mouse_position_delta.y * delta
+			if layers.selected_layers:
+				for selected in layers.selected_layers:
+					match direction:
+						coordinates.xy:
+							selected.image.scale += mouse_position_delta * delta
+						coordinates.x:
+							selected.image.scale.x += mouse_position_delta.x * delta
+						coordinates.y:
+							selected.image.scale.y += mouse_position_delta.y * delta
 
 	previous_mouse_position = get_global_mouse_position()
 
@@ -143,16 +149,19 @@ func _input(event):
 func tool_shortcut(index): # handle tools list
 	match index:
 		tool_mode.move_image:
-			if selected_layer:
-				add_to_undo_history([selected_layer, "position", selected_layer.position])
+			if layers.selected_layers:
+				for selected in layers.selected_layers:
+					add_to_undo_history([selected.image, "position", selected.image.position])
 				current_mode = tool_mode.move_image
 		tool_mode.rotate_image:
-			if selected_layer:
-				add_to_undo_history([selected_layer, "rotation", selected_layer.rotation])
+			if layers.selected_layers:
+				for selected in layers.selected_layers:
+					add_to_undo_history([selected.image, "rotation", selected.image.rotation])
 				current_mode = tool_mode.rotate_image
 		tool_mode.scale_image:
-			if selected_layer:
-				add_to_undo_history([selected_layer, "scale", selected_layer.scale])
+			if layers.selected_layers:
+				for selected in layers.selected_layers:
+					add_to_undo_history([selected.image, "scale", selected.image.scale])
 				current_mode = tool_mode.scale_image
 func new_project() -> void:
 	center_view()
@@ -171,24 +180,8 @@ func new_project() -> void:
 
 
 
-#func add_new_image():
-#	var new_layer : TextureRect = TextureRect.new()
-#	new_layer.texture = load("res://icon.png")
-#	Canvas.add_child(new_layer)
-#	new_layer.position = get_global_mouse_position()
-#	if LayersList:
-#		LayersList.add_item(str(new_layer.name))
-#	layers.append(new_layer)
-#	new_layer.connect("mouse_entered",func(): select_layer(layers.find(new_layer)))
-#	deselect_all_tools()
-#
-func select_layer(layer):
-		selected_layer = layer
-		mt_globals.main_window.get_panel("Layers").set_layers(layers,selected_layer)
 
-func selection_changed(old_selected, new_selected: TreeItem):
-	print(new_selected.get_text(0))
-	selected_layer = canvas.get_node(new_selected.get_text(0))
+	
 
 var undo_history = []
 var redo_history = []

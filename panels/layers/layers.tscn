@@ -32,7 +32,7 @@ region = Rect2(0, 0, 16, 16)
 script = ExtResource("1_wunpw")
 
 [node name="Buttons" type="HBoxContainer" parent="."]
-offset_right = 96.0
+offset_right = 76.0
 offset_bottom = 16.0
 size_flags_horizontal = 3
 
@@ -76,6 +76,7 @@ texture_normal = SubResource("5")
 stretch_mode = 3
 
 [node name="Config" type="TextureButton" parent="Buttons"]
+visible = false
 offset_left = 80.0
 offset_right = 96.0
 offset_bottom = 16.0
@@ -85,13 +86,16 @@ stretch_mode = 3
 
 [node name="Tree" type="Tree" parent="."]
 offset_top = 20.0
-offset_right = 96.0
+offset_right = 76.0
 offset_bottom = 20.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 focus_mode = 0
 columns = 2
+allow_reselect = true
+hide_folding = true
 hide_root = true
+select_mode = 2
 script = ExtResource("3_yyid0")
 
 [connection signal="pressed" from="Buttons/Add" to="." method="_on_Add_pressed"]
@@ -100,6 +104,10 @@ script = ExtResource("3_yyid0")
 [connection signal="pressed" from="Buttons/Up" to="." method="_on_Up_pressed"]
 [connection signal="pressed" from="Buttons/Down" to="." method="_on_Down_pressed"]
 [connection signal="pressed" from="Buttons/Config" to="." method="_on_Config_pressed"]
+[connection signal="button_clicked" from="Tree" to="Tree" method="_on_tree_button_clicked"]
 [connection signal="cell_selected" from="Tree" to="Tree" method="_on_Tree_cell_selected"]
 [connection signal="gui_input" from="Tree" to="Tree" method="_on_Tree_gui_input"]
 [connection signal="item_edited" from="Tree" to="Tree" method="_on_Tree_item_edited"]
+[connection signal="multi_selected" from="Tree" to="Tree" method="_on_tree_multi_selected"]
+[connection signal="nothing_selected" from="Tree" to="Tree" method="_on_tree_nothing_selected"]
+[connection signal="selection_changed" from="Tree" to="." method="_on_Tree_selection_changed"]

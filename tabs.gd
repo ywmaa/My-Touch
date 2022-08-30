@@ -8,7 +8,7 @@ var current_tab = -1 :
 		if current_tab >= 0 && current_tab < $Tabs.get_tab_count():
 			node = get_child(current_tab)
 			node.visible = false
-			node.selected_layer = null
+			node.layers.selected_layers.clear()
 		current_tab = t
 		node = get_child(current_tab)
 		node.visible = true
@@ -25,6 +25,7 @@ func add_child(control, legible_unique_name = false,i=0) -> void:
 	if !(control is TabBar):
 		$Tabs.add_tab(control.name)
 		move_child(control, $Tabs.get_tab_count()-1)
+	
 
 func close_tab(tab = null) -> void:
 	if tab == null:

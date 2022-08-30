@@ -23,11 +23,23 @@ _global_script_classes=[{
 "class": &"MTPaths",
 "language": &"GDScript",
 "path": "res://paths.gd"
+}, {
+"base": "Resource",
+"class": &"base_layer",
+"language": &"GDScript",
+"path": "res://layers/base_layer.gd"
+}, {
+"base": "Node",
+"class": &"layers_object",
+"language": &"GDScript",
+"path": "res://layers/layers_data_object.gd"
 }]
 _global_script_class_icons={
 "MMNodeLink": "",
 "MTGraph": "",
-"MTPaths": ""
+"MTPaths": "",
+"base_layer": "",
+"layers_object": ""
 }
 
 [application]
@@ -41,6 +53,7 @@ config/actual_release="0.1"
 [autoload]
 
 mt_globals="*res://globals.tscn"
+Layers="*res://layers/layers_data_object.gd"
 
 [display]
 

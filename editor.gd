@@ -337,6 +337,11 @@ func view_center() -> void:
 	var graph_edit : MTGraph = get_current_graph_edit()
 	graph_edit.center_view()
 
+func view_reset_zoom() -> void:
+	var graph_edit : MTGraph = get_current_graph_edit()
+	graph_edit.canvas.get_camera_2d().zoom = Vector2(1,1)
+	graph_edit.canvas.get_camera_2d().position = Vector2(0,0)
+
 func toggle_side_panels() -> void:
 	$VBoxContainer/Layout.toggle_side_panels()
 # -----------------------------------------------------------------------
