@@ -28,6 +28,5 @@ render_target_update_mode = 4
 
 [node name="Camera2D" type="Camera2D" parent="SubViewportContainer/Canvas"]
 z_as_relative = false
-anchor_mode = 0
 current = true
 editor_draw_limits = true

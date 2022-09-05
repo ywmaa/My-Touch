@@ -57,9 +57,26 @@ var previous_mouse_position : Vector2
 var mouse_position_delta : Vector2
 @export var smooth_mode : bool = false
 
+var zoom_step = 1.005
+
+
+func zoom_at_point(zoom_change, point):
+	var c0 = canvas.get_camera_2d().position # camera position
+	var v0 = canvas.size # vieport size
+	var c1 # next camera position
+	var z0 = canvas.get_camera_2d().zoom # current zoom value
+	var z1 = z0 * zoom_change # next zoom value
+
+	c1 = c0 + (-0.5*v0 + point)*(z1 - z0)
+	canvas.get_camera_2d().zoom = z1
+	canvas.get_camera_2d().position = c1
 
 func _process(delta):
-
+	if Input.is_action_pressed("select_all"):
+		for child in canvas.get_children():
+			if child is Camera2D:
+				continue
+			layers.select_layer_name(child.name)
 	if Input.is_action_pressed("ui_up"):
 		canvas.get_camera_2d().position.y += -1.0
 	if Input.is_action_pressed("ui_down"):
@@ -70,15 +87,15 @@ func _process(delta):
 		canvas.get_camera_2d().position.x += 1.0
 	#zoom
 	if Input.is_action_pressed("ui_text_scroll_up"):
-		canvas.get_camera_2d().zoom += Vector2(0.1,0.1)
+		zoom_at_point(zoom_step,canvas.get_mouse_position())
 	if Input.is_action_pressed("ui_text_scroll_down"):
-		canvas.get_camera_2d().zoom -= Vector2(0.1,0.1)
+		zoom_at_point(1/zoom_step,canvas.get_mouse_position())
 	if Input.is_action_just_pressed("mouse_left"):
 		for child in canvas.get_children():
 			if child is Camera2D:
 				continue
-			if child.get_rect().has_point(canvas.get_mouse_position()):
-#				print(child)
+			var child_size = child.get_rect().size
+			if Rect2(child.position-child_size/2,child_size).has_point(canvas.get_camera_2d().get_global_mouse_position()):
 				layers.select_layer_name(child.name)
 	#handle shortcuts
 	if Input.is_action_just_pressed("move"):
@@ -361,15 +378,5 @@ func remove_crash_recovery_file() -> void:
 # Center view
 
 func center_view() -> void:
-	var center = Vector2(0, 0)
-	var layers_count = 0
-	for c in canvas.get_children():
-		if c is Camera2D:
-			continue
-		if c:
-			center += c.position + 0.5*c.get_rect().size
-			layers_count += 1
-	if layers_count > 0:
-		center /= layers_count
-		scroll_horizontal = (center - 0.5*get_rect().size).x
-		scroll_vertical = (center - 0.5*get_rect().size).y
+	canvas.get_camera_2d().position = Vector2(0,0)
+	canvas.get_camera_2d().zoom = Vector2(1,1)

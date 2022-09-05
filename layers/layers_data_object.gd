@@ -14,13 +14,15 @@ func add_layer(new_layer:base_layer):
 func select_layer_name(layer_name):
 	for l in layers:
 		if l.name == layer_name:
-			selected_layers.append(l) 
+			if !selected_layers.has(l):
+				selected_layers.append(l) 
 	_on_layers_changed()
 
 
 func select_layer(layer : base_layer) -> void:
 	if layers.has(layer):
-		selected_layers.append(layer)
+		if !selected_layers.has(layer):
+			selected_layers.append(layer)
 
 func deselect_layer(layer : base_layer) -> void:
 	if layers.has(layer):
