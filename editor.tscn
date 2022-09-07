@@ -47,12 +47,14 @@ _data = {
 }
 
 [node name="Editor" type="Panel"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme = ExtResource("1_gmhfm")
 script = ExtResource("1_ix08l")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -12.0
@@ -80,9 +82,12 @@ script = ExtResource("2_o50ww")
 
 [node name="PhotoEditing" type="Control" parent="VBoxContainer/Layout"]
 visible = false
+layout_mode = 3
+anchors_preset = 0
 offset_bottom = 679.0
 
 [node name="ToolsList" type="ItemList" parent="VBoxContainer/Layout/PhotoEditing"]
+anchors_preset = 9
 anchor_bottom = 1.0
 offset_right = 81.0
 grow_vertical = 2
@@ -126,6 +131,8 @@ offset_right = 1268.0
 offset_bottom = 679.0
 
 [node name="ProjectsPanel" type="Control" parent="VBoxContainer/Layout/SplitRight"]
+layout_mode = 3
+anchors_preset = 0
 offset_right = 980.0
 offset_bottom = 679.0
 size_flags_horizontal = 3
@@ -137,6 +144,7 @@ autostart = true
 
 [node name="Projects" type="Panel" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel"]
 custom_minimum_size = Vector2(986, 684)
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = 6.0
@@ -178,6 +186,7 @@ use_hidden_tabs_for_min_size = true
 
 [node name="UndoRedoLabel" type="Label" parent="."]
 modulate = Color(1, 1, 1, 0)
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -94.0

@@ -70,46 +70,54 @@ func zoom_at_point(zoom_change, point):
 	c1 = c0 + (-0.5*v0 + point)*(z1 - z0)
 	canvas.get_camera_2d().zoom = z1
 	canvas.get_camera_2d().position = c1
-
-func _process(delta):
-	if Input.is_action_pressed("select_all"):
+func _input(event): 
+	if event.is_action_pressed("toggle_fullscreen"):
+		OS.window_fullscreen = !OS.window_fullscreen
+	if event.is_action_pressed("select_all"):
 		for child in canvas.get_children():
 			if child is Camera2D:
 				continue
 			layers.select_layer_name(child.name)
-	if Input.is_action_pressed("ui_up"):
+	if event.is_action("ui_up"):
 		canvas.get_camera_2d().position.y += -1.0
-	if Input.is_action_pressed("ui_down"):
+	if event.is_action("ui_down"):
 		canvas.get_camera_2d().position.y += 1.0
-	if Input.is_action_pressed("ui_left"):
+	if event.is_action("ui_left"):
 		canvas.get_camera_2d().position.x += -1.0
-	if Input.is_action_pressed("ui_right"):
+	if event.is_action("ui_right"):
 		canvas.get_camera_2d().position.x += 1.0
 	#zoom
 	if Input.is_action_pressed("ui_text_scroll_up"):
 		zoom_at_point(zoom_step,canvas.get_mouse_position())
 	if Input.is_action_pressed("ui_text_scroll_down"):
 		zoom_at_point(1/zoom_step,canvas.get_mouse_position())
-	if Input.is_action_just_pressed("mouse_left"):
+	if event.is_action_pressed("mouse_left"):
+		var child_under_mouse = false
 		for child in canvas.get_children():
 			if child is Camera2D:
 				continue
-			var child_size = child.get_rect().size
+			var child_size = child.texture.get_size() * child.scale
 			if Rect2(child.position-child_size/2,child_size).has_point(canvas.get_camera_2d().get_global_mouse_position()):
+				if !Input.is_key_pressed(KEY_SHIFT):
+					layers.selected_layers = []
 				layers.select_layer_name(child.name)
+				child_under_mouse = true
+				break
+		if !child_under_mouse and current_mode == tool_mode.none:
+			layers.selected_layers = []
 	#handle shortcuts
-	if Input.is_action_just_pressed("move"):
+	if event.is_action_pressed("move"):
 		tool_shortcut(tool_mode.move_image)
-	if Input.is_action_just_pressed("rotate"):
+	if event.is_action_pressed("rotate"):
 		tool_shortcut(tool_mode.rotate_image)
-	if Input.is_action_just_pressed("scale"):
+	if event.is_action_pressed("scale"):
 		tool_shortcut(tool_mode.scale_image)
-	if Input.is_action_just_pressed("lock_x"):
+	if event.is_action_pressed("lock_x"):
 		if direction == coordinates.x:
 			direction = coordinates.xy
 		else:
 			direction = coordinates.x
-	if Input.is_action_just_pressed("lock_y"):
+	if event.is_action_pressed("lock_y"):
 		if direction == coordinates.y:
 			direction = coordinates.xy
 		else:
@@ -122,6 +130,11 @@ func _process(delta):
 			current_mode = tool_mode.none
 			direction = coordinates.xy
 			undo()
+
+
+func _process(delta):
+
+
 	mouse_position_delta = get_global_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
 	if current_mode == tool_mode.none:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -157,9 +170,7 @@ func _process(delta):
 
 
 
-func _input(event): 
-	if event.is_action_pressed("toggle_fullscreen"):
-		OS.window_fullscreen = !OS.window_fullscreen
+
 
 
 
