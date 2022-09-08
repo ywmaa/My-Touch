@@ -14,6 +14,9 @@
 
  easy addons system (future work)
 
+ version control support for projects
+
+ multiple project syncing and combining (which will allow better collaborartion and projects/layers management)
 
 
 # Roadmap

@@ -53,6 +53,7 @@ const MENU = [
 	{ menu="Edit/-" },
 	{ menu="Edit/Load Selection", command="edit_load_selection" },
 	{ menu="Edit/Save Selection", command="edit_save_selection" },
+	{ menu="Edit/Load Project as image", command="edit_load_project_as_image" },
 	{ menu="Edit/-" },
 	{ menu="Edit/Set theme", submenu="set_theme" },
 	{ menu="Edit/Preferences", command="edit_preferences" },
@@ -336,13 +337,13 @@ func export_png_image():
 		return
 	# Generate the image
 	var graph_edit : MTGraph = get_current_graph_edit()
-	graph_edit.canvas.transparent_bg = true
-	await get_tree().create_timer(0.1).timeout
-	await get_tree().process_frame
+#	graph_edit.canvas.transparent_bg = true
+#	await get_tree().create_timer(0.1).timeout
+#	await get_tree().process_frame
 	var image : Image = Image.new()
 	image = graph_edit.canvas.get_texture().get_image()
 	image.save_png(files[0])
-	graph_edit.canvas.transparent_bg = false
+#	graph_edit.canvas.transparent_bg = false
 	
 func export_jpeg_image():
 	# Prompt for a target PNG file
@@ -457,6 +458,40 @@ func edit_select_invert() -> void:
 	var graph_edit : MTGraph = get_current_graph_edit()
 	if graph_edit != null:
 		graph_edit.select_invert()
+func edit_load_selection() -> void:
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	add_child(dialog)
+	dialog.min_size = Vector2(500, 500)
+	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
+	dialog.add_filter("*.mt.tres;My Touch files")
+	if mt_globals.config.has_section_key("path", "project"):
+		dialog.current_dir = mt_globals.config.get_value("path", "project")
+	var files = await dialog.select_files()
+	if files.size() > 0:
+		var graph_edit : MTGraph = get_current_graph_edit()
+		if graph_edit != null:
+			graph_edit.load_selection(files)
+
+func edit_save_selection() -> void:
+	var project = get_current_project()
+	if project != null:
+		return await project.save_selection()
+
+func edit_load_project_as_image() -> void:
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	add_child(dialog)
+	dialog.min_size = Vector2(500, 500)
+	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
+	dialog.add_filter("*.mt.tres;My Touch files")
+	if mt_globals.config.has_section_key("path", "project"):
+		dialog.current_dir = mt_globals.config.get_value("path", "project")
+	var files = await dialog.select_files()
+	if files.size() > 0:
+		var graph_edit : MTGraph = get_current_graph_edit()
+		if graph_edit != null:
+			graph_edit.load_project_layer(files)
 
 func set_app_theme(theme_name : String) -> void:
 	theme = load("res://theme/"+theme_name+".tres")

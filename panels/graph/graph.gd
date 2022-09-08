@@ -37,9 +37,8 @@ func set_current():
 	# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	layers.canvas = canvas
-	
 	OS.low_processor_usage_mode = true
-	
+	$SubViewportContainer/Background.size = canvas.size
 	#default layer
 	var new_layer : base_layer = base_layer.new()
 	new_layer.image.texture = default_icon
@@ -52,6 +51,9 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 var previous_mouse_position : Vector2
 var mouse_position_delta : Vector2
+var dragging : bool = false
+var drag_start : Vector2 = Vector2.ZERO
+var select_rect = RectangleShape2D.new()
 @export var smooth_mode : bool = false
 
 var zoom_step = 1.005
@@ -67,7 +69,62 @@ func zoom_at_point(zoom_change, point):
 	c1 = c0 + (-0.5*v0 + point)*(z1 - z0)
 	canvas.get_camera_2d().zoom = z1
 	canvas.get_camera_2d().position = c1
-func _input(event): 
+func _draw():
+	if dragging:
+		draw_rect(Rect2(drag_start,get_local_mouse_position()-drag_start),\
+		Color(0.5,0.5,0.5),false)
+func _input(event):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		if event.pressed:
+			if current_mode != tool_mode.none:
+				current_mode = tool_mode.none
+				direction = coordinates.xy
+				undo()
+	
+	if event is InputEventMouseMotion and dragging:
+		queue_redraw()
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			dragging = true
+			drag_start = get_local_mouse_position()
+			for layer in canvas.get_children():
+				if layer is Camera2D:
+					continue
+				var collision : CollisionShape2D = CollisionShape2D.new()
+				collision.shape = RectangleShape2D.new()
+				var area : Area2D = Area2D.new()
+				collision.shape.size = layer.texture.get_size()
+				layer.add_child(area)
+				area.add_child(collision)
+			current_mode = tool_mode.none
+			direction = coordinates.xy
+		elif dragging:
+			dragging = false
+			queue_redraw()
+			var drag_end = get_local_mouse_position()
+			select_rect.extents = abs(drag_end-drag_start)/2
+			var space = canvas.get_world_2d().direct_space_state
+			var query = PhysicsShapeQueryParameters2D.new()
+			query.set_shape(select_rect)
+			query.transform = Transform2D(0,(drag_end+drag_start)/2-Vector2(canvas.size)/2)
+			query.collide_with_areas = true
+			
+			#deselect on selecting none
+#			if space.intersect_shape(query) == []:
+#				layers.selected_layers = []
+			for area in space.intersect_shape(query):
+				for layer in layers.layers:
+					if area.collider.get_parent() == layer.image:
+						layers.select_layer(layer)
+						break
+			for layer in canvas.get_children():
+				if layer is Camera2D:
+					continue
+				for child in layer.get_children():
+					child.queue_free()
+			
+
+func _unhandled_input(event): 
 	if event.is_action_pressed("toggle_fullscreen"):
 		OS.window_fullscreen = !OS.window_fullscreen
 	if event.is_action("ui_up"):
@@ -83,21 +140,7 @@ func _input(event):
 		zoom_at_point(zoom_step,canvas.get_mouse_position())
 	if Input.is_action_pressed("ui_text_scroll_down"):
 		zoom_at_point(1/zoom_step,canvas.get_mouse_position())
-	if event.is_action_pressed("mouse_left"):
-		var child_under_mouse = false
-		for child in canvas.get_children():
-			if child is Camera2D:
-				continue
-			var child_size = child.texture.get_size() * child.scale
-			if Rect2(child.position-child_size/2,child_size).has_point(canvas.get_camera_2d().get_global_mouse_position()):
-				if !Input.is_key_pressed(KEY_SHIFT):
-					layers.selected_layers = []
-				layers.select_layer_name(child.name)
-				child_under_mouse = true
-				break
-		if !child_under_mouse and current_mode == tool_mode.none:
-			pass
-#			layers.selected_layers = []
+
 	#handle shortcuts
 	if event.is_action_pressed("move"):
 		tool_shortcut(tool_mode.move_image)
@@ -115,19 +158,10 @@ func _input(event):
 			direction = coordinates.xy
 		else:
 			direction = coordinates.y
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		current_mode = tool_mode.none
-		direction = coordinates.xy
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
-		if current_mode != tool_mode.none:
-			current_mode = tool_mode.none
-			direction = coordinates.xy
-			undo()
+
 
 
 func _process(delta):
-
-
 	mouse_position_delta = get_global_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
 	if current_mode == tool_mode.none:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -167,37 +201,6 @@ func remove_selection() -> void:
 	for selection in layers.selected_layers:
 		layers.remove_layer(selection)
 		
-
-
-func serialize_selection(current_layers = []):
-	return str(layers.selected_layers)
-#	var data = { nodes = [], connections = [] }
-#	if nodes.empty():
-#		for c in get_children():
-#			if c is GraphNode and c.selected and c.name != "Material" and c.name != "Brush":
-#				nodes.append(c)
-#	if nodes.empty():
-#		return {}
-#	var center = Vector2(0, 0)
-#	for n in nodes:
-#		center += n.offset+0.5*n.rect_size
-#	center /= nodes.size()
-#	for n in nodes:
-#		var s = n.generator.serialize()
-#		var p = n.offset-center
-#		s.node_position = { x=p.x, y=p.y }
-#		data.nodes.append(s)
-#	for c in get_connection_list():
-#		var from = get_node(c.from)
-#		var to = get_node(c.to)
-#		if from != null and from.selected and to != null and to.selected:
-#			var connection = c.duplicate(true)
-#			connection.from = from.generator.name
-#			connection.to = to.generator.name
-#			data.connections.append(connection)
-#	return data
-
-
 func cut() -> void:
 	copy()
 	remove_selection()
@@ -228,8 +231,75 @@ func select_invert():
 			continue
 		inverted_selections.append(layer)
 	layers.selected_layers = inverted_selections
+func load_selection(filenames) -> void:
+	var file_name : String = ""
+	for f in filenames:
+		var file = File.new()
+		if file.open(f, File.READ) != OK:
+			continue
+		file_name = file.get_path_absolute()
+		file.close()
+		var data = ResourceLoader.load(file_name) as SaveProject
+		if data != null:
+			layers.layers.append_array(data.layers.layers)
+			layers.canvas = canvas
+			layers.load_layers()
+		else:
+			var dialog : AcceptDialog = AcceptDialog.new()
+			add_child(dialog)
+			dialog.title = "Load failed!"
+			dialog.dialog_text = "Failed to load "+file_name
+			dialog.connect("popup_hide", dialog.queue_free)
+			dialog.popup_centered()
 
+func save_selection() -> void:
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	add_child(dialog)
+	dialog.min_size = Vector2(500, 500)
+	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+	dialog.add_filter("*.mt.tres;My Touch files")
+	var main_window = mt_globals.main_window
+	if mt_globals.config.has_section_key("path", "project"):
+		dialog.current_dir = mt_globals.config.get_value("path", "project")
+	var files = await dialog.select_files()
+	if files.size() == 1:
+		if do_save_selection(files[0]):
+			pass
+#			main_window.add_recent(save_path)
 
+func do_save_selection(filename) -> bool:
+	var data : SaveProject = SaveProject.new()
+	data.layers = layers_object.new()
+	data.layers.layers = layers.selected_layers
+	ResourceSaver.save(data,filename)
+	return true
+
+func load_project_layer(filenames) -> void:
+	var file_name : String = ""
+	for f in filenames:
+		var file = File.new()
+		if file.open(f, File.READ) != OK:
+			continue
+		file_name = file.get_path_absolute()
+		file.close()
+		var data = ResourceLoader.load(file_name) as SaveProject
+		if data != null:
+			var new_project_layer = project_layer.new()
+			new_project_layer.project_layers = layers_object.new()
+			new_project_layer.project_layers = data.layers
+			new_project_layer.project_layers.canvas = canvas
+			
+			new_project_layer.project_layers.load_layers()
+			layers.add_layer(new_project_layer)
+			
+		else:
+			var dialog : AcceptDialog = AcceptDialog.new()
+			add_child(dialog)
+			dialog.title = "Load failed!"
+			dialog.dialog_text = "Failed to load "+file_name
+			dialog.connect("popup_hide", dialog.queue_free)
+			dialog.popup_centered()
 
 func tool_shortcut(index): # handle tools list
 	match index:

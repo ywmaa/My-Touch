@@ -50,7 +50,7 @@ func duplicate_layer(source_layer : base_layer) -> void:
 func remove_layer(layer : base_layer) -> void:
 	var need_reselect : bool = (layer in selected_layers)
 	var layers_array : Array = find_parent_array(layer)
-	layer.image.queue_free()
+	layer.clear_image()
 	layers_array.erase(layer)
 	if need_reselect:
 		selected_layers = []

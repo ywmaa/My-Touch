@@ -1,7 +1,7 @@
 extends Resource
 class_name base_layer
 
-enum layer_type {image}
+enum layer_type {image,project}
 
 @export var image : Sprite2D = Sprite2D.new():
 	set(new_image):
@@ -19,3 +19,8 @@ enum layer_type {image}
 		hidden = new_hidden
 		image.visible = !hidden
 		
+
+
+
+func clear_image():
+	image.queue_free()
