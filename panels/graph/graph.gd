@@ -164,10 +164,7 @@ func _process(delta):
 
 
 func select_all():
-	for child in canvas.get_children():
-		if child is Camera2D:
-			continue
-		layers.select_layer_name(child.name)
+	layers.selected_layers = layers.layers
 func select_none():
 	layers.selected_layers = []
 func select_invert():
