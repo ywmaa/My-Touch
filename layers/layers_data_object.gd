@@ -1,15 +1,20 @@
-extends Node
+extends Resource
 class_name layers_object
 
-var layers : Array[base_layer] = []
+@export var layers = []
 var selected_layers : Array[base_layer] = []
 var canvas
+
+func load_layers():
+	for layer in layers:
+		layer.image.z_index = layers.find(layer)
+		canvas.add_child(layer.image)
+		_on_layers_changed()
 func add_layer(new_layer:base_layer):
 	layers.append(new_layer)
 	new_layer.image.z_index = layers.find(new_layer)
 	canvas.add_child(new_layer.image)
 	_on_layers_changed()
-	# Called when the node enters the scene tree for the first time.
 
 func select_layer_name(layer_name):
 	for l in layers:
@@ -30,11 +35,11 @@ func deselect_layer(layer : base_layer) -> void:
 		
 
 func _on_layers_changed() -> void:
-	mt_globals.main_window.get_panel("Layers").set_layers(self)
+	pass
 	
 
 func duplicate_layer(source_layer : base_layer) -> void:
-	var layer = source_layer.duplicate()
+	var layer = base_layer.new()#source_layer.duplicate()
 	layer.name = get_unused_layer_name(layers)
 	layer.image.texture = source_layer.image.texture
 	layer.type = source_layer.type

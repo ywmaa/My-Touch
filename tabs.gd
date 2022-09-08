@@ -30,8 +30,9 @@ func add_child(control, legible_unique_name = false,i=0) -> void:
 func close_tab(tab = null) -> void:
 	if tab == null:
 		tab = $Tabs.get_current_tab()
-	await check_save_tab(tab)
-	do_close_tab(tab)
+	var result = await check_save_tab(tab)
+	if result:
+		do_close_tab(tab)
 
 func get_tab_count() -> int:
 	return $Tabs.get_tab_count()
@@ -57,21 +58,18 @@ func check_save_tab(tab) -> bool:
 			save_path = save_path.get_file()
 		dialog.dialog_text = "Save "+save_path+" before closing?"
 		#dialog.dialog_autowrap = true
-		dialog.get_ok().text = "Save and close"
+		dialog.get_ok_button().text = "Save and close"
 		dialog.add_button("Discard changes", true, "discard")
-		dialog.add_cancel("Cancel")
+		dialog.add_cancel_button("Cancel")
 		get_parent().add_child(dialog)
 		var result = await dialog.ask()
 		match result:
 			"ok":
-				var status = mt_globals.main_window.save_project(tab_control)
+				var status = await mt_globals.main_window.save_project(tab_control)
 				if !status:
 					return false
 			"cancel":
 				return false
-			_:
-				if tab_control.has_method("remove_crash_recovery_file"):
-					tab_control.remove_crash_recovery_file()
 	return true
 
 func do_close_custom_action(_action : String, _tab : int, dialog : AcceptDialog) -> void:
@@ -109,12 +107,6 @@ func _on_Projects_resized() -> void:
 	$Tabs.get_rect().size.x = get_rect().size.x
 
 
-func _on_CrashRecoveryTimer_timeout():
-	for i in range($Tabs.get_tab_count()):
-		var tab_control = get_child(i)
-		if tab_control.has_method("crash_recovery_save"):
-			tab_control.crash_recovery_save()
-
 func _input(event: InputEvent) -> void:
 	# Navigate between tabs using keyboard shortcuts.
 	if event.is_action_pressed("ui_previous_tab"):
@@ -138,3 +130,10 @@ func _gui_input(event: InputEvent) -> void:
 
 func set_current_tab(tab):
 	current_tab = tab
+
+
+func _on_auto_save_timer_timeout():
+	for i in range($Tabs.get_tab_count()):
+		var tab_control = get_child(i)
+		if tab_control.has_method("auto_save"):
+			tab_control.auto_save()

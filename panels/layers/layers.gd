@@ -6,11 +6,17 @@ var layers
 @onready var tree = $Tree
 
 func _process(delta):
-	set_layers(mt_globals.main_window.get_current_graph_edit().layers)
+	if mt_globals.main_window.get_current_graph_edit():
+		set_layers(mt_globals.main_window.get_current_graph_edit().layers)
+	else:
+		set_layers([])
 func set_layers(layers) -> void:
 	layers = layers
 	tree.layers = layers
-	tree.update_from_layers(layers.layers, layers.selected_layers)
+	if layers:
+		tree.update_from_layers(layers.layers, layers.selected_layers)
+	else:
+		tree.update_from_layers([], [])
 
 func _on_Tree_selection_changed(new_selected) -> void:
 	layers.selected_layers.clear()

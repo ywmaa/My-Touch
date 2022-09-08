@@ -20,13 +20,10 @@ var default_icon = preload("res://icon.png")
 var save_path = null : 
 	set(path):
 		if path != save_path:
-			remove_crash_recovery_file()
-			need_save_crash_recovery = false
 			save_path = path
 			update_tab_title()
 			emit_signal("save_path_changed", self, path)
 var need_save : bool = false
-var need_save_crash_recovery : bool = false
 
 
 signal save_path_changed
@@ -73,11 +70,6 @@ func zoom_at_point(zoom_change, point):
 func _input(event): 
 	if event.is_action_pressed("toggle_fullscreen"):
 		OS.window_fullscreen = !OS.window_fullscreen
-	if event.is_action_pressed("select_all"):
-		for child in canvas.get_children():
-			if child is Camera2D:
-				continue
-			layers.select_layer_name(child.name)
 	if event.is_action("ui_up"):
 		canvas.get_camera_2d().position.y += -1.0
 	if event.is_action("ui_down"):
@@ -104,7 +96,8 @@ func _input(event):
 				child_under_mouse = true
 				break
 		if !child_under_mouse and current_mode == tool_mode.none:
-			layers.selected_layers = []
+			pass
+#			layers.selected_layers = []
 	#handle shortcuts
 	if event.is_action_pressed("move"):
 		tool_shortcut(tool_mode.move_image)
@@ -170,7 +163,20 @@ func _process(delta):
 
 
 
-
+func select_all():
+	for child in canvas.get_children():
+		if child is Camera2D:
+			continue
+		layers.select_layer_name(child.name)
+func select_none():
+	layers.selected_layers = []
+func select_invert():
+	var inverted_selections : Array = []
+	for layer in layers.layers:
+		if layer in layers.selected_layers:
+			continue
+		inverted_selections.append(layer)
+	layers.selected_layers = inverted_selections
 
 
 
@@ -180,21 +186,24 @@ func tool_shortcut(index): # handle tools list
 			if layers.selected_layers:
 				for selected in layers.selected_layers:
 					add_to_undo_history([selected.image, "position", selected.image.position])
+				send_changed_signal()
 				current_mode = tool_mode.move_image
 		tool_mode.rotate_image:
 			if layers.selected_layers:
 				for selected in layers.selected_layers:
 					add_to_undo_history([selected.image, "rotation", selected.image.rotation])
+				send_changed_signal()
 				current_mode = tool_mode.rotate_image
 		tool_mode.scale_image:
 			if layers.selected_layers:
 				for selected in layers.selected_layers:
 					add_to_undo_history([selected.image, "scale", selected.image.scale])
+				send_changed_signal()
 				current_mode = tool_mode.scale_image
 func new_project() -> void:
 	center_view()
 	save_path = null
-#	set_need_save(false)
+	set_need_save(false)
 
 
 #func deselect_all_tools():
@@ -207,9 +216,9 @@ func new_project() -> void:
 #	ToolsList.set_item_disabled(2,!state) 
 
 
+func send_changed_signal() -> void:
+	set_need_save(true)
 
-
-	
 
 var undo_history = []
 var redo_history = []
@@ -221,7 +230,7 @@ func add_to_undo_history(data:Array): # syntax : [object,str(property_name),valu
 	if undo_history.size() > undo_limit:
 		undo_history.pop_front()
 	print("history added")
-	get_node("/root/Editor/UndoRedoLabel").show_step(undo_history.size())
+	get_node("/root/Editor/MessageLabel").show_step(undo_history.size())
 func undo():
 	if !can_undo():
 		print("nothing to undo")
@@ -279,34 +288,21 @@ func update_tab_title() -> void:
 		get_parent().set_tab_title(get_index(), title)
 
 func load_file(filename) -> bool:
-	var rescued = false
-	var new_generator = null
-	var file = File.new()
-	if filename != null and file.file_exists(filename+".mmcr"):
-		var dialog = preload("res://windows/accept_dialog/accept_dialog.tscn").instance()
-		dialog.dialog_text = "Rescue file for "+filename.get_file()+" was found.\nLoad it?"
-		dialog.get_ok().text = "Rescue"
-		dialog.add_cancel("Load "+filename.get_file())
-		add_child(dialog)
-		var result = await dialog.ask()
-		if result == "ok":
-			pass
-#			new_generator = mm_loader.load_gen(filename+".mtcr")
-	if get_child_count() > 1:
-		rescued = true
-	else:
-		pass
-#		new_generator = mm_loader.load_gen(filename)
-	if new_generator != null:
+	var data = ResourceLoader.load(filename,"") as SaveProject
+	if data != null:
 		save_path = filename
-		if rescued:
-			pass
-#			set_need_save(true)
+		for child in canvas.get_children():
+			if child is Camera2D:
+				continue
+			child.queue_free()
+		layers = data.layers
+		layers.canvas = canvas
+		layers.load_layers()
 		return true
 	else:
 		var dialog : AcceptDialog = AcceptDialog.new()
 		add_child(dialog)
-		dialog.window_title = "Load failed!"
+		dialog.title = "Load failed!"
 		dialog.dialog_text = "Failed to load "+filename
 		dialog.connect("popup_hide", dialog.queue_free)
 		dialog.popup_centered()
@@ -314,77 +310,52 @@ func load_file(filename) -> bool:
 
 # Save
 
-#func save() -> bool:
-#	var status
-#	if save_path != null:
-#		status = await save_file(save_path)
-#	else:
-#		status = await save_as()
-#	return status
-
-#func save_as() -> bool:
-#	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
-#	add_child(dialog)
-#	dialog.rect_min_size = Vector2(500, 500)
-#	dialog.access = FileDialog.ACCESS_FILESYSTEM
-#	dialog.mode = FileDialog.MODE_SAVE_FILE
-#	dialog.add_filter("*.mt;My Touch files")
-#	var main_window = mt_globals.main_window
-#	if mt_globals.config.has_section_key("path", "project"):
-#		dialog.current_dir = mt_globals.config.get_value("path", "project")
-#	var files = await dialog.select_files()
-#	if files.size() == 1:
-#		if save_file(files[0]):
-#			main_window.add_recent(save_path)
-#			mt_globals.config.set_value("path", "project", save_path.get_base_dir())
-#			return true
-#	return false
-#
-#func save_file(filename) -> bool:
-#
-#	var data = serialize_file()
-#	var file = File.new()
-#	if file.open(filename, File.WRITE) == OK:
-#		file.store_string(JSON.print(data, "\t", true))
-#		file.close()
-#	else:
-#		return false
-#	save_path = filename
-#	set_need_save(false)
-#	remove_crash_recovery_file()
-#	return true
-#
-#func set_need_save(ns = true) -> void:
-#	if ns != need_save:
-#		need_save = ns
-#		update_tab_title()
-#	if save_path != null:
-#		if ns:
-#			need_save_crash_recovery = true
-#		else:
-#			need_save_crash_recovery = false
-
-
-
-
-
-
-# crash_recovery
-
-#func crash_recovery_save() -> void:
-#	if !need_save_crash_recovery:
-#		return
-#	var data = top_generator.serialize()
-#	var file = File.new()
-#	if file.open(save_path+".mtcr", File.WRITE) == OK:
-#		file.store_string(JSON.print(data))
-#		file.close()
-#		need_save_crash_recovery = false
-
-func remove_crash_recovery_file() -> void:
+func save() -> bool:
+	var status
 	if save_path != null:
-		var dir = Directory.new()
-		dir.remove(save_path+".mtcr")
+		status = await save_file(save_path)
+	else:
+		status = await save_as()
+	return status
+
+func save_as() -> bool:
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	add_child(dialog)
+	dialog.min_size = Vector2(500, 500)
+	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+	dialog.add_filter("*.mt.tres;My Touch files")
+	var main_window = mt_globals.main_window
+	if mt_globals.config.has_section_key("path", "project"):
+		dialog.current_dir = mt_globals.config.get_value("path", "project")
+	var files = await dialog.select_files()
+	if files.size() == 1:
+		if save_file(files[0]):
+#			main_window.add_recent(save_path)
+			mt_globals.config.set_value("path", "project", save_path.get_base_dir())
+			return true
+	return false
+#
+func save_file(filename) -> bool:
+	var data : SaveProject = SaveProject.new()
+	data.layers = layers 
+	ResourceSaver.save(data,filename)
+	save_path = filename
+	set_need_save(false)
+	return true
+
+func set_need_save(ns = true) -> void:
+	if ns != need_save:
+		need_save = ns
+		update_tab_title()
+
+func auto_save():
+	if save_path != null and need_save:
+		await save_file(save_path)
+		get_node("/root/Editor/MessageLabel").show_message("auto saved")
+		
+
+
 
 # Center view
 

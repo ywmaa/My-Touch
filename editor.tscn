@@ -12,10 +12,15 @@ func show_step(step : int):
 	text = \"Undo/Redo action added (%d)\" % step
 	$AnimationPlayer.stop()
 	$AnimationPlayer.play(\"show\")
+func show_message(message_text):
+	text = message_text
+	$AnimationPlayer.stop()
+	$AnimationPlayer.play(\"show\")
 "
 
 [sub_resource type="Animation" id="7"]
 resource_name = "show"
+length = 2.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -23,7 +28,7 @@ tracks/0/path = NodePath(".:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 1),
+"times": PackedFloat32Array(0, 2.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [true, false]
@@ -35,7 +40,7 @@ tracks/1/path = NodePath(".:modulate")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 1),
+"times": PackedFloat32Array(0, 2.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
@@ -50,29 +55,37 @@ _data = {
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme = ExtResource("1_gmhfm")
 script = ExtResource("1_ix08l")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -12.0
 offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="TopBar" type="HBoxContainer" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
 offset_right = 1268.0
 offset_bottom = 25.0
 
 [node name="Menu" type="HBoxContainer" parent="VBoxContainer/TopBar"]
 custom_minimum_size = Vector2(1011, 25)
+layout_mode = 2
 offset_right = 1268.0
 offset_bottom = 25.0
 size_flags_horizontal = 3
 
 [node name="Layout" type="HSplitContainer" parent="VBoxContainer"]
 custom_minimum_size = Vector2(1268, 679)
+layout_mode = 2
 offset_top = 29.0
 offset_right = 1268.0
 offset_bottom = 708.0
@@ -82,11 +95,12 @@ script = ExtResource("2_o50ww")
 
 [node name="PhotoEditing" type="Control" parent="VBoxContainer/Layout"]
 visible = false
-layout_mode = 3
+layout_mode = 2
 anchors_preset = 0
 offset_bottom = 679.0
 
 [node name="ToolsList" type="ItemList" parent="VBoxContainer/Layout/PhotoEditing"]
+layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
 offset_right = 81.0
@@ -104,6 +118,7 @@ metadata/_edit_use_anchors_ = true
 
 [node name="Left" type="VSplitContainer" parent="VBoxContainer/Layout"]
 custom_minimum_size = Vector2(124, 679)
+layout_mode = 2
 offset_right = 124.0
 offset_bottom = 679.0
 size_flags_horizontal = 3
@@ -111,6 +126,7 @@ split_offset = 312
 
 [node name="Top" type="TabContainer" parent="VBoxContainer/Layout/Left"]
 custom_minimum_size = Vector2(124, 349)
+layout_mode = 2
 offset_right = 124.0
 offset_bottom = 349.0
 drag_to_rearrange_enabled = true
@@ -118,6 +134,7 @@ use_hidden_tabs_for_min_size = true
 
 [node name="Bottom" type="TabContainer" parent="VBoxContainer/Layout/Left"]
 custom_minimum_size = Vector2(124, 322)
+layout_mode = 2
 offset_top = 357.0
 offset_right = 124.0
 offset_bottom = 679.0
@@ -126,24 +143,26 @@ use_hidden_tabs_for_min_size = true
 
 [node name="SplitRight" type="HSplitContainer" parent="VBoxContainer/Layout"]
 custom_minimum_size = Vector2(1136, 679)
+layout_mode = 2
 offset_left = 132.0
 offset_right = 1268.0
 offset_bottom = 679.0
 
 [node name="ProjectsPanel" type="Control" parent="VBoxContainer/Layout/SplitRight"]
-layout_mode = 3
+layout_mode = 2
 anchors_preset = 0
 offset_right = 980.0
 offset_bottom = 679.0
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 6.5
 
-[node name="CrashRecoveryTimer" type="Timer" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel"]
+[node name="AutoSaveTimer" type="Timer" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel"]
 wait_time = 15.0
 autostart = true
 
 [node name="Projects" type="Panel" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel"]
 custom_minimum_size = Vector2(986, 684)
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -156,6 +175,7 @@ metadata/_edit_layout_mode = 1
 
 [node name="Tabs" type="TabBar" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects"]
 custom_minimum_size = Vector2(950, 24)
+layout_mode = 0
 offset_right = 950.0
 offset_bottom = 40.0
 tab_close_display_policy = 1
@@ -163,6 +183,7 @@ drag_to_rearrange_enabled = true
 
 [node name="Right" type="VSplitContainer" parent="VBoxContainer/Layout/SplitRight"]
 custom_minimum_size = Vector2(147, 349)
+layout_mode = 2
 offset_left = 989.0
 offset_right = 1136.0
 offset_bottom = 679.0
@@ -171,6 +192,7 @@ split_offset = 312
 
 [node name="Top" type="TabContainer" parent="VBoxContainer/Layout/SplitRight/Right"]
 custom_minimum_size = Vector2(124, 349)
+layout_mode = 2
 offset_right = 147.0
 offset_bottom = 349.0
 drag_to_rearrange_enabled = true
@@ -178,24 +200,26 @@ use_hidden_tabs_for_min_size = true
 
 [node name="Bottom" type="TabContainer" parent="VBoxContainer/Layout/SplitRight/Right"]
 custom_minimum_size = Vector2(124, 322)
+layout_mode = 2
 offset_top = 357.0
 offset_right = 147.0
 offset_bottom = 679.0
 drag_to_rearrange_enabled = true
 use_hidden_tabs_for_min_size = true
 
-[node name="UndoRedoLabel" type="Label" parent="."]
-modulate = Color(1, 1, 1, 0)
+[node name="MessageLabel" type="Label" parent="."]
+layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -94.0
 offset_right = 94.0
 offset_bottom = 33.0
+grow_horizontal = 2
 text = "Undo/Redo action added"
 script = SubResource("6")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="UndoRedoLabel"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MessageLabel"]
 libraries = {
 "": SubResource("AnimationLibrary_21bw6")
 }
@@ -203,6 +227,7 @@ libraries = {
 [connection signal="item_selected" from="VBoxContainer/Layout/PhotoEditing/ToolsList" to="." method="_on_tools_list_item_selected"]
 [connection signal="tab_changed" from="VBoxContainer/Layout/Left/Top" to="VBoxContainer/Layout" method="_on_tab_changed"]
 [connection signal="tab_changed" from="VBoxContainer/Layout/Left/Bottom" to="VBoxContainer/Layout" method="_on_tab_changed"]
+[connection signal="timeout" from="VBoxContainer/Layout/SplitRight/ProjectsPanel/AutoSaveTimer" to="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects" method="_on_auto_save_timer_timeout"]
 [connection signal="active_tab_rearranged" from="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects/Tabs" to="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects" method="move_active_tab_to"]
 [connection signal="tab_changed" from="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects/Tabs" to="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects" method="set_current_tab"]
 [connection signal="tab_close_pressed" from="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects/Tabs" to="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects" method="close_tab"]

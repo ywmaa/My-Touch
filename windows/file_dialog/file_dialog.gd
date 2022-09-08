@@ -39,7 +39,7 @@ func _on_FileDialog_file_selected(path) -> void:
 	emit_signal("return_paths", [ path ])
 
 func _on_FileDialog_files_selected(paths) -> void:
-	left_panel.add_recent(get_full_current_dir())
+#	left_panel.add_recent(get_full_current_dir())
 	emit_signal("return_paths", paths)
 
 func _on_FileDialog_dir_selected(dir) -> void:

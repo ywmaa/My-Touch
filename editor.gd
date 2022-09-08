@@ -47,8 +47,8 @@ const MENU = [
 	{ menu="Edit/Paste", command="edit_paste", shortcut="Control+V" },
 	{ menu="Edit/Duplicate", command="edit_duplicate", shortcut="Control+D" },
 	{ menu="Edit/-" },
-	{ menu="Edit/Select All", command="edit_select_all", shortcut="Control+A" },
-	{ menu="Edit/Select None", command="edit_select_none", shortcut="Control+Shift+A" },
+	{ menu="Edit/Select All", command="edit_select_all", shortcut="A" },
+	{ menu="Edit/Select None", command="edit_select_none", shortcut="Shift+A" },
 	{ menu="Edit/Invert Selection", command="edit_select_invert", shortcut="Control+I" },
 	{ menu="Edit/-" },
 	{ menu="Edit/Load Selection", command="edit_load_selection" },
@@ -107,7 +107,7 @@ func _ready() -> void:
 	tools = get_panel("Tools")
 #
 #	# Load recent projects
-#	load_recents()
+	load_recents()
 #
 	# Create menus
 	mt_globals.menu_manager.create_menus(MENU, self, $VBoxContainer/TopBar/Menu)
@@ -194,6 +194,122 @@ func new_graph_panel():
 	projects.add_child(graph_edit)
 	projects.current_tab = graph_edit.get_index()
 	return graph_edit
+
+func load_project() -> void:
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	add_child(dialog)
+	dialog.min_size = Vector2(500, 500)
+	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
+	dialog.add_filter("*.mt.tres;My Touch files")
+	if mt_globals.config.has_section_key("path", "project"):
+		dialog.current_dir = mt_globals.config.get_value("path", "project")
+	var files = await dialog.select_files()
+	if files.size() > 0:
+		do_load_projects(files)
+
+func do_load_projects(filenames) -> void:
+	var file_name : String = ""
+	for f in filenames:
+		var file = File.new()
+		if file.open(f, File.READ) != OK:
+			continue
+		file_name = file.get_path_absolute()
+		file.close()
+		do_load_project(file_name)
+	if file_name != "":
+		mt_globals.config.set_value("path", "project", file_name.get_base_dir())
+
+func do_load_project(file_name) -> bool:
+	var status : bool = false
+	match file_name.get_extension():
+		"tres":
+			status = do_load_mt(file_name)
+	if status:
+		add_recent(file_name)
+	else:
+		remove_recent(file_name)
+	return status
+func do_load_mt(filename : String) -> bool:
+	var graph_edit : MTGraph = get_current_graph_edit()
+	var node_count = 2 # So test below succeeds if graph_edit is null...
+	if graph_edit != null:
+		node_count = 0
+		for c in graph_edit.canvas.get_children():
+			if !(c is Camera2D):
+				node_count += 1
+				if node_count > 1:
+					break
+	if node_count > 1:
+		graph_edit = new_graph_panel()
+	graph_edit.load_file(filename)
+	return true
+
+func create_menu_load_recent(menu) -> void:
+	menu.clear()
+	if recent_files.is_empty():
+		menu.add_item("No items found", 0)
+		menu.set_item_disabled(0, true)
+	else:
+		for i in recent_files.size():
+			menu.add_item(recent_files[i], i)
+		if !menu.is_connected("id_pressed", _on_LoadRecent_id_pressed):
+			menu.connect("id_pressed", _on_LoadRecent_id_pressed)
+
+func _on_LoadRecent_id_pressed(id) -> void:
+	do_load_project(recent_files[id])
+
+func load_recents() -> void:
+	var f = File.new()
+	if f.open("user://recent_files.bin", File.READ) == OK:
+		recent_files = JSON.new().parse_string(f.get_as_text())
+		f.close()
+
+func save_recents() -> void:
+	var f = File.new()
+	f.open("user://recent_files.bin", File.WRITE)
+	f.store_string(JSON.new().stringify(recent_files))
+	f.close()
+
+func add_recent(path, save = true) -> void:
+	remove_recent(path, false)
+	recent_files.push_front(path)
+	while recent_files.size() > RECENT_FILES_COUNT:
+		recent_files.pop_back()
+	if save:
+		save_recents()
+
+func remove_recent(path, save = true) -> void:
+	while true:
+		var index = recent_files.find(path)
+		if index >= 0:
+			recent_files.remove_at(index)
+		else:
+			break
+	if save:
+		save_recents()
+
+func save_project(project : Control = null) -> bool:
+	if project == null:
+		project = get_current_project()
+	if project != null:
+		return await project.save()
+	return false
+
+func save_project_as(project : Control = null) -> bool:
+	if project == null:
+		project = get_current_project()
+	if project != null:
+		return await project.save_as()
+	return false
+
+func save_all_projects() -> void:
+	for i in range(projects.get_tab_count()):
+		var result = await projects.get_tab(i).save()
+
+
+
+
 func create_menu_export(menu : PopupMenu):
 	menu.clear()
 	for E in EXPORT_TYPES:
@@ -307,6 +423,21 @@ func edit_redo_is_disabled() ->  bool:
 	if project != null:
 		return !project.can_redo()
 	return true
+
+func edit_select_all() -> void:
+	var graph_edit : MTGraph = get_current_graph_edit()
+	if graph_edit != null:
+		graph_edit.select_all()
+
+func edit_select_none() -> void:
+	var graph_edit : MTGraph = get_current_graph_edit()
+	if graph_edit != null:
+		graph_edit.select_none()
+
+func edit_select_invert() -> void:
+	var graph_edit : MTGraph = get_current_graph_edit()
+	if graph_edit != null:
+		graph_edit.select_invert()
 
 func set_app_theme(theme_name : String) -> void:
 	theme = load("res://theme/"+theme_name+".tres")
