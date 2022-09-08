@@ -2,7 +2,7 @@ extends ScrollContainer
 class_name MTGraph
 enum tool_mode {none,move_image,rotate_image,scale_image}
 enum coordinates {xy,x,y}
-
+var clipboard_file_path = "user://my_touch_clipboard.tres"
 
 @onready var canvas : SubViewport = get_node("SubViewportContainer/Canvas")
 var direction : coordinates = coordinates.xy
@@ -161,7 +161,61 @@ func _process(delta):
 
 	previous_mouse_position = get_global_mouse_position()
 
+# Cut / copy / paste / duplicate
 
+func remove_selection() -> void:
+	for selection in layers.selected_layers:
+		layers.remove_layer(selection)
+		
+
+
+func serialize_selection(current_layers = []):
+	return str(layers.selected_layers)
+#	var data = { nodes = [], connections = [] }
+#	if nodes.empty():
+#		for c in get_children():
+#			if c is GraphNode and c.selected and c.name != "Material" and c.name != "Brush":
+#				nodes.append(c)
+#	if nodes.empty():
+#		return {}
+#	var center = Vector2(0, 0)
+#	for n in nodes:
+#		center += n.offset+0.5*n.rect_size
+#	center /= nodes.size()
+#	for n in nodes:
+#		var s = n.generator.serialize()
+#		var p = n.offset-center
+#		s.node_position = { x=p.x, y=p.y }
+#		data.nodes.append(s)
+#	for c in get_connection_list():
+#		var from = get_node(c.from)
+#		var to = get_node(c.to)
+#		if from != null and from.selected and to != null and to.selected:
+#			var connection = c.duplicate(true)
+#			connection.from = from.generator.name
+#			connection.to = to.generator.name
+#			data.connections.append(connection)
+#	return data
+
+
+func cut() -> void:
+	copy()
+	remove_selection()
+
+func copy() -> void:
+	var data : mt_clipboard = mt_clipboard.new()
+	data.layers = layers.selected_layers
+	ResourceSaver.save(data,clipboard_file_path)
+
+func paste() -> void:
+	var data = ResourceLoader.load(clipboard_file_path) as mt_clipboard
+	select_none()
+	for layer in data.layers:
+		layers.duplicate_layer(layer)
+
+func duplicate_selected() -> void:
+	copy()
+	paste()
 
 func select_all():
 	layers.selected_layers = layers.layers

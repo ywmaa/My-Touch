@@ -38,6 +38,11 @@ _global_script_classes=[{
 "class": &"layers_object",
 "language": &"GDScript",
 "path": "res://layers/layers_data_object.gd"
+}, {
+"base": "Resource",
+"class": &"mt_clipboard",
+"language": &"GDScript",
+"path": "res://clipboard.gd"
 }]
 _global_script_class_icons={
 "MMNodeLink": "",
@@ -45,7 +50,8 @@ _global_script_class_icons={
 "MTPaths": "",
 "SaveProject": "",
 "base_layer": "",
-"layers_object": ""
+"layers_object": "",
+"mt_clipboard": ""
 }
 
 [application]

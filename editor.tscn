@@ -224,6 +224,11 @@ libraries = {
 "": SubResource("AnimationLibrary_21bw6")
 }
 
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MessageLabel/AnimationPlayer"]
+libraries = {
+"": SubResource("AnimationLibrary_21bw6")
+}
+
 [connection signal="item_selected" from="VBoxContainer/Layout/PhotoEditing/ToolsList" to="." method="_on_tools_list_item_selected"]
 [connection signal="tab_changed" from="VBoxContainer/Layout/Left/Top" to="VBoxContainer/Layout" method="_on_tab_changed"]
 [connection signal="tab_changed" from="VBoxContainer/Layout/Left/Bottom" to="VBoxContainer/Layout" method="_on_tab_changed"]

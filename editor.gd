@@ -424,6 +424,25 @@ func edit_redo_is_disabled() ->  bool:
 		return !project.can_redo()
 	return true
 
+func edit_cut() -> void:
+	var graph_edit : MTGraph = get_current_graph_edit()
+	if graph_edit != null:
+		graph_edit.cut()
+func edit_copy() -> void:
+	var graph_edit : MTGraph = get_current_graph_edit()
+	if graph_edit != null:
+		graph_edit.copy()
+
+func edit_paste() -> void:
+	var graph_edit : MTGraph = get_current_graph_edit()
+	if graph_edit != null:
+		graph_edit.paste()
+
+func edit_duplicate() -> void:
+	var graph_edit : MTGraph = get_current_graph_edit()
+	if graph_edit != null:
+		graph_edit.duplicate_selected()
+
 func edit_select_all() -> void:
 	var graph_edit : MTGraph = get_current_graph_edit()
 	if graph_edit != null:
