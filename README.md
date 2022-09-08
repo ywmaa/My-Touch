@@ -30,4 +30,6 @@
 
 ### mac os
 
+### html5 (still thinking)
+
 ### android (still thinking)
