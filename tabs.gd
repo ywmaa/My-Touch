@@ -114,7 +114,7 @@ func _input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_next_tab"):
 		current_tab = wrapi(current_tab + 1, 0, $Tabs.get_tab_count())
 
-func _gui_input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
 	# Navigate between tabs by hovering tabs then using the mouse wheel.
 	# Only take into account the mouse wheel scrolling on the tabs themselves,
 	# not their content.

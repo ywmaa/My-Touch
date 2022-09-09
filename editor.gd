@@ -36,6 +36,8 @@ const MENU = [
 	{ menu="File/-" },
 	{ menu="File/Export", submenu="export" },
 	{ menu="File/-" },
+	{ menu="File/Refresh", command="refresh", shortcut="Control+R" },
+	{ menu="File/-" },
 	{ menu="File/Close", command="close_project", shortcut="Control+Shift+Q" },
 	{ menu="File/Quit", command="quit", shortcut="Control+Q" },
 
@@ -114,11 +116,12 @@ func _ready() -> void:
 	mt_globals.menu_manager.create_menus(MENU, self, $VBoxContainer/TopBar/Menu)
 
 	new_project()
-#
-#	do_load_projects(OS.get_cmdline_args())
-#
-#	get_tree().connect("files_dropped", self, "on_files_dropped")
-#
+
+	do_load_projects(OS.get_cmdline_args())
+
+	get_viewport().connect("files_dropped", on_files_dropped)
+
+
 
 func _enter_tree() -> void:
 	mt_globals.main_window = self
@@ -362,7 +365,10 @@ func export_jpeg_image():
 	var image : Image = Image.new()
 	image = graph_edit.canvas.get_texture().get_image()
 	image.save_png(files[0])
-
+func refresh():
+	var project = get_current_project()
+	if project != null:
+		project.refresh()
 func close_project() -> void:
 	projects.close_tab()
 
@@ -564,6 +570,42 @@ func about() -> void:
 
 
 
+
+# Handle dropped files
+
+func get_controls_at_position(pos : Vector2, parent : Control) -> Array:
+	var return_value = []
+	for c in parent.get_children():
+		if c is Control and c.visible and c.get_global_rect().has_point(pos):
+			for n in get_controls_at_position(pos, c):
+				return_value.append(n)
+	if return_value.is_empty():
+		return_value.append(parent)
+	return return_value
+
+func on_files_dropped(files : PackedStringArray) -> void:
+	var file : File = File.new()
+	for f in files:
+		if file.open(f, File.READ) != OK:
+			continue
+		f = file.get_path_absolute()
+		match f.get_extension():
+			"tres":
+				do_load_project(f)
+			"jpg", "jpeg", "png", "svg", "webp":
+				var controls : Array = get_controls_at_position(get_global_mouse_position(), self)
+#				print(controls)
+				while !controls.is_empty():
+					var next_controls = []
+					for control in controls:
+						if control == null:
+							continue
+						if control.has_method("on_drop_image_file"):
+							control.on_drop_image_file(f)
+							return
+						if control.get_parent() != self:
+							next_controls.append(control.get_parent())
+					controls = next_controls
 
 
 

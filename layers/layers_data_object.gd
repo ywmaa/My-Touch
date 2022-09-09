@@ -2,17 +2,20 @@ extends Resource
 class_name layers_object
 
 @export var layers = []
-var selected_layers : Array[base_layer] = []
+var selected_layers : Array = []
 var canvas
+
+
 
 func load_layers():
 	for layer in layers:
-		layer.image.z_index = layers.find(layer)
-		canvas.add_child(layer.image)
-		_on_layers_changed()
+		if layer:
+			layer.image.z_index = layers.find(layer)
+			layer.refresh()
+		if canvas:
+			canvas.add_child(layer.image)
 func add_layer(new_layer:base_layer):
 	layers.append(new_layer)
-	new_layer.image.z_index = layers.find(new_layer)
 	canvas.add_child(new_layer.image)
 	_on_layers_changed()
 
@@ -38,14 +41,24 @@ func _on_layers_changed() -> void:
 	pass
 	
 
-func duplicate_layer(source_layer : base_layer) -> void:
-	var layer = base_layer.new()#source_layer.duplicate()
-	layer.name = get_unused_layer_name(layers)
-	layer.image.texture = source_layer.image.texture
-	layer.type = source_layer.type
-	add_layer(layer)
-	select_layer(layer)
-	_on_layers_changed()
+func duplicate_layer(source_layer) -> void:
+	if source_layer is project_layer:
+		var layer = project_layer.new()
+		layer.project_layers = layers_object.new()
+		layer.name = source_layer.name
+		add_layer(layer)
+		select_layer(layer)
+		_on_layers_changed()
+		return
+	if source_layer is base_layer:
+		var layer = base_layer.new()
+		layer.name = get_unused_layer_name()
+		layer.image.texture = source_layer.image.texture
+		layer.type = source_layer.type
+		add_layer(layer)
+		select_layer(layer)
+		_on_layers_changed()
+		return
 
 func remove_layer(layer : base_layer) -> void:
 	var need_reselect : bool = (layer in selected_layers)
@@ -71,7 +84,6 @@ func move_layer_into(layer : base_layer, target_layer : base_layer, index : int 
 	elif array == target_array and index > orig_index:
 		index -= 1
 	target_array.insert(index, layer)
-	layer.image.z_index = index
 	_on_layers_changed()
 
 func move_layer_up(layer : base_layer) -> void:
@@ -80,8 +92,6 @@ func move_layer_up(layer : base_layer) -> void:
 	if orig_index > 0:
 		array.erase(layer)
 		array.insert(orig_index-1, layer)
-		layer.image.z_index = orig_index-2
-		array[orig_index].image.z_index = orig_index
 		_on_layers_changed()
 
 func move_layer_down(layer : base_layer) -> void:
@@ -90,8 +100,6 @@ func move_layer_down(layer : base_layer) -> void:
 	if orig_index < array.size()-1:
 		array.erase(layer)
 		array.insert(orig_index+1, layer)
-		layer.image.z_index = orig_index+1
-		array[orig_index].image.z_index = orig_index
 		_on_layers_changed()
 
 
@@ -103,5 +111,14 @@ func find_parent_array(layer : base_layer, layer_array : Array = layers):
 	return null
 
 
-func get_unused_layer_name(layers_array : Array) -> String:
-	return "New"
+func get_unused_layer_name() -> String:
+	var naming = "new_layer"
+	var return_name : String
+	var count = 0
+	return_name = naming
+	for layer in layers:
+		if layer.name == return_name:
+			count += 1
+		if count > 0:
+			return_name = naming + " " + str(count)
+	return return_name

@@ -14,9 +14,12 @@ func set_layers(layers) -> void:
 	layers = layers
 	tree.layers = layers
 	if layers:
+		layers.load_layers()
 		tree.update_from_layers(layers.layers, layers.selected_layers)
 	else:
 		tree.update_from_layers([], [])
+func on_drop_image_file(path):
+	mt_globals.main_window.get_current_graph_edit().on_drop_image_file(path)
 
 func _on_Tree_selection_changed(new_selected) -> void:
 	layers.selected_layers.clear()

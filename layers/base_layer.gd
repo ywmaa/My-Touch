@@ -19,8 +19,22 @@ enum layer_type {image,project}
 		hidden = new_hidden
 		image.visible = !hidden
 		
+@export var image_path : String
 
 
+var texture = ImageTexture.new()
+
+func init(image_name: String,path: String,layer_type : layer_type):
+	name = image_name
+	image_path = path
+	type = layer_type
 
 func clear_image():
 	image.queue_free()
+
+func refresh():
+	if !texture.get_image():
+		var load_image = Image.load_from_file(image_path)
+		texture.set_image(load_image)
+		if image:
+			image.texture = texture

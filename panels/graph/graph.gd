@@ -16,7 +16,7 @@ var current_mode : tool_mode = tool_mode.none:
 
 
 var layers : layers_object = layers_object.new()
-var default_icon = preload("res://icon.png")
+var default_icon = "res://icon.png"
 var save_path = null : 
 	set(path):
 		if path != save_path:
@@ -41,9 +41,7 @@ func _ready() -> void:
 	$SubViewportContainer/Background.size = canvas.size
 	#default layer
 	var new_layer : base_layer = base_layer.new()
-	new_layer.image.texture = default_icon
-	new_layer.name = "new_layer"
-	new_layer.type = base_layer.layer_type.image
+	new_layer.init(layers.get_unused_layer_name(),default_icon,base_layer.layer_type.image)
 	layers.add_layer(new_layer)
 	center_view()
 
@@ -110,8 +108,9 @@ func _input(event):
 			query.collide_with_areas = true
 			
 			#deselect on selecting none
-#			if space.intersect_shape(query) == []:
-#				layers.selected_layers = []
+			
+			if space.intersect_shape(query) == [] and get_global_rect().has_point(get_global_mouse_position()):
+				layers.selected_layers = []
 			for area in space.intersect_shape(query):
 				for layer in layers.layers:
 					if area.collider.get_parent() == layer.image:
@@ -121,7 +120,8 @@ func _input(event):
 				if layer is Camera2D:
 					continue
 				for child in layer.get_children():
-					child.queue_free()
+					if child is Area2D:
+						child.queue_free()
 			
 
 func _unhandled_input(event): 
@@ -160,7 +160,12 @@ func _unhandled_input(event):
 			direction = coordinates.y
 
 
-
+func on_drop_image_file(path):
+	var new_layer : base_layer = base_layer.new()
+	new_layer.init(layers.get_unused_layer_name(),path,base_layer.layer_type.image)
+	new_layer.type = base_layer.layer_type.image
+	layers.add_layer(new_layer)
+	
 func _process(delta):
 	mouse_position_delta = get_global_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
 	if current_mode == tool_mode.none:
@@ -287,12 +292,8 @@ func load_project_layer(filenames) -> void:
 		if data != null:
 			var new_project_layer = project_layer.new()
 			new_project_layer.project_layers = layers_object.new()
-			new_project_layer.project_layers = data.layers
-			new_project_layer.project_layers.canvas = canvas
-			
-			new_project_layer.project_layers.load_layers()
+			new_project_layer.init(file_name,default_icon,base_layer.layer_type.project)
 			layers.add_layer(new_project_layer)
-			
 		else:
 			var dialog : AcceptDialog = AcceptDialog.new()
 			add_child(dialog)
@@ -300,6 +301,11 @@ func load_project_layer(filenames) -> void:
 			dialog.dialog_text = "Failed to load "+file_name
 			dialog.connect("popup_hide", dialog.queue_free)
 			dialog.popup_centered()
+func refresh():
+	for layer in layers.layers:
+		if layer is project_layer:
+			layer.refresh()
+	
 
 func tool_shortcut(index): # handle tools list
 	match index:
