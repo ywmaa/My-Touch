@@ -20,7 +20,7 @@
 
 
 # Roadmap
- https://trello.com/b/ATaLIaII/photo-touch
+ https://trello.com/b/ATaLIaII/my-touch
  
 # Current Version 0.0.9
 
