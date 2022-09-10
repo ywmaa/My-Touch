@@ -2,21 +2,22 @@ extends Panel
 
 var current_tab = -1 :
 	set(t):
-		if t == current_tab or t < 0 or t >= $Tabs.get_tab_count():
+		if t < 0 or t >= $Tabs.get_tab_count():
 			return
 		var node
 		if current_tab >= 0 && current_tab < $Tabs.get_tab_count():
 			node = get_child(current_tab)
-			node.visible = false
-			node.layers.selected_layers.clear()
+			if !(node is TabBar):
+				node.visible = false
+				node.layers.unload_layers()
+				node.layers.selected_layers.clear()
 		current_tab = t
 		node = get_child(current_tab)
 		node.visible = true
 		node.get_rect().position = Vector2(0, $Tabs.get_rect().size.y)
 		node.get_rect().size = get_rect().size - node.get_rect().position
-		
 		$Tabs.current_tab = current_tab
-		emit_signal("tab_changed", current_tab)
+		emit_signal("tab_changed")
 signal tab_changed
 signal no_more_tabs
 
@@ -77,11 +78,13 @@ func do_close_custom_action(_action : String, _tab : int, dialog : AcceptDialog)
 
 
 func do_close_tab(tab = 0) -> void:
+	for child in get_child(tab).get_children():
+		remove_child(child)
 	get_child(tab).queue_free()
 	$Tabs.remove_tab(tab)
 	var control = get_child(tab)
 	remove_child(control)
-	control.free()
+#	control.free()
 	current_tab = -1
 	if $Tabs.get_tab_count() == 0:
 		emit_signal("no_more_tabs")
@@ -97,6 +100,7 @@ func move_active_tab_to(idx_to) -> void:
 
 func set_tab_title(index, title) -> void:
 	$Tabs.set_tab_title(index, title)
+	
 
 func get_current_tab_control():
 	if get_child_count() < 2:
@@ -109,9 +113,9 @@ func _on_Projects_resized() -> void:
 
 func _input(event: InputEvent) -> void:
 	# Navigate between tabs using keyboard shortcuts.
-	if event.is_action_pressed("ui_previous_tab"):
+	if event.is_action_pressed("ui_focus_prev"):
 		current_tab = wrapi(current_tab - 1, 0, $Tabs.get_tab_count())
-	elif event.is_action_pressed("ui_next_tab"):
+	elif event.is_action_pressed("ui_focus_next"):
 		current_tab = wrapi(current_tab + 1, 0, $Tabs.get_tab_count())
 
 func _unhandled_input(event: InputEvent) -> void:

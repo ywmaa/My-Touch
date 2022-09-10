@@ -4,7 +4,13 @@ extends VBoxContainer
 var layers
 
 @onready var tree = $Tree
-
+#func _ready():
+#	mt_globals.main_window.get_node("/root/Editor/VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects").connect("tab_changed",update_signal)
+#func update_signal():
+#	mt_globals.main_window.get_current_graph_edit().connect("graph_changed",update_layers)
+#	set_layers(mt_globals.main_window.get_current_graph_edit().layers)
+#func update_layers():
+#	set_layers(mt_globals.main_window.get_current_graph_edit().layers)
 func _process(delta):
 	if mt_globals.main_window.get_current_graph_edit():
 		set_layers(mt_globals.main_window.get_current_graph_edit().layers)
@@ -18,8 +24,6 @@ func set_layers(layers) -> void:
 		tree.update_from_layers(layers.layers, layers.selected_layers)
 	else:
 		tree.update_from_layers([], [])
-func on_drop_image_file(path):
-	mt_globals.main_window.get_current_graph_edit().on_drop_image_file(path)
 
 func _on_Tree_selection_changed(new_selected) -> void:
 	layers.selected_layers.clear()

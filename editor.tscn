@@ -195,6 +195,8 @@ drag_to_rearrange_enabled = true
 use_hidden_tabs_for_min_size = true
 
 [node name="MessageLabel" type="Label" parent="."]
+visible = false
+modulate = Color(1, 1, 1, 0)
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -206,11 +208,6 @@ text = "Undo/Redo action added"
 script = SubResource("6")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="MessageLabel"]
-libraries = {
-"": SubResource("AnimationLibrary_21bw6")
-}
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="MessageLabel/AnimationPlayer"]
 libraries = {
 "": SubResource("AnimationLibrary_21bw6")
 }

@@ -37,6 +37,7 @@ const MENU = [
 	{ menu="File/Export", submenu="export" },
 	{ menu="File/-" },
 	{ menu="File/Refresh", command="refresh", shortcut="Control+R" },
+	{ menu="File/Open File Location", command="open_file_location" },
 	{ menu="File/-" },
 	{ menu="File/Close", command="close_project", shortcut="Control+Shift+Q" },
 	{ menu="File/Quit", command="quit", shortcut="Control+Q" },
@@ -65,6 +66,7 @@ const MENU = [
 	{ menu="View/-" },
 	{ menu="View/Show or Hide side panels", command="toggle_side_panels", shortcut="Control+Space" },
 	{ menu="View/Panels", submenu="show_panels" },
+	{ menu="View/Fullscreen", command="fullscreen", shortcut="F11"},
 
 	{ menu="Help/User manual", command="show_doc", shortcut="F1" },
 	{ menu="Help/Report a bug", command="bug_report" },
@@ -80,14 +82,15 @@ func _ready() -> void:
 		mt_globals.set_config("locale", TranslationServer.get_locale())
 
 	on_config_changed()
-
+	
+	get_screen_position()
+	
 	# Restore the window position/size if values are present in the configuration cache
 	if mt_globals.config.has_section_key("window", "screen"):
 		DisplayServer.window_set_current_screen(mt_globals.config.get_value("window", "screen"))
 	if mt_globals.config.has_section_key("window", "maximized"):
 		DisplayServer.window_set_mode(mt_globals.config.get_value("window", "maximized"))
-	
-	if !Window.MODE_MAXIMIZED:
+	if DisplayServer.window_get_mode() != DisplayServer.WindowMode.WINDOW_MODE_MAXIMIZED:
 		if mt_globals.config.has_section_key("window", "position"):
 			DisplayServer.window_set_position(mt_globals.config.get_value("window", "position"))
 		if mt_globals.config.has_section_key("window", "size"):
@@ -99,13 +102,13 @@ func _ready() -> void:
 		theme_name = mt_globals.config.get_value("window", "theme")
 	set_app_theme(theme_name)
 
-
+	
 	# Set a minimum window size to prevent UI elements from collapsing on each other.
 	DisplayServer.window_set_min_size(Vector2i(1024, 600))
 	# Set window title
 	DisplayServer.window_set_title(str(ProjectSettings.get_setting("application/config/name")+" v"+ProjectSettings.get_setting("application/config/actual_release")))
 
-
+	
 	layout.load_panels()
 	tools = get_panel("Tools")
 #
@@ -118,7 +121,7 @@ func _ready() -> void:
 	new_project()
 
 	do_load_projects(OS.get_cmdline_args())
-
+	
 	get_viewport().connect("files_dropped", on_files_dropped)
 
 
@@ -190,7 +193,6 @@ func _notification(what : int) -> void:
 
 func new_project() -> void:
 	var graph_edit = new_graph_panel()
-#	graph_edit.new_canvas()
 	graph_edit.update_tab_title()
 
 func new_graph_panel():
@@ -235,17 +237,22 @@ func do_load_project(file_name) -> bool:
 		remove_recent(file_name)
 	return status
 func do_load_mt(filename : String) -> bool:
-	var graph_edit : MTGraph = get_current_graph_edit()
-	var node_count = 2 # So test below succeeds if graph_edit is null...
-	if graph_edit != null:
-		node_count = 0
-		for c in graph_edit.canvas.get_children():
-			if !(c is Camera2D):
-				node_count += 1
-				if node_count > 1:
-					break
-	if node_count > 1:
-		graph_edit = new_graph_panel()
+	var name_used = false
+	var name_without_path = filename.substr(filename.rfind("/")+1)
+	for tab in projects.get_node("Tabs").tab_count:
+		if projects.get_node("Tabs").get_tab_title(tab).contains("/"):
+			projects.get_child(tab).name_used = false
+			projects.get_child(tab).update_tab_title()
+		if projects.get_node("Tabs").get_tab_title(tab) == name_without_path:
+			if projects.get_child(tab).save_path == filename:
+				projects.set_current_tab(tab)
+				return true
+			else:
+				projects.get_child(tab).name_used = true
+				projects.get_child(tab).update_tab_title()
+				name_used = true
+	var graph_edit = new_graph_panel()
+	graph_edit.name_used = name_used
 	graph_edit.load_file(filename)
 	return true
 
@@ -369,6 +376,17 @@ func refresh():
 	var project = get_current_project()
 	if project != null:
 		project.refresh()
+func open_file_location():
+	var project = get_current_graph_edit()
+	if project != null:
+		if project.save_path != null:
+			var path = project.save_path
+			var path_array = path.split("/")
+			path_array.remove_at(path_array.size()-1)
+			path = ""
+			for s in path_array:
+				path += s + "/"
+			OS.shell_open(path)
 func close_project() -> void:
 	projects.close_tab()
 
@@ -535,6 +553,12 @@ func view_reset_zoom() -> void:
 
 func toggle_side_panels() -> void:
 	$VBoxContainer/Layout.toggle_side_panels()
+	
+func fullscreen():
+	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_FULLSCREEN:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 # -----------------------------------------------------------------------
 #                             Help menu
 # -----------------------------------------------------------------------
@@ -573,17 +597,8 @@ func about() -> void:
 
 # Handle dropped files
 
-func get_controls_at_position(pos : Vector2, parent : Control) -> Array:
-	var return_value = []
-	for c in parent.get_children():
-		if c is Control and c.visible and c.get_global_rect().has_point(pos):
-			for n in get_controls_at_position(pos, c):
-				return_value.append(n)
-	if return_value.is_empty():
-		return_value.append(parent)
-	return return_value
-
 func on_files_dropped(files : PackedStringArray) -> void:
+	
 	var file : File = File.new()
 	for f in files:
 		if file.open(f, File.READ) != OK:
@@ -593,19 +608,8 @@ func on_files_dropped(files : PackedStringArray) -> void:
 			"tres":
 				do_load_project(f)
 			"jpg", "jpeg", "png", "svg", "webp":
-				var controls : Array = get_controls_at_position(get_global_mouse_position(), self)
-#				print(controls)
-				while !controls.is_empty():
-					var next_controls = []
-					for control in controls:
-						if control == null:
-							continue
-						if control.has_method("on_drop_image_file"):
-							control.on_drop_image_file(f)
-							return
-						if control.get_parent() != self:
-							next_controls.append(control.get_parent())
-					controls = next_controls
+				if get_current_graph_edit():
+					get_current_graph_edit().on_drop_image_file(f)
 
 
 

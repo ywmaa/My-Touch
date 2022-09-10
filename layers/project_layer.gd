@@ -7,8 +7,8 @@ func _init():
 	type = layer_type.project
 
 func clear_image():
+	super.clear_image()
 	for layer in project_layers.layers:
-		project_layers.layers.erase(layer)
 		layer.clear_image()
 
 func refresh():
@@ -16,5 +16,8 @@ func refresh():
 	project_layers.canvas = image
 	var data = ResourceLoader.load(name) as SaveProject
 	if data != null:
-		project_layers.layers = data.layers.layers
+		for layer in project_layers.layers:
+			project_layers.remove_layer(layer)
+		for layer in data.layers.layers:
+			project_layers.add_layer(layer)
 		project_layers.load_layers()

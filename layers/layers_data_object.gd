@@ -5,18 +5,26 @@ class_name layers_object
 var selected_layers : Array = []
 var canvas
 
-
-
+signal layers_changed
+func unload_layers():
+	for layer in layers:
+		if layer:
+			layer.clear_image()
+#		if canvas:
+#			if layer.image.get_parent() == canvas:
+#				canvas.add_child(layer.image)
 func load_layers():
 	for layer in layers:
 		if layer:
-			layer.image.z_index = layers.find(layer)
 			layer.refresh()
+			layer.image.z_index = layers.find(layer)
 		if canvas:
-			canvas.add_child(layer.image)
+			if layer.image.get_parent() == null:
+				canvas.add_child(layer.image)
 func add_layer(new_layer:base_layer):
 	layers.append(new_layer)
-	canvas.add_child(new_layer.image)
+	if new_layer.image.get_parent() == null:
+		canvas.add_child(new_layer.image)
 	_on_layers_changed()
 
 func select_layer_name(layer_name):
@@ -31,14 +39,15 @@ func select_layer(layer : base_layer) -> void:
 	if layers.has(layer):
 		if !selected_layers.has(layer):
 			selected_layers.append(layer)
+	_on_layers_changed()
 
 func deselect_layer(layer : base_layer) -> void:
 	if layers.has(layer):
 		selected_layers.erase(layer)
-		
+	_on_layers_changed()
 
 func _on_layers_changed() -> void:
-	pass
+	emit_signal("layers_changed")
 	
 
 func duplicate_layer(source_layer) -> void:

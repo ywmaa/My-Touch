@@ -17,6 +17,7 @@ var current_mode : tool_mode = tool_mode.none:
 
 var layers : layers_object = layers_object.new()
 var default_icon = "res://icon.png"
+var name_used : bool = false
 var save_path = null : 
 	set(path):
 		if path != save_path:
@@ -33,16 +34,18 @@ signal activate_layer_related_tools(state:bool)
 
 
 func set_current():
-	mt_globals.main_window.get_panel("Layers").set_layers(layers)
+	emit_signal("graph_changed")
 	# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	layers.canvas = canvas
+	layers.connect("layers_changed",func(): emit_signal("graph_changed"))
 	OS.low_processor_usage_mode = true
 	$SubViewportContainer/Background.size = canvas.size
 	#default layer
 	var new_layer : base_layer = base_layer.new()
 	new_layer.init(layers.get_unused_layer_name(),default_icon,base_layer.layer_type.image)
 	layers.add_layer(new_layer)
+	
 	center_view()
 
 
@@ -85,7 +88,7 @@ func _input(event):
 		if event.pressed:
 			dragging = true
 			drag_start = get_local_mouse_position()
-			for layer in canvas.get_children():
+			for layer in mt_globals.main_window.get_current_graph_edit().canvas.get_children():
 				if layer is Camera2D:
 					continue
 				var collision : CollisionShape2D = CollisionShape2D.new()
@@ -122,11 +125,9 @@ func _input(event):
 				for child in layer.get_children():
 					if child is Area2D:
 						child.queue_free()
-			
+		
 
-func _unhandled_input(event): 
-	if event.is_action_pressed("toggle_fullscreen"):
-		OS.window_fullscreen = !OS.window_fullscreen
+func _unhandled_input(event):
 	if event.is_action("ui_up"):
 		canvas.get_camera_2d().position.y += -1.0
 	if event.is_action("ui_down"):
@@ -163,7 +164,6 @@ func _unhandled_input(event):
 func on_drop_image_file(path):
 	var new_layer : base_layer = base_layer.new()
 	new_layer.init(layers.get_unused_layer_name(),path,base_layer.layer_type.image)
-	new_layer.type = base_layer.layer_type.image
 	layers.add_layer(new_layer)
 	
 func _process(delta):
@@ -303,8 +303,7 @@ func load_project_layer(filenames) -> void:
 			dialog.popup_centered()
 func refresh():
 	for layer in layers.layers:
-		if layer is project_layer:
-			layer.refresh()
+		layer.refresh()
 	
 
 func tool_shortcut(index): # handle tools list
@@ -408,7 +407,11 @@ func update_tab_title() -> void:
 		return
 	var title = "[unnamed]"
 	if save_path != null:
-		title = save_path.right(save_path.rfind("/")+1)
+		if name_used == true:
+			title = save_path
+		else:
+			title = save_path.substr(save_path.rfind("/")+1)
+		
 	if need_save:
 		title += " *"
 	if get_parent().has_method("set_tab_title"):
@@ -421,10 +424,10 @@ func load_file(filename) -> bool:
 		for child in canvas.get_children():
 			if child is Camera2D:
 				continue
-			child.queue_free()
+			remove_child(child)
+			
 		layers = data.layers
 		layers.canvas = canvas
-		layers.load_layers()
 		return true
 	else:
 		var dialog : AcceptDialog = AcceptDialog.new()

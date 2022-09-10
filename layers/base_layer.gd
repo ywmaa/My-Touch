@@ -30,7 +30,8 @@ func init(image_name: String,path: String,layer_type : layer_type):
 	type = layer_type
 
 func clear_image():
-	image.queue_free()
+	if image.get_parent() != null:
+		image.get_parent().remove_child(image)
 
 func refresh():
 	if !texture.get_image():
