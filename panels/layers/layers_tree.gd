@@ -3,7 +3,7 @@ extends Tree
 var layers = null
 var selected_items : Array[TreeItem]
 var just_selected : bool = false
-
+var editing : bool = false
 const ICON_LAYER_PAINT = preload("res://panels/layers/icons/layer_paint.tres")
 const ICON_LAYER_PROC = preload("res://panels/layers/icons/layer_proc.tres")
 const ICON_LAYER_MASK = preload("res://panels/layers/icons/layer_mask.tres")
@@ -27,9 +27,10 @@ func _make_custom_tooltip(for_text):
 	return panel
 
 func update_from_layers(layers_array : Array, selected_layers) -> void:
-	selected_items.clear()
-	clear()
-	do_update_from_layers(layers_array, create_item(), selected_layers)
+	if !editing:
+		selected_items.clear()
+		clear()
+		do_update_from_layers(layers_array, create_item(), selected_layers)
 
 func do_update_from_layers(layers_array : Array, item : TreeItem, selected_layers) -> void:
 	for l in layers_array:
@@ -37,7 +38,6 @@ func do_update_from_layers(layers_array : Array, item : TreeItem, selected_layer
 		new_item.set_text(0, l.name)
 		new_item.set_icon(0, ICONS[l.type])
 		new_item.add_button(1, BUTTON_HIDDEN if l.hidden else BUTTON_SHOWN)
-#		new_item.set_editable(0, true)
 		new_item.set_meta("layer", l)
 		new_item.set_tooltip_text(0, str(new_item.get_instance_id()))
 		if l in selected_layers:
@@ -96,15 +96,18 @@ func _on_tree_button_clicked(item, column, id, mouse_button_index):
 	l.hidden = !l.hidden
 	_on_layers_changed()
 
-#func _on_Tree_gui_input(event):
-#	if event is InputEventMouseButton and event.double_click == true:
-#		for selected_item in selected_items:
-#			selected_item.set_editable(0, true)
-#		just_selected = false
+func _on_Tree_gui_input(event):
+	if event is InputEventMouseButton and event.double_click == true:
+		for selected_item in selected_items:
+			if !(selected_item.get_meta("layer") is project_layer):
+				selected_item.set_editable(0, true)
+				editing = true
+		just_selected = false
 
 func _on_Tree_item_edited():
 	for selected_item in selected_items:
 		selected_item.get_meta("layer").name = selected_item.get_text(0)
+	editing = false
 
 func _on_layers_changed():
 	layers._on_layers_changed()

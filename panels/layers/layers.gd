@@ -70,3 +70,7 @@ func _on_Config_pressed():
 		var popup = preload("res://panels/layers/layer_config_popup.tscn").instantiate()
 		add_child(popup)
 		popup.configure_layer(layers, current.get_meta("layer"))
+
+func _input(event):
+	if Input.is_action_just_pressed("delete"):
+		_on_Remove_pressed()
