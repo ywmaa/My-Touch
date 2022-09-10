@@ -54,16 +54,14 @@ func duplicate_layer(source_layer) -> void:
 	if source_layer is project_layer:
 		var layer = project_layer.new()
 		layer.project_layers = layers_object.new()
-		layer.name = source_layer.name
+		layer.init(source_layer.name,source_layer.image_path,base_layer.layer_type.project)
 		add_layer(layer)
 		select_layer(layer)
 		_on_layers_changed()
 		return
 	if source_layer is base_layer:
 		var layer = base_layer.new()
-		layer.name = get_unused_layer_name()
-		layer.image.texture = source_layer.image.texture
-		layer.type = source_layer.type
+		layer.init(get_unused_layer_name(),source_layer.image_path,source_layer.type)
 		add_layer(layer)
 		select_layer(layer)
 		_on_layers_changed()
@@ -71,7 +69,7 @@ func duplicate_layer(source_layer) -> void:
 
 func remove_layer(layer : base_layer) -> void:
 	var need_reselect : bool = (layer in selected_layers)
-	var layers_array : Array = find_parent_array(layer)
+	var layers_array = find_parent_array(layer)
 	layer.clear_image()
 	layers_array.erase(layer)
 	if need_reselect:
