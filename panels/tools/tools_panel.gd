@@ -18,7 +18,6 @@ func _ready():
 	create_menu(TOOLS,self,tree)
 
 func create_menu(menu_def : Array, object : Object, menu:Tree):
-	var is_mac : bool = OS.get_name() == "OSX"
 	menu.clear()
 	if !menu.is_connected("item_selected", on_menu_id_pressed):
 		menu.connect("item_selected", on_menu_id_pressed.bind(menu_def, object))
@@ -35,7 +34,7 @@ func create_menu(menu_def : Array, object : Object, menu:Tree):
 				if s == "Alt":
 					shortcut |= KEY_MASK_ALT
 				elif s == "Control":
-					shortcut |= KEY_MASK_CMD if is_mac else KEY_MASK_CTRL
+					shortcut |= KEY_MASK_CMD_OR_CTRL
 				elif s == "Shift":
 					shortcut |= KEY_MASK_SHIFT
 				else:

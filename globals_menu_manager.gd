@@ -24,7 +24,6 @@ func create_menu(menu_def : Array, object : Object, menu : PopupMenu, menu_name 
 	var mode = ""
 	if object.has_method("get_current_mode"):
 		mode = object.get_current_mode()
-	var is_mac : bool = OS.get_name() == "OSX"
 	var submenus = {}
 	var menu_name_length = menu_name.length() 
 	menu.clear()
@@ -74,7 +73,7 @@ func create_menu(menu_def : Array, object : Object, menu : PopupMenu, menu_name 
 					if s == "Alt":
 						shortcut |= KEY_MASK_ALT
 					elif s == "Control":
-						shortcut |= KEY_MASK_CMD if is_mac else KEY_MASK_CTRL
+						shortcut |= KEY_MASK_CMD_OR_CTRL
 					elif s == "Shift":
 						shortcut |= KEY_MASK_SHIFT
 					else:
