@@ -1,6 +1,5 @@
 extends Node
 
-
 # warning-ignore:unused_class_variable
 @onready var menu_manager = $MenuManager
 

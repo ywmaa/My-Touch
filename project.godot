@@ -70,6 +70,7 @@ config/actual_release="0.1"
 
 [autoload]
 
+ToolManager="*res://tool_manager.gd"
 mt_globals="*res://globals.tscn"
 Layers="*res://layers/layers_data_object.gd"
 

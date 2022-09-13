@@ -2,9 +2,11 @@ extends VBoxContainer
 var tools_items : Array 
 @onready var tree : Tree = $Tree
 const TOOLS = [
+	{ tool="Select", command="none", shortcut="Shift+F", tooltip="select tool" },
 	{ tool="Move", command="move", shortcut="Shift+G", tooltip="move tool" },
 	{ tool="Rotate", command="rotate", shortcut="Shift+R", tooltip="rotate tool" },
 	{ tool="Scale", command="scale", shortcut="Shift+S", tooltip="scale tool" },
+	{ tool="Text tool", command="text", shortcut="Shift+T", tooltip="text tool" },
 ]
 
 func _on_tree_item_activated():
@@ -71,9 +73,17 @@ func _input(event):
 	for tool in TOOLS:
 		if tool.shortcut == event.as_text():
 			tools_items[TOOLS.find(tool)].select(0)
+func none():
+	ToolManager.current_tool = ToolManager.tool_mode.none
+	ToolManager.current_mode = ToolManager.tool_mode.none
 func move():
-	print("selected move tool")
+	ToolManager.current_tool = ToolManager.tool_mode.move_image
+	ToolManager.current_mode = ToolManager.tool_mode.none
 func rotate():
-	print("selected rotate tool")
+	ToolManager.current_tool = ToolManager.tool_mode.rotate_image
+	ToolManager.current_mode = ToolManager.tool_mode.none
 func scale():
-	print("selected scale tool")
+	ToolManager.current_tool = ToolManager.tool_mode.scale_image
+	ToolManager.current_mode = ToolManager.tool_mode.none
+func text():
+	print("selected text tool")
