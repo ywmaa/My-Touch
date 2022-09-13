@@ -6,7 +6,6 @@ const TOOLS = [
 	{ tool="Move", command="move", shortcut="Shift+G", tooltip="move tool" },
 	{ tool="Rotate", command="rotate", shortcut="Shift+R", tooltip="rotate tool" },
 	{ tool="Scale", command="scale", shortcut="Shift+S", tooltip="scale tool" },
-	{ tool="Text tool", command="text", shortcut="Shift+T", tooltip="text tool" },
 ]
 
 func _on_tree_item_activated():
@@ -36,7 +35,8 @@ func create_menu(menu_def : Array, object : Object, menu:Tree):
 				if s == "Alt":
 					shortcut |= KEY_MASK_ALT
 				elif s == "Control":
-					shortcut |= KEY_MASK_CMD_OR_CTRL
+					#replace with KEY_MASK_CMD_OR_CTRL
+					shortcut |= KEY_MASK_CTRL
 				elif s == "Shift":
 					shortcut |= KEY_MASK_SHIFT
 				else:
@@ -85,5 +85,3 @@ func rotate():
 func scale():
 	ToolManager.current_tool = ToolManager.tool_mode.scale_image
 	ToolManager.current_mode = ToolManager.tool_mode.none
-func text():
-	print("selected text tool")

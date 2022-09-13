@@ -51,7 +51,8 @@ func check_save_tabs() -> bool:
 func check_save_tab(tab) -> bool:
 	var tab_control = get_child(tab)
 	if tab_control.need_save and mt_globals.get_config("confirm_close_project"):
-		var dialog = preload("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
+		#replace with preload
+		var dialog = load("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
 		var save_path = tab_control.save_path
 		if save_path == null:
 			save_path = "[unnamed]"

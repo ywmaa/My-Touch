@@ -66,6 +66,8 @@ config/name="My Touch"
 run/main_scene="res://editor.tscn"
 config/features=PackedStringArray("4.0", "Vulkan Mobile")
 config/icon="res://icon.png"
+config/macos_native_icon="res://icon.png"
+config/windows_native_icon="res://icon.png"
 config/actual_release="0.1"
 
 [autoload]

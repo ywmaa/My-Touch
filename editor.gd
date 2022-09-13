@@ -196,13 +196,15 @@ func new_project() -> void:
 	graph_edit.update_tab_title()
 
 func new_graph_panel():
-	var graph_edit = preload("res://panels/graph/graph.tscn").instantiate()
+	#replace with preload
+	var graph_edit = load("res://panels/graph/graph.tscn").instantiate()
 	projects.add_child(graph_edit)
 	projects.current_tab = graph_edit.get_index()
 	return graph_edit
 
 func load_project() -> void:
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	#replace with preload
+	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -336,7 +338,8 @@ func _on_export_id_pressed(id) -> void:
 			export_jpeg_image()
 func export_png_image():
 	# Prompt for a target PNG file
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	#replace with preload
+	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -347,17 +350,14 @@ func export_png_image():
 		return
 	# Generate the image
 	var graph_edit : MTGraph = get_current_graph_edit()
-#	graph_edit.canvas.transparent_bg = true
-#	await get_tree().create_timer(0.1).timeout
-#	await get_tree().process_frame
 	var image : Image = Image.new()
 	image = graph_edit.canvas.get_texture().get_image()
 	image.save_png(files[0])
-#	graph_edit.canvas.transparent_bg = false
 	
 func export_jpeg_image():
 	# Prompt for a target PNG file
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	#replace with preload
+	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -394,7 +394,8 @@ func quit() -> void:
 	if quitting:
 		return
 	quitting = true
-	var dialog = preload("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
+	#replace with preload
+	var dialog = load("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
 	dialog.dialog_text = "Quit My Touch?"
 	dialog.add_cancel_button("Cancel")
 	add_child(dialog)
@@ -483,7 +484,8 @@ func edit_select_invert() -> void:
 	if graph_edit != null:
 		graph_edit.select_invert()
 func edit_load_selection() -> void:
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	#replace with preload
+	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -503,7 +505,8 @@ func edit_save_selection() -> void:
 		return await project.save_selection()
 
 func edit_load_project_as_image() -> void:
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	#replace with preload
+	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -585,7 +588,8 @@ func bug_report() -> void:
 	OS.shell_open("https://github.com/ywmaa/My-Touch/issues")
 
 func about() -> void:
-	var about_box = preload("res://windows/about/about.tscn").instantiate()
+	#replace with preload
+	var about_box = load("res://windows/about/about.tscn").instantiate()
 	add_child(about_box)
 	about_box.connect("popup_hide", about_box.queue_free)
 	about_box.popup_centered()

@@ -22,7 +22,7 @@
 # Roadmap
  https://trello.com/b/ATaLIaII/my-touch
  
-# Current Version 0.0.9
+# Current Version 0.1
 
 
 # Supported Platforms :

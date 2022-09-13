@@ -248,7 +248,8 @@ func load_selection(filenames) -> void:
 			dialog.popup_centered()
 
 func save_selection() -> void:
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	#replace with preload
+	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -439,7 +440,8 @@ func save() -> bool:
 	return status
 
 func save_as() -> bool:
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	#replace with preload
+	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
