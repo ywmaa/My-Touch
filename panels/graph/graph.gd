@@ -229,8 +229,8 @@ func select_invert():
 func load_selection(filenames) -> void:
 	var file_name : String = ""
 	for f in filenames:
-		var file = File.new()
-		if file.open(f, File.READ) != OK:
+		var file = FileAccess.open(f, FileAccess.READ)
+		if file == null:
 			continue
 		file_name = file.get_path_absolute()
 		file.close()
@@ -248,8 +248,7 @@ func load_selection(filenames) -> void:
 			dialog.popup_centered()
 
 func save_selection() -> void:
-	#replace with preload
-	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -274,8 +273,8 @@ func do_save_selection(filename) -> bool:
 func load_project_layer(filenames) -> void:
 	var file_name : String = ""
 	for f in filenames:
-		var file = File.new()
-		if file.open(f, File.READ) != OK:
+		var file = FileAccess.open(f, FileAccess.READ)
+		if file == null:
 			continue
 		file_name = file.get_path_absolute()
 		file.close()
@@ -441,7 +440,7 @@ func save() -> bool:
 
 func save_as() -> bool:
 	#replace with preload
-	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM

@@ -1,7 +1,6 @@
 extends base_layer
 class_name project_layer
-#replace with preload
-var default_icon = load("res://icon.png")
+var default_icon = preload("res://icon.png")
 @export var project_layers : Resource
 
 func _init():

@@ -5,14 +5,13 @@ var selected_items : Array[TreeItem]
 var just_selected : bool = false
 var editing : bool = false
 
-#replace with preload and const
-var ICON_LAYER_PAINT = load("res://panels/layers/icons/layer_paint.tres")
-var ICON_LAYER_PROC = load("res://panels/layers/icons/layer_proc.tres")
-var ICON_LAYER_MASK = load("res://panels/layers/icons/layer_mask.tres")
-var ICONS = [ ICON_LAYER_PAINT, ICON_LAYER_PROC, ICON_LAYER_MASK ]
+const ICON_LAYER_PAINT = preload("res://panels/layers/icons/layer_paint.tres")
+const ICON_LAYER_PROC = preload("res://panels/layers/icons/layer_proc.tres")
+const ICON_LAYER_MASK = preload("res://panels/layers/icons/layer_mask.tres")
+const ICONS = [ ICON_LAYER_PAINT, ICON_LAYER_PROC, ICON_LAYER_MASK ]
 
-var BUTTON_SHOWN = load("res://panels/layers/icons/visible.tres")
-var BUTTON_HIDDEN = load("res://panels/layers/icons/not_visible.tres")
+var BUTTON_SHOWN = preload("res://panels/layers/icons/visible.tres")
+var BUTTON_HIDDEN = preload("res://panels/layers/icons/not_visible.tres")
 
 signal selection_changed(new_selected)
 
@@ -23,8 +22,7 @@ func _ready():
 func _make_custom_tooltip(for_text):
 	if for_text == "":
 		return null
-	#replace with preload
-	var panel = load("res://panels/layers/layer_tooltip.tscn").instantiate()
+	var panel = preload("res://panels/layers/layer_tooltip.tscn").instantiate()
 	var item : TreeItem = instance_from_id(for_text.to_int()) as TreeItem
 	panel.set_layer(item.get_meta("layer"))
 	return panel

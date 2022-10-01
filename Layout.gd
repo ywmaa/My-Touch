@@ -7,10 +7,9 @@ const PANEL_POSITIONS = {
 	BottomRight="SplitRight/Right/Bottom"
 }
 var PANELS = [
-	#replace with preload
-	{ name="Tools", scene=load("res://panels/tools/tools_panel.tscn"), position="TopLeft" },
+	{ name="Tools", scene=preload("res://panels/tools/tools_panel.tscn"), position="TopLeft" },
 #	{ name="Reference", scene=preload("res://panels/reference/reference_panel.tscn"), position="BottomLeft" },
-	{ name="Layers", scene=load("res://panels/layers/layers.tscn"), position="BottomRight" },
+	{ name="Layers", scene=preload("res://panels/layers/layers.tscn"), position="BottomRight" },
 ]
 const HIDE_PANELS = {
 	photo_editing=[],

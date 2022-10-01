@@ -196,15 +196,13 @@ func new_project() -> void:
 	graph_edit.update_tab_title()
 
 func new_graph_panel():
-	#replace with preload
-	var graph_edit = load("res://panels/graph/graph.tscn").instantiate()
+	var graph_edit = preload("res://panels/graph/graph.tscn").instantiate()
 	projects.add_child(graph_edit)
 	projects.current_tab = graph_edit.get_index()
 	return graph_edit
 
 func load_project() -> void:
-	#replace with preload
-	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -219,11 +217,11 @@ func load_project() -> void:
 func do_load_projects(filenames) -> void:
 	var file_name : String = ""
 	for f in filenames:
-		var file = File.new()
-		if file.open(f, File.READ) != OK:
+		var file = FileAccess.open(f, FileAccess.READ)
+		if file == null:
 			continue
 		file_name = file.get_path_absolute()
-		file.close()
+		file = null
 		do_load_project(file_name)
 	if file_name != "":
 		mt_globals.config.set_value("path", "project", file_name.get_base_dir())
@@ -273,16 +271,16 @@ func _on_LoadRecent_id_pressed(id) -> void:
 	do_load_project(recent_files[id])
 
 func load_recents() -> void:
-	var f = File.new()
-	if f.open("user://recent_files.bin", File.READ) == OK:
+	var f = FileAccess.open("user://recent_files.bin", FileAccess.READ)
+	if f != null:
 		recent_files = JSON.new().parse_string(f.get_as_text())
-		f.close()
+		f = null
 
 func save_recents() -> void:
-	var f = File.new()
-	f.open("user://recent_files.bin", File.WRITE)
-	f.store_string(JSON.new().stringify(recent_files))
-	f.close()
+	var f = FileAccess.open("user://recent_files.bin", FileAccess.READ)
+	if f != null:
+		f.store_string(JSON.new().stringify(recent_files))
+	f = null
 
 func add_recent(path, save = true) -> void:
 	remove_recent(path, false)
@@ -338,8 +336,7 @@ func _on_export_id_pressed(id) -> void:
 			export_jpeg_image()
 func export_png_image():
 	# Prompt for a target PNG file
-	#replace with preload
-	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -356,8 +353,7 @@ func export_png_image():
 	
 func export_jpeg_image():
 	# Prompt for a target PNG file
-	#replace with preload
-	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -394,8 +390,7 @@ func quit() -> void:
 	if quitting:
 		return
 	quitting = true
-	#replace with preload
-	var dialog = load("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
+	var dialog = preload("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
 	dialog.dialog_text = "Quit My Touch?"
 	dialog.add_cancel_button("Cancel")
 	add_child(dialog)
@@ -484,8 +479,7 @@ func edit_select_invert() -> void:
 	if graph_edit != null:
 		graph_edit.select_invert()
 func edit_load_selection() -> void:
-	#replace with preload
-	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -505,8 +499,7 @@ func edit_save_selection() -> void:
 		return await project.save_selection()
 
 func edit_load_project_as_image() -> void:
-	#replace with preload
-	var dialog = load("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -574,7 +567,7 @@ func get_doc_dir() -> String:
 	# We can use a globalized `res://` path here as the project isn't exported.
 	var devel_doc_path = ProjectSettings.globalize_path("res://doc/_build/html")
 	for p in [ release_doc_path, devel_doc_path ]:
-		var file = File.new()
+		var file = FileAccess.new()
 		if file.file_exists(p+"/index.html"):
 			return p
 	return ""
@@ -602,10 +595,9 @@ func about() -> void:
 # Handle dropped files
 
 func on_files_dropped(files : PackedStringArray) -> void:
-	
-	var file : File = File.new()
 	for f in files:
-		if file.open(f, File.READ) != OK:
+		var file = FileAccess.open(f, FileAccess.READ)
+		if file == null:
 			continue
 		f = file.get_path_absolute()
 		match f.get_extension():

@@ -31,8 +31,7 @@ func _on_Tree_selection_changed(new_selected) -> void:
 		layers.select_layer(item.get_meta("layer"))
 
 func _on_Add_pressed():
-	#replace with preload
-	var menu = load("res://panels/layers/add_layer_menu.tscn").instantiate()
+	var menu = preload("res://panels/layers/add_layer_menu.tscn").instantiate()
 	add_child(menu)
 	var button_rect = $Buttons/Add.get_global_rect()
 	menu.connect("id_pressed", _on_add_layer_menu)
@@ -68,8 +67,7 @@ func _on_Config_pressed():
 	var current = tree.get_selected()
 	if current != null:
 		var layer = current.get_meta("layer")
-		#replace with preload
-		var popup = load("res://panels/layers/layer_config_popup.tscn").instantiate()
+		var popup = preload("res://panels/layers/layer_config_popup.tscn").instantiate()
 		add_child(popup)
 		popup.configure_layer(layers, current.get_meta("layer"))
 

@@ -146,8 +146,7 @@ func _on_ContextMenu_about_to_show():
 func _on_ContextMenu_index_pressed(index):
 	match index:
 		0:
-			#replace with preload
-			var dialog = load("res://windows/file_dialog/file_dialog.tscn").instance()
+			var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instance()
 			add_child(dialog)
 			dialog.rect_min_size = Vector2(500, 500)
 			dialog.access = FileDialog.ACCESS_FILESYSTEM
