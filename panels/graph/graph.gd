@@ -96,6 +96,8 @@ func _input(event):
 					else:
 						tool_shortcut(ToolManager.tool_mode.scale_image)
 				ToolManager.tool_mode.none:
+					ToolManager.current_mode = ToolManager.tool_mode.none
+					ToolManager.direction = ToolManager.coordinates.xy
 					dragging = true
 					drag_start = get_local_mouse_position()
 					for layer in mt_globals.main_window.get_current_graph_edit().canvas.get_children():

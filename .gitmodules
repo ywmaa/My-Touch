@@ -1,0 +1,3 @@
+[submodule "AI/ImageGeneration/InvokeAI"]
+	path = AI/ImageGeneration/InvokeAI
+	url = https://github.com/invoke-ai/InvokeAI
