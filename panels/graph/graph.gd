@@ -96,8 +96,6 @@ func _input(event):
 					else:
 						tool_shortcut(ToolManager.tool_mode.scale_image)
 				ToolManager.tool_mode.none:
-					ToolManager.current_mode = ToolManager.tool_mode.none
-					ToolManager.direction = ToolManager.coordinates.xy
 					dragging = true
 					drag_start = get_local_mouse_position()
 					for layer in mt_globals.main_window.get_current_graph_edit().canvas.get_children():
@@ -109,6 +107,7 @@ func _input(event):
 						collision.shape.size = layer.texture.get_size()
 						layer.add_child(area)
 						area.add_child(collision)
+
 		elif dragging:
 			dragging = false
 			queue_redraw()
@@ -123,7 +122,14 @@ func _input(event):
 			#deselect on selecting none
 			
 			if space.intersect_shape(query) == [] and get_global_rect().has_point(get_global_mouse_position()):
-				layers.selected_layers = []
+				if ToolManager.current_mode == ToolManager.tool_mode.none:
+					layers.selected_layers = []
+				else:
+					ToolManager.current_mode = ToolManager.tool_mode.none
+					ToolManager.direction = ToolManager.coordinates.xy
+			else:
+				ToolManager.current_mode = ToolManager.tool_mode.none
+				ToolManager.direction = ToolManager.coordinates.xy
 			for area in space.intersect_shape(query):
 				for layer in layers.layers:
 					if area.collider.get_parent() == layer.image:
@@ -184,7 +190,7 @@ func _process(delta):
 		ToolManager.tool_mode.rotate_image:
 			if layers.selected_layers:
 				for selected in layers.selected_layers:
-					ToolManager.rotate(selected.image,get_local_mouse_position())
+					ToolManager.rotate(selected.image,canvas.get_mouse_position()-canvas.size/2.0)
 		ToolManager.tool_mode.scale_image:
 			if layers.selected_layers:
 				for selected in layers.selected_layers:

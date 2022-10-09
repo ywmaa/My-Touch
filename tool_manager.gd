@@ -18,7 +18,8 @@ var current_mode : tool_mode = tool_mode.none:
 
 
 func rotate(object,direction_point:Vector2):
-	object.rotation = object.global_position.angle_to_point(direction_point)
+	object.look_at(direction_point)
+	object.rotate(PI/2) 
 
 
 func scale(object,amount:Vector2):
