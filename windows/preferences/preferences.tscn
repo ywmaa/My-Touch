@@ -14,12 +14,15 @@ borderless = false
 script = ExtResource("2")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 351.0
 offset_bottom = 401.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="TabContainer" type="TabContainer" parent="VBoxContainer"]
 offset_right = 347.0
@@ -28,9 +31,12 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="General" type="VBoxContainer" parent="VBoxContainer/TabContainer"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 31.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TabContainer/General"]
@@ -63,6 +69,8 @@ offset_bottom = 31.0
 text = "Download"
 
 [node name="Space1" type="Control" parent="VBoxContainer/TabContainer/General"]
+layout_mode = 3
+anchors_preset = 0
 offset_top = 35.0
 offset_right = 347.0
 offset_bottom = 35.0
@@ -81,6 +89,8 @@ text = "Confirm when closing a project"
 config_variable = "confirm_close_project"
 
 [node name="Space3" type="Control" parent="VBoxContainer/TabContainer/General"]
+layout_mode = 3
+anchors_preset = 0
 offset_top = 109.0
 offset_right = 347.0
 offset_bottom = 109.0
@@ -97,13 +107,15 @@ offset_bottom = 28.0
 text = "UI scale (0 = auto):"
 
 [node name="GuiScale" parent="VBoxContainer/TabContainer/General/GuiScale" instance=ExtResource("3")]
+anchors_preset = 0
 anchor_left = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
 offset_left = 145.0
 offset_right = 212.0
 offset_bottom = 31.0
-caret_blink_speed = 0.5
+grow_horizontal = 0
+grow_vertical = 2
 config_variable = "ui_scale"
 value = 0.0
 max_value = 2.0
@@ -111,6 +123,8 @@ step = 0.01
 float_only = true
 
 [node name="Space2" type="Control" parent="VBoxContainer/TabContainer/General"]
+layout_mode = 3
+anchors_preset = 0
 offset_top = 148.0
 offset_right = 347.0
 offset_bottom = 148.0
@@ -131,22 +145,20 @@ offset_bottom = 218.0
 offset_top = 2.0
 offset_right = 71.0
 offset_bottom = 28.0
-hint_tooltip = "A higher FPS limit may result in smoother operation but may use more CPU/GPU resources.
-Higher values may increase power usage, leading to reduced battery life on laptops."
 mouse_filter = 1
 text = "FPS limit:"
 
 [node name="FPSLimit" parent="VBoxContainer/TabContainer/General/FPSLimit" instance=ExtResource("3")]
+anchors_preset = 0
 anchor_left = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
 offset_left = 75.0
 offset_right = 142.0
 offset_bottom = 31.0
-hint_tooltip = "A higher FPS limit may result in smoother operation but may use more CPU/GPU resources.
-Higher values may increase power usage, leading to reduced battery life on laptops."
+grow_horizontal = 0
+grow_vertical = 2
 text = "145"
-caret_blink_speed = 0.5
 config_variable = "fps_limit"
 value = 145.0
 min_value = 20.0
@@ -155,6 +167,8 @@ step = 1.0
 float_only = true
 
 [node name="Space" type="Control" parent="VBoxContainer/TabContainer/General/FPSLimit"]
+layout_mode = 3
+anchors_preset = 0
 offset_left = 146.0
 offset_right = 146.0
 offset_bottom = 31.0
@@ -164,22 +178,20 @@ offset_left = 150.0
 offset_top = 2.0
 offset_right = 254.0
 offset_bottom = 28.0
-hint_tooltip = "A higher FPS limit may result in smoother operation but may use more CPU/GPU resources.
-Higher values may increase power usage, leading to reduced battery life on laptops."
 mouse_filter = 1
 text = "Idle FPS limit:"
 
 [node name="IdleFPSLimit" parent="VBoxContainer/TabContainer/General/FPSLimit" instance=ExtResource("3")]
+anchors_preset = 0
 anchor_left = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
 offset_left = 258.0
 offset_right = 325.0
 offset_bottom = 31.0
-hint_tooltip = "A higher FPS limit may result in smoother operation but may use more CPU/GPU resources.
-Higher values may increase power usage, leading to reduced battery life on laptops."
+grow_horizontal = 0
+grow_vertical = 2
 text = "145"
-caret_blink_speed = 0.5
 config_variable = "idle_fps_limit"
 value = 20.0
 min_value = 1.0

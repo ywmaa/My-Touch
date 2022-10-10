@@ -74,6 +74,8 @@ const MENU = [
 	{ menu="Help/About", command="about" }
 ]
 
+
+
 func _ready() -> void:
 	
 	get_tree().set_auto_accept_quit(false)

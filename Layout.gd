@@ -8,7 +8,7 @@ const PANEL_POSITIONS = {
 }
 var PANELS = [
 	{ name="Tools", scene=preload("res://panels/tools/tools_panel.tscn"), position="TopLeft" },
-#	{ name="Reference", scene=preload("res://panels/reference/reference_panel.tscn"), position="BottomLeft" },
+	{ name="Project Settings", scene=preload("res://panels/graph/GraphSettings.tscn"), position="TopRight" },
 	{ name="Layers", scene=preload("res://panels/layers/layers.tscn"), position="BottomRight" },
 ]
 const HIDE_PANELS = {

@@ -5,7 +5,6 @@ extends Node
 
 # warning-ignore:unused_class_variable
 var main_window
-
 var config : ConfigFile = ConfigFile.new()
 const DEFAULT_CONFIG = {
 	locale = "",

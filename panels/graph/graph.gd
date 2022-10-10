@@ -177,6 +177,7 @@ func on_drop_image_file(path):
 	layers.add_layer(new_layer)
 	
 func _process(delta):
+	
 	mouse_position_delta = get_global_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
 	if ToolManager.current_mode == ToolManager.tool_mode.none:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -426,6 +427,9 @@ func load_file(filename) -> bool:
 			
 		layers = data.layers
 		layers.canvas = canvas
+		canvas.size = data.canvas_size
+		$SubViewportContainer.size = data.canvas_size
+		$SubViewportContainer/Background.size = data.canvas_size
 		return true
 	else:
 		var dialog : AcceptDialog = AcceptDialog.new()
@@ -468,6 +472,7 @@ func save_as() -> bool:
 func save_file(filename) -> bool:
 	var data : SaveProject = SaveProject.new()
 	data.layers = layers 
+	data.canvas_size = canvas.size 
 	ResourceSaver.save(data,filename)
 	save_path = filename
 	set_need_save(false)

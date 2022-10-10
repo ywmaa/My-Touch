@@ -116,7 +116,7 @@ func _gui_input(event : InputEvent) -> void:
 			emit_signal("value_changed_undo", value, true)
 		accept_event()
 	elif event is InputEventKey and !event.echo:
-		match event.scancode:
+		match event.keycode:
 			
 			KEY_SHIFT, KEY_CTRL, KEY_ALT:
 				start_position = last_position

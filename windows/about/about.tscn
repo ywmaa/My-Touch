@@ -35,14 +35,14 @@ grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
 custom_minimum_size = Vector2i(628, 377)
-offset_right = 628.0
-offset_bottom = 377.0
+offset_right = 1908.0
+offset_bottom = 1097.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
-offset_left = 164.0
-offset_right = 464.0
+offset_left = 804.0
+offset_right = 1104.0
 offset_bottom = 64.0
 size_flags_horizontal = 6
 
@@ -92,8 +92,8 @@ text = "© 2022 ywmaa and contributors"
 [node name="VBoxContainer" type="TabContainer" parent="HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2i(628, 281)
 offset_top = 68.0
-offset_right = 628.0
-offset_bottom = 373.0
+offset_right = 1908.0
+offset_bottom = 1093.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 tab_alignment = 1
@@ -108,8 +108,8 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="List" type="GridContainer" parent="HBoxContainer/VBoxContainer/VBoxContainer/Authors"]
-offset_right = 628.0
-offset_bottom = 274.0
+offset_right = 1908.0
+offset_bottom = 994.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 columns = 2
@@ -135,7 +135,7 @@ text = " Godot Engine"
 [node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/VBoxContainer/Authors/List"]
 offset_left = 180.0
 offset_top = 19.0
-offset_right = 628.0
+offset_right = 1908.0
 offset_bottom = 45.0
 size_flags_horizontal = 3
 text = "90% of My Touch's code is the awesome Godot Engine"
@@ -150,8 +150,8 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/VBoxContainer/Donors"]
-offset_right = 628.0
-offset_bottom = 305.0
+offset_right = 1908.0
+offset_bottom = 1025.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -215,16 +215,16 @@ THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMP
 editable = false
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
-offset_top = 377.0
-offset_right = 628.0
-offset_bottom = 377.0
+offset_top = 1097.0
+offset_right = 1908.0
+offset_bottom = 1097.0
 size_flags_horizontal = 3
 
 [node name="SocialNetworks" type="VBoxContainer" parent="HBoxContainer"]
 clip_contents = true
-offset_left = 632.0
-offset_right = 696.0
-offset_bottom = 377.0
+offset_left = 1912.0
+offset_right = 1976.0
+offset_bottom = 1097.0
 size_flags_vertical = 3
 
 [node name="Patreon" type="TextureButton" parent="HBoxContainer/SocialNetworks"]
@@ -249,9 +249,9 @@ texture_normal = ExtResource("5")
 stretch_mode = 4
 
 [node name="Github" type="TextureButton" parent="HBoxContainer/SocialNetworks"]
-offset_top = 156.0
+offset_top = 516.0
 offset_right = 64.0
-offset_bottom = 220.0
+offset_bottom = 580.0
 size_flags_horizontal = 4
 size_flags_vertical = 6
 mouse_default_cursor_shape = 2
