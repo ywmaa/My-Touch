@@ -10,6 +10,7 @@ var PANELS = [
 	{ name="Tools", scene=preload("res://panels/tools/tools_panel.tscn"), position="TopLeft" },
 	{ name="Project Settings", scene=preload("res://panels/graph/GraphSettings.tscn"), position="TopRight" },
 	{ name="Layers", scene=preload("res://panels/layers/layers.tscn"), position="BottomRight" },
+	{ name="Layers Inspector", scene=preload("res://panels/layer_inspector/LayerInspector.tscn"), position="BottomLeft" },
 ]
 const HIDE_PANELS = {
 	photo_editing=[],

@@ -4,7 +4,7 @@ enum coordinates {xy,x,y}
 
 var direction : coordinates = coordinates.xy
 
-enum tool_mode {none,move_image,rotate_image,scale_image,text}
+enum tool_mode {none,move_image,rotate_image,scale_image,selection_tools,text}
 var current_tool : tool_mode = tool_mode.none
 
 

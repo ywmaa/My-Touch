@@ -6,6 +6,7 @@ const TOOLS = [
 	{ tool="Move", command="move", shortcut="Shift+G", tooltip="move tool" },
 	{ tool="Rotate", command="rotate", shortcut="Shift+R", tooltip="rotate tool" },
 	{ tool="Scale", command="scale", shortcut="Shift+S", tooltip="scale tool" },
+	{ tool="Selection Tools", command="select_tool", shortcut="Shift+F", tooltip="selection tool" },
 ]
 
 func _on_tree_item_activated():
@@ -85,3 +86,6 @@ func rotate():
 func scale():
 	ToolManager.current_tool = ToolManager.tool_mode.scale_image
 	ToolManager.current_mode = ToolManager.tool_mode.none
+
+func select_tool():
+	pass

@@ -65,6 +65,8 @@ func _draw():
 		draw_rect(Rect2(drag_start,get_local_mouse_position()-drag_start),\
 		Color(0.5,0.5,0.5),false)
 func _input(event):
+	if !visible:
+		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
 		if event.pressed:
 			if ToolManager.current_mode != ToolManager.tool_mode.none:
