@@ -71,18 +71,18 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="TopBar" type="HBoxContainer" parent="VBoxContainer"]
-custom_minimum_size = Vector2i(0, 25)
+custom_minimum_size = Vector2(0, 25)
 offset_right = 1268.0
 offset_bottom = 25.0
 
 [node name="Menu" type="HBoxContainer" parent="VBoxContainer/TopBar"]
-custom_minimum_size = Vector2i(1011, 25)
+custom_minimum_size = Vector2(1011, 25)
 offset_right = 1268.0
 offset_bottom = 25.0
 size_flags_horizontal = 3
 
 [node name="Layout" type="HSplitContainer" parent="VBoxContainer"]
-custom_minimum_size = Vector2i(1268, 679)
+custom_minimum_size = Vector2(1268, 679)
 offset_top = 29.0
 offset_right = 1268.0
 offset_bottom = 708.0
@@ -113,21 +113,21 @@ metadata/_edit_layout_mode = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="Left" type="VSplitContainer" parent="VBoxContainer/Layout"]
-custom_minimum_size = Vector2i(124, 679)
+custom_minimum_size = Vector2(124, 679)
 offset_right = 124.0
 offset_bottom = 679.0
 size_flags_horizontal = 3
 split_offset = 312
 
 [node name="Top" type="TabContainer" parent="VBoxContainer/Layout/Left"]
-custom_minimum_size = Vector2i(124, 349)
+custom_minimum_size = Vector2(124, 349)
 offset_right = 124.0
 offset_bottom = 349.0
 drag_to_rearrange_enabled = true
 use_hidden_tabs_for_min_size = true
 
 [node name="Bottom" type="TabContainer" parent="VBoxContainer/Layout/Left"]
-custom_minimum_size = Vector2i(124, 322)
+custom_minimum_size = Vector2(124, 322)
 offset_top = 357.0
 offset_right = 124.0
 offset_bottom = 679.0
@@ -135,7 +135,7 @@ drag_to_rearrange_enabled = true
 use_hidden_tabs_for_min_size = true
 
 [node name="SplitRight" type="HSplitContainer" parent="VBoxContainer/Layout"]
-custom_minimum_size = Vector2i(1136, 679)
+custom_minimum_size = Vector2(1136, 679)
 offset_left = 132.0
 offset_right = 1268.0
 offset_bottom = 679.0
@@ -153,7 +153,7 @@ wait_time = 15.0
 autostart = true
 
 [node name="Projects" type="Panel" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel"]
-custom_minimum_size = Vector2i(986, 684)
+custom_minimum_size = Vector2(986, 684)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -165,14 +165,14 @@ script = ExtResource("4_ejxk4")
 metadata/_edit_layout_mode = 1
 
 [node name="Tabs" type="TabBar" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects"]
-custom_minimum_size = Vector2i(950, 24)
+custom_minimum_size = Vector2(950, 24)
 offset_right = 950.0
 offset_bottom = 40.0
 tab_close_display_policy = 1
 drag_to_rearrange_enabled = true
 
 [node name="Right" type="VSplitContainer" parent="VBoxContainer/Layout/SplitRight"]
-custom_minimum_size = Vector2i(147, 349)
+custom_minimum_size = Vector2(147, 349)
 offset_left = 989.0
 offset_right = 1136.0
 offset_bottom = 679.0
@@ -180,14 +180,14 @@ size_flags_horizontal = 10
 split_offset = 312
 
 [node name="Top" type="TabContainer" parent="VBoxContainer/Layout/SplitRight/Right"]
-custom_minimum_size = Vector2i(124, 349)
+custom_minimum_size = Vector2(124, 349)
 offset_right = 147.0
 offset_bottom = 349.0
 drag_to_rearrange_enabled = true
 use_hidden_tabs_for_min_size = true
 
 [node name="Bottom" type="TabContainer" parent="VBoxContainer/Layout/SplitRight/Right"]
-custom_minimum_size = Vector2i(124, 322)
+custom_minimum_size = Vector2(124, 322)
 offset_top = 357.0
 offset_right = 147.0
 offset_bottom = 679.0

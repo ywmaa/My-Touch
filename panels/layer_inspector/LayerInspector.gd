@@ -4,15 +4,16 @@ var current_graph : MTGraph
 var current_layer : base_layer
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	%PositionX.connect("value_changed",value_changed)
-	%PositionY.connect("value_changed",value_changed)
+	%PositionX.connect("value_changed",value_changed.bind(%PositionX))
+	%PositionY.connect("value_changed",value_changed.bind(%PositionY))
 
-	%SizeX.connect("value_changed",value_changed)
-	%SizeY.connect("value_changed",value_changed)
+	%SizeX.connect("value_changed",value_changed.bind(%SizeX))
+	%SizeY.connect("value_changed",value_changed.bind(%SizeY))
 
-	%ScaleX.connect("value_changed",value_changed)
-	%ScaleY.connect("value_changed",value_changed)
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+	%ScaleX.connect("value_changed",value_changed.bind(%ScaleX))
+	%ScaleY.connect("value_changed",value_changed.bind(%ScaleY))
+
+
 func _process(delta):
 	if !mt_globals.main_window.get_current_graph_edit():
 		visible = false
@@ -42,10 +43,14 @@ func _process(delta):
 		%ScaleY.value = current_layer.image.scale.y
 
 
-func value_changed(value):
-	if !current_layer:
-		return
-#	if current_layer.image.position.x != %PositionX.value:
-#		current_layer.image.position.x = %PositionX.value
-#	if current_layer.image.position.y != %PositionY.value:
-#		current_layer.image.position.y = %PositionY.value
+func value_changed(value,property):
+	
+	if current_layer.image.position.x != %PositionX.value and property == %PositionX:
+		current_layer.image.position.x = %PositionX.value
+	if current_layer.image.position.y != %PositionY.value and property == %PositionY:
+		current_layer.image.position.y = %PositionY.value
+
+	if current_layer.image.scale.x != %ScaleX.value and property == %ScaleX:
+		current_layer.image.scale.x = %ScaleX.value
+	if current_layer.image.scale.y != %ScaleY.value and property == %ScaleY:
+		current_layer.image.scale.y = %ScaleY.value
