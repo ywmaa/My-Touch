@@ -5,10 +5,18 @@
  
  big thanks to material maker for its open source code,it helped me do the UI part
 
+# Notes for contributers
+
+The current version of Godot for the project is : Godot 4 Beta 4
+
+the project has a lot of files from material maker and it is not organised, yet.
+
 # goals
  easy to use photo editor
 
  blender like shortcuts
+
+ AI Tools (StableDiffusion,Upscaling,Object Select Tool)
 
  powerfull and customizable tools
 
