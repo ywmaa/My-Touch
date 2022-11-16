@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://8w67718v7rk"]
+[gd_scene load_steps=9 format=3 uid="uid://8w67718v7rk"]
 
 [ext_resource type="Theme" uid="uid://dl7dg81sapu26" path="res://theme/dark.tres" id="1_gmhfm"]
 [ext_resource type="Script" path="res://editor.gd" id="1_ix08l"]
 [ext_resource type="Script" path="res://Layout.gd" id="2_o50ww"]
 [ext_resource type="Script" path="res://tabs.gd" id="4_ejxk4"]
+[ext_resource type="PackedScene" uid="uid://bm0lg64mbtyim" path="res://panels/tools bar/tools_panel.tscn" id="4_t1qqc"]
 
 [sub_resource type="GDScript" id="6"]
 script/source = "extends Label
@@ -57,7 +58,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-focus_mode = 2
 theme = ExtResource("1_gmhfm")
 script = ExtResource("1_ix08l")
 
@@ -72,61 +72,41 @@ grow_vertical = 2
 
 [node name="TopBar" type="HBoxContainer" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 25)
-offset_right = 1268.0
+offset_right = 1276.0
 offset_bottom = 25.0
 
 [node name="Menu" type="HBoxContainer" parent="VBoxContainer/TopBar"]
-custom_minimum_size = Vector2(1011, 25)
-offset_right = 1268.0
+offset_right = 1276.0
 offset_bottom = 25.0
 size_flags_horizontal = 3
 
 [node name="Layout" type="HSplitContainer" parent="VBoxContainer"]
-custom_minimum_size = Vector2(1268, 679)
 offset_top = 29.0
-offset_right = 1268.0
+offset_right = 1276.0
 offset_bottom = 708.0
 size_flags_vertical = 3
 split_offset = -1118
 script = ExtResource("2_o50ww")
 
-[node name="PhotoEditing" type="Control" parent="VBoxContainer/Layout"]
-visible = false
-layout_mode = 3
-anchors_preset = 0
+[node name="SplitLeft" type="HSplitContainer" parent="VBoxContainer/Layout"]
+offset_right = 168.0
 offset_bottom = 679.0
 
-[node name="ToolsList" type="ItemList" parent="VBoxContainer/Layout/PhotoEditing"]
-anchors_preset = 9
-anchor_bottom = 1.0
-offset_right = 81.0
-grow_vertical = 2
-auto_height = true
-item_count = 3
-item_0/text = "move"
-item_0/disabled = true
-item_1/text = "rotate"
-item_1/disabled = true
-item_2/text = "scale"
-item_2/disabled = true
-metadata/_edit_layout_mode = 1
-metadata/_edit_use_anchors_ = true
-
-[node name="Left" type="VSplitContainer" parent="VBoxContainer/Layout"]
+[node name="Left" type="VSplitContainer" parent="VBoxContainer/Layout/SplitLeft"]
 custom_minimum_size = Vector2(124, 679)
 offset_right = 124.0
 offset_bottom = 679.0
 size_flags_horizontal = 3
 split_offset = 312
 
-[node name="Top" type="TabContainer" parent="VBoxContainer/Layout/Left"]
+[node name="Top" type="TabContainer" parent="VBoxContainer/Layout/SplitLeft/Left"]
 custom_minimum_size = Vector2(124, 349)
 offset_right = 124.0
 offset_bottom = 349.0
 drag_to_rearrange_enabled = true
 use_hidden_tabs_for_min_size = true
 
-[node name="Bottom" type="TabContainer" parent="VBoxContainer/Layout/Left"]
+[node name="Bottom" type="TabContainer" parent="VBoxContainer/Layout/SplitLeft/Left"]
 custom_minimum_size = Vector2(124, 322)
 offset_top = 357.0
 offset_right = 124.0
@@ -134,37 +114,47 @@ offset_bottom = 679.0
 drag_to_rearrange_enabled = true
 use_hidden_tabs_for_min_size = true
 
-[node name="SplitRight" type="HSplitContainer" parent="VBoxContainer/Layout"]
-custom_minimum_size = Vector2(1136, 679)
+[node name="Tools" parent="VBoxContainer/Layout/SplitLeft" instance=ExtResource("4_t1qqc")]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
 offset_left = 132.0
-offset_right = 1268.0
+offset_right = 168.0
+offset_bottom = 679.0
+grow_horizontal = 1
+grow_vertical = 1
+size_flags_horizontal = 3
+
+[node name="SplitRight" type="HSplitContainer" parent="VBoxContainer/Layout"]
+clip_contents = true
+custom_minimum_size = Vector2(1100, 679)
+offset_left = 176.0
+offset_right = 1276.0
 offset_bottom = 679.0
 
 [node name="ProjectsPanel" type="Control" parent="VBoxContainer/Layout/SplitRight"]
 layout_mode = 3
 anchors_preset = 0
-offset_right = 980.0
+offset_right = 945.0
 offset_bottom = 679.0
 size_flags_horizontal = 3
-size_flags_stretch_ratio = 6.5
+mouse_filter = 1
 
 [node name="AutoSaveTimer" type="Timer" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel"]
 wait_time = 15.0
 autostart = true
 
 [node name="Projects" type="Panel" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel"]
-custom_minimum_size = Vector2(986, 684)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 6.0
-offset_bottom = 5.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("4_ejxk4")
 metadata/_edit_layout_mode = 1
 
 [node name="Tabs" type="TabBar" parent="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects"]
+clip_contents = true
 custom_minimum_size = Vector2(950, 24)
 offset_right = 950.0
 offset_bottom = 40.0
@@ -173,10 +163,9 @@ drag_to_rearrange_enabled = true
 
 [node name="Right" type="VSplitContainer" parent="VBoxContainer/Layout/SplitRight"]
 custom_minimum_size = Vector2(147, 349)
-offset_left = 989.0
-offset_right = 1136.0
+offset_left = 953.0
+offset_right = 1100.0
 offset_bottom = 679.0
-size_flags_horizontal = 10
 split_offset = 312
 
 [node name="Top" type="TabContainer" parent="VBoxContainer/Layout/SplitRight/Right"]
@@ -212,9 +201,11 @@ libraries = {
 "": SubResource("AnimationLibrary_21bw6")
 }
 
-[connection signal="item_selected" from="VBoxContainer/Layout/PhotoEditing/ToolsList" to="." method="_on_tools_list_item_selected"]
-[connection signal="tab_changed" from="VBoxContainer/Layout/Left/Top" to="VBoxContainer/Layout" method="_on_tab_changed"]
-[connection signal="tab_changed" from="VBoxContainer/Layout/Left/Bottom" to="VBoxContainer/Layout" method="_on_tab_changed"]
+[node name="LeftCursor" type="Sprite2D" parent="."]
+visible = false
+
+[connection signal="tab_changed" from="VBoxContainer/Layout/SplitLeft/Left/Top" to="VBoxContainer/Layout" method="_on_tab_changed"]
+[connection signal="tab_changed" from="VBoxContainer/Layout/SplitLeft/Left/Bottom" to="VBoxContainer/Layout" method="_on_tab_changed"]
 [connection signal="timeout" from="VBoxContainer/Layout/SplitRight/ProjectsPanel/AutoSaveTimer" to="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects" method="_on_auto_save_timer_timeout"]
 [connection signal="active_tab_rearranged" from="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects/Tabs" to="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects" method="move_active_tab_to"]
 [connection signal="tab_changed" from="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects/Tabs" to="VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects" method="set_current_tab"]

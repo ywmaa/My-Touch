@@ -6,6 +6,7 @@
 
 [node name="Project Settings" type="VBoxContainer"]
 clip_contents = true
+focus_mode = 2
 script = ExtResource("1_arwtu")
 
 [node name="TabContainer" type="TabContainer" parent="."]
@@ -59,7 +60,7 @@ grow_horizontal = 1
 grow_vertical = 1
 text = "1280"
 script = ExtResource("2_8a3vq")
-value = 1280.0
+value = 1920.0
 min_value = 2.0
 max_value = 10000.0
 step = 1.0
@@ -92,7 +93,7 @@ grow_horizontal = 1
 grow_vertical = 1
 text = "720"
 script = ExtResource("2_8a3vq")
-value = 720.0
+value = 1080.0
 min_value = 2.0
 max_value = 10000.0
 step = 1.0

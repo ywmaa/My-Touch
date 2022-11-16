@@ -1,9 +1,32 @@
-extends ScrollContainer
+extends SubViewportContainer
 class_name MTGraph
 
 var clipboard_file_path = "user://my_touch_clipboard.tres"
+var undo_redo := UndoRedo.new()
+var tiles: Tiles
+var has_focus
+var canvas_size : Vector2: 
+	set(value):
+		if !tiles:
+			canvas_size = value
+			return
+		if canvas_size.x != 0:
+			tiles.x_basis = (tiles.x_basis * value.x / canvas_size.x).round()
+		else:
+			tiles.x_basis = Vector2(value.x, 0)
+		if canvas_size.y != 0:
+			tiles.y_basis = (tiles.y_basis * value.y / canvas_size.y).round()
+		else:
+			tiles.y_basis = Vector2(0, value.y)
+		tiles.tile_size = value
+		tiles.reset_mask()
+		canvas_size = value
+		transparent_checker.update_rect()
 
-@onready var canvas : SubViewport = get_node("SubViewportContainer/Canvas")
+
+@onready var canvas : SubViewport = $Viewport/canvas
+@onready var transparent_checker = $Viewport/TransparentChecker
+@onready var camera: Camera2D = get_node("Viewport/Camera2D")
 
 var layers : layers_object = layers_object.new()
 var default_icon = "res://icon.png"
@@ -22,22 +45,28 @@ signal graph_changed
 
 signal activate_layer_related_tools(state:bool)
 
-
+func _init():
+	canvas_size = Vector2(mt_globals.default_width,mt_globals.default_height)
+	tiles = Tiles.new(canvas_size)
+	
 func set_current():
 	emit_signal("graph_changed")
 	# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	self.connect("mouse_entered",_on_mouse_entered)
+	self.connect("mouse_exited",_on_mouse_exited)
 	layers.canvas = canvas
+	
 	layers.connect("layers_changed",func(): emit_signal("graph_changed"))
 	OS.low_processor_usage_mode = true
-	$SubViewportContainer/Background.size = canvas.size
+	
 	#default layer
 	var new_layer : base_layer = base_layer.new()
 	new_layer.init(layers.get_unused_layer_name(),default_icon,base_layer.layer_type.image)
 	layers.add_layer(new_layer)
 	
 	center_view()
-
+	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 var previous_mouse_position : Vector2
@@ -45,27 +74,23 @@ var mouse_position_delta : Vector2
 var dragging : bool = false
 var drag_start : Vector2 = Vector2.ZERO
 var select_rect = RectangleShape2D.new()
+var select_draw_rectangle : bool = false
+var select_draw_circle : bool = false
 @export var smooth_mode : bool = false
 
-var zoom_step = 1.005
 
-
-func zoom_at_point(zoom_change, point):
-	var c0 = canvas.get_camera_2d().position # camera position
-	var v0 = canvas.size # vieport size
-	var c1 # next camera position
-	var z0 = canvas.get_camera_2d().zoom # current zoom value
-	var z1 = z0 * zoom_change # next zoom value
-
-	c1 = c0 + (-0.5*v0 + point)*(z1 - z0)
-	canvas.get_camera_2d().zoom = z1
-	canvas.get_camera_2d().position = c1
 func _draw():
+	if select_draw_circle:
+		draw_circle(drag_start,(get_local_mouse_position()-drag_start).length(),Color(0.5,0.5,0.5))
+	if select_draw_rectangle:
+		draw_rect(Rect2(drag_start,get_local_mouse_position()-drag_start),Color(0.5,0.5,0.5),false)
+
 	if dragging:
-		draw_rect(Rect2(drag_start,get_local_mouse_position()-drag_start),\
-		Color(0.5,0.5,0.5),false)
+#		draw_polyline() # free select
+		draw_rect(Rect2(drag_start,get_local_mouse_position()-drag_start),Color(0.5,0.5,0.5),false)
+
 func _input(event):
-	if !visible:
+	if !visible or has_focus == false:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
 		if event.pressed:
@@ -78,87 +103,36 @@ func _input(event):
 		queue_redraw()
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
-			match ToolManager.current_tool:
-				ToolManager.tool_mode.move_image:
-					if ToolManager.current_mode == ToolManager.tool_mode.move_image:
-						ToolManager.current_mode = ToolManager.tool_mode.none
-						ToolManager.direction = ToolManager.coordinates.xy
-					else:
-						tool_shortcut(ToolManager.tool_mode.move_image)
-				ToolManager.tool_mode.rotate_image:
-					if ToolManager.current_mode == ToolManager.tool_mode.rotate_image:
-						ToolManager.current_mode = ToolManager.tool_mode.none
-						ToolManager.direction = ToolManager.coordinates.xy
-					else:
-						tool_shortcut(ToolManager.tool_mode.rotate_image)
-				ToolManager.tool_mode.scale_image:
-					if ToolManager.current_mode == ToolManager.tool_mode.scale_image:
-						ToolManager.current_mode = ToolManager.tool_mode.none
-						ToolManager.direction = ToolManager.coordinates.xy
-					else:
-						tool_shortcut(ToolManager.tool_mode.scale_image)
-				ToolManager.tool_mode.none:
-					dragging = true
-					drag_start = get_local_mouse_position()
-					for layer in mt_globals.main_window.get_current_graph_edit().canvas.get_children():
-						if layer is Camera2D:
-							continue
-						var collision : CollisionShape2D = CollisionShape2D.new()
-						collision.shape = RectangleShape2D.new()
-						var area : Area2D = Area2D.new()
-						collision.shape.size = layer.texture.get_size()
-						layer.add_child(area)
-						area.add_child(collision)
+			if ToolManager.current_tool == ToolManager.tool_mode.move_image:
+				if ToolManager.current_mode == ToolManager.tool_mode.move_image:
+					ToolManager.current_mode = ToolManager.tool_mode.none
+					ToolManager.direction = ToolManager.coordinates.xy
+				else:
+					tool_shortcut(ToolManager.tool_mode.move_image)
+			if ToolManager.current_tool == ToolManager.tool_mode.rotate_image:
+				if ToolManager.current_mode == ToolManager.tool_mode.rotate_image:
+					ToolManager.current_mode = ToolManager.tool_mode.none
+					ToolManager.direction = ToolManager.coordinates.xy
+				else:
+					tool_shortcut(ToolManager.tool_mode.rotate_image)
+			if ToolManager.current_tool == ToolManager.tool_mode.scale_image:
+				if ToolManager.current_mode == ToolManager.tool_mode.scale_image:
+					ToolManager.current_mode = ToolManager.tool_mode.none
+					ToolManager.direction = ToolManager.coordinates.xy
+				else:
+					tool_shortcut(ToolManager.tool_mode.scale_image)
+			if ToolManager.current_tool == ToolManager.tool_mode.none:
+				dragging = true
+				drag_start = get_local_mouse_position()
+				pass # layer selection
 
 		elif dragging:
 			dragging = false
 			queue_redraw()
 			var drag_end = get_local_mouse_position()
-			select_rect.extents = abs(drag_end-drag_start)/2
-			var space = canvas.get_world_2d().direct_space_state
-			var query = PhysicsShapeQueryParameters2D.new()
-			query.set_shape(select_rect)
-			query.transform = Transform2D(0,(drag_end+drag_start)/2-Vector2(canvas.size)/2)
-			query.collide_with_areas = true
-			
-			#deselect on selecting none
-			
-			if space.intersect_shape(query) == [] and get_global_rect().has_point(get_global_mouse_position()):
-				if ToolManager.current_mode == ToolManager.tool_mode.none:
-					layers.selected_layers = []
-				else:
-					ToolManager.current_mode = ToolManager.tool_mode.none
-					ToolManager.direction = ToolManager.coordinates.xy
-			else:
-				ToolManager.current_mode = ToolManager.tool_mode.none
-				ToolManager.direction = ToolManager.coordinates.xy
-			for area in space.intersect_shape(query):
-				for layer in layers.layers:
-					if area.collider.get_parent() == layer.image:
-						layers.select_layer(layer)
-						break
-			for layer in canvas.get_children():
-				if layer is Camera2D:
-					continue
-				for child in layer.get_children():
-					if child is Area2D:
-						child.queue_free()
 		
 
 func _unhandled_input(event):
-	if event.is_action("ui_up"):
-		canvas.get_camera_2d().position.y += -1.0
-	if event.is_action("ui_down"):
-		canvas.get_camera_2d().position.y += 1.0
-	if event.is_action("ui_left"):
-		canvas.get_camera_2d().position.x += -1.0
-	if event.is_action("ui_right"):
-		canvas.get_camera_2d().position.x += 1.0
-	#zoom
-	if Input.is_action_pressed("ui_text_scroll_up"):
-		zoom_at_point(zoom_step,canvas.get_mouse_position())
-	if Input.is_action_pressed("ui_text_scroll_down"):
-		zoom_at_point(1/zoom_step,canvas.get_mouse_position())
 
 	#handle shortcuts
 	if event.is_action_pressed("move"):
@@ -179,25 +153,23 @@ func on_drop_image_file(path):
 	layers.add_layer(new_layer)
 	
 func _process(delta):
-	
 	mouse_position_delta = get_global_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
 	if ToolManager.current_mode == ToolManager.tool_mode.none:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	else:
 		Input.mouse_mode = Input.MOUSE_MODE_CONFINED
-	match ToolManager.current_mode:
-		ToolManager.tool_mode.move_image:
-			if layers.selected_layers:
-				for selected in layers.selected_layers:
-					ToolManager.move(selected.image,mouse_position_delta)
-		ToolManager.tool_mode.rotate_image:
-			if layers.selected_layers:
-				for selected in layers.selected_layers:
-					ToolManager.rotate(selected.image,canvas.get_mouse_position()-canvas.size/2.0)
-		ToolManager.tool_mode.scale_image:
-			if layers.selected_layers:
-				for selected in layers.selected_layers:
-					ToolManager.scale(selected.image,mouse_position_delta * delta) 
+	if ToolManager.current_tool == ToolManager.tool_mode.move_image:
+		if layers.selected_layers:
+			for selected in layers.selected_layers:
+				ToolManager.move(selected.image,mouse_position_delta)
+	if ToolManager.current_tool == ToolManager.tool_mode.rotate_image:
+		if layers.selected_layers:
+			for selected in layers.selected_layers:
+				ToolManager.rotate(selected.image,canvas.get_mouse_position()-canvas.size/2.0)
+	if ToolManager.current_tool == ToolManager.tool_mode.scale_image:
+		if layers.selected_layers:
+			for selected in layers.selected_layers:
+				ToolManager.scale(selected.image,mouse_position_delta * delta) 
 
 	previous_mouse_position = get_global_mouse_position()
 
@@ -308,25 +280,24 @@ func refresh():
 	
 
 func tool_shortcut(index): # handle tools list
-	match index:
-		ToolManager.tool_mode.move_image:
-			if layers.selected_layers:
-				for selected in layers.selected_layers:
-					add_to_undo_history([selected.image, "position", selected.image.position])
-				send_changed_signal()
-				ToolManager.current_mode = ToolManager.tool_mode.move_image
-		ToolManager.tool_mode.rotate_image:
-			if layers.selected_layers:
-				for selected in layers.selected_layers:
-					add_to_undo_history([selected.image, "rotation", selected.image.rotation])
-				send_changed_signal()
-				ToolManager.current_mode = ToolManager.tool_mode.rotate_image
-		ToolManager.tool_mode.scale_image:
-			if layers.selected_layers:
-				for selected in layers.selected_layers:
-					add_to_undo_history([selected.image, "scale", selected.image.scale])
-				send_changed_signal()
-				ToolManager.current_mode = ToolManager.tool_mode.scale_image
+	if index == ToolManager.tool_mode.move_image:
+		if layers.selected_layers:
+			for selected in layers.selected_layers:
+				add_to_undo_history([selected.image, "position", selected.image.position])
+			send_changed_signal()
+			ToolManager.current_mode = ToolManager.tool_mode.move_image
+	if index == ToolManager.tool_mode.rotate_image:
+		if layers.selected_layers:
+			for selected in layers.selected_layers:
+				add_to_undo_history([selected.image, "rotation", selected.image.rotation])
+			send_changed_signal()
+			ToolManager.current_mode = ToolManager.tool_mode.rotate_image
+	if index == ToolManager.tool_mode.scale_image:
+		if layers.selected_layers:
+			for selected in layers.selected_layers:
+				add_to_undo_history([selected.image, "scale", selected.image.scale])
+			send_changed_signal()
+			ToolManager.current_mode = ToolManager.tool_mode.scale_image
 func new_project() -> void:
 	center_view()
 	save_path = null
@@ -347,44 +318,19 @@ func send_changed_signal() -> void:
 	set_need_save(true)
 
 
-var undo_history = []
-var redo_history = []
 @export var undo_limit : int = 32
-var undo_saved_step : int = 0
 func add_to_undo_history(data:Array): # syntax : [object,str(property_name),value]
-	redo_history.clear()
-	undo_history.append(data)
-	if undo_history.size() > undo_limit:
-		undo_history.pop_front()
-	print("history added")
-	get_node("/root/Editor/MessageLabel").show_step(undo_history.size())
+	undo_redo.create_action(data[1],0)
+	undo_redo.add_undo_property(data[0],data[1],data[2])
+#	undo_redo.add_do_property(data[0],data[1],data[2])
+	undo_redo.commit_action()
+	get_node("/root/Editor/MessageLabel").show_step(undo_redo.get_history_count())
 func undo():
-	if !can_undo():
-		print("nothing to undo")
-		return
-	var tween : Tween = get_tree().create_tween()
-	var redo_data = [undo_history.back()[0],undo_history.back()[1],undo_history.back()[2]]
-	redo_history.append(redo_data)
-	tween.tween_property(undo_history.back()[0],undo_history.back()[1],undo_history.back()[2],0.01)
-	undo_history.pop_back()
-	print("undo")
+	undo_redo.undo()
 	
-func can_undo() -> bool:
-	return !(undo_history.size() == 0)
 
 func redo():
-	if !can_redo():
-		print("nothing to redo")
-		return
-	var tween : Tween = get_tree().create_tween()
-	var undo_data = [redo_history.back()[0],redo_history.back()[1],redo_history.back()[2]]
-	undo_history.append(undo_data)
-	tween.tween_property(redo_history.back()[0],redo_history.back()[1],redo_history.back()[2],0.01)
-	redo_history.pop_back()
-	print("redo")
-
-func can_redo() -> bool:
-	return !(redo_history.size() == 0)
+	undo_redo.redo()
 
 func _exit_tree():
 	save_config()
@@ -429,9 +375,7 @@ func load_file(filename) -> bool:
 			
 		layers = data.layers
 		layers.canvas = canvas
-		canvas.size = data.canvas_size
-		$SubViewportContainer.size = data.canvas_size
-		$SubViewportContainer/Background.size = data.canvas_size
+		canvas_size = data.canvas_size
 		return true
 	else:
 		var dialog : AcceptDialog = AcceptDialog.new()
@@ -496,5 +440,21 @@ func auto_save():
 # Center view
 
 func center_view() -> void:
-	canvas.get_camera_2d().position = Vector2(0,0)
-	canvas.get_camera_2d().zoom = Vector2(1,1)
+	camera.fit_to_frame(canvas_size)
+
+
+
+
+
+
+
+
+
+func _on_mouse_entered():
+	has_focus = true
+	mt_globals.main_window.left_cursor.visible = mt_globals.show_left_tool_icon
+
+
+func _on_mouse_exited():
+	has_focus = false
+	mt_globals.main_window.left_cursor.visible = false

@@ -1,16 +1,16 @@
 extends HSplitContainer
 
 const PANEL_POSITIONS = {
-	TopLeft="Left/Top",
-	BottomLeft="Left/Bottom",
+	TopLeft="SplitLeft/Left/Top",
+	BottomLeft="SplitLeft/Left/Bottom",
 	TopRight="SplitRight/Right/Top",
 	BottomRight="SplitRight/Right/Bottom"
 }
 var PANELS = [
-	{ name="Tools", scene=preload("res://panels/tools/tools_panel.tscn"), position="TopLeft" },
-	{ name="Project Settings", scene=preload("res://panels/graph/GraphSettings.tscn"), position="TopRight" },
-	{ name="Layers", scene=preload("res://panels/layers/layers.tscn"), position="BottomRight" },
-	{ name="Layers Inspector", scene=preload("res://panels/layer_inspector/LayerInspector.tscn"), position="BottomLeft" },
+	{ name="Tool Settings", scene=preload("res://panels/tools bar/tool_settings.tscn"), position="TopLeft" },
+	{ name="Layers", scene=preload("res://panels/layers/layers.tscn"), position="TopRight" },
+	{ name="Layers Inspector", scene=preload("res://panels/layer_inspector/LayerInspector.tscn"), position="BottomRight" },
+	{ name="Project Settings", scene=preload("res://panels/graph/GraphSettings.tscn"), position="BottomRight" },
 ]
 const HIDE_PANELS = {
 	photo_editing=[],
@@ -26,7 +26,7 @@ func _ready() -> void:
 func toggle_side_panels() -> void:
 	# Toggle side docks' visibility to maximize the space available
 	# for the graph panel. This is useful on smaller displays.
-	$Left.visible = not $Left.visible
+	$SplitLeft/Left.visible = not $SplitLeft/Left.visible
 	$SplitRight/Right.visible = not $SplitRight/Right.visible
 
 func load_panels() -> void:
@@ -52,10 +52,12 @@ func load_panels() -> void:
 			node.set_meta("hidden", false)
 	# Split positions
 	await get_tree().process_frame 
+	if mt_globals.config.has_section_key("layout", "VSplitOffset"):
+		split_offset = mt_globals.config.get_value("layout", "VSplitOffset")
 	if mt_globals.config.has_section_key("layout", "LeftVSplitOffset"):
-		split_offset = mt_globals.config.get_value("layout", "LeftVSplitOffset")
+		$SplitLeft.split_offset = mt_globals.config.get_value("layout", "LeftVSplitOffset")
 	if mt_globals.config.has_section_key("layout", "LeftHSplitOffset"):
-		$Left.split_offset = mt_globals.config.get_value("layout", "LeftHSplitOffset")
+		$SplitLeft/Left.split_offset = mt_globals.config.get_value("layout", "LeftHSplitOffset")
 	if mt_globals.config.has_section_key("layout", "RightVSplitOffset"):
 		$SplitRight.split_offset = mt_globals.config.get_value("layout", "RightVSplitOffset")
 	if mt_globals.config.has_section_key("layout", "RightHSplitOffset"):
@@ -73,8 +75,9 @@ func save_config() -> void:
 		for l in PANEL_POSITIONS.keys():
 			if location == get_node(PANEL_POSITIONS[l]):
 				mt_globals.config.set_value("layout", config_panel_name+"_location", l)
-	mt_globals.config.set_value("layout", "LeftVSplitOffset", split_offset)
-	mt_globals.config.set_value("layout", "LeftHSplitOffset", $Left.split_offset)
+	mt_globals.config.set_value("layout", "VSplitOffset", split_offset)
+	mt_globals.config.set_value("layout", "LeftVSplitOffset", $SplitLeft.split_offset)
+	mt_globals.config.set_value("layout", "LeftHSplitOffset", $SplitLeft/Left.split_offset)
 	mt_globals.config.set_value("layout", "RightVSplitOffset", $SplitRight.split_offset)
 	mt_globals.config.set_value("layout", "RightHSplitOffset", $SplitRight/Right.split_offset)
 
@@ -108,21 +111,21 @@ func change_mode(m : String) -> void:
 	update_panels()
 
 func update_panels() -> void:
-	var left_width = $Left.get_rect().size.x
+	var left_width = $SplitLeft/Left.get_rect().size.x
 	var left_requested = left_width
 	var right_width = $SplitRight/Right.get_rect().size.x
 	var right_requested = right_width
-	if $Left/Top.get_tab_count() == 0:
-		if $Left/Bottom.get_tab_count() == 0:
+	if $SplitLeft/Left/Top.get_tab_count() == 0:
+		if $SplitLeft/Left/Bottom.get_tab_count() == 0:
 			left_requested = 10
-			$Left.split_offset -= ($Left/Top.get_rect().size.y-$Left/Bottom.get_rect().size.y)/2
-			$Left.clamp_split_offset()
+			$SplitLeft/Left.split_offset -= ($SplitLeft/Left/Top.get_rect().size.y-$SplitLeft/Left/Bottom.get_rect().size.y)/2
+			$SplitLeft/Left.clamp_split_offset()
 		else:
-			$Left.split_offset -= $Left/Top.get_rect().size.y-10
-			$Left.clamp_split_offset()
-	elif $Left/Bottom.get_tab_count() == 0:
-		$Left.split_offset += $Left/Bottom.get_rect().size.y-10
-		$Left.clamp_split_offset()
+			$SplitLeft/Left.split_offset -= $SplitLeft/Left/Top.get_rect().size.y-10
+			$SplitLeft/Left.clamp_split_offset()
+	elif $SplitLeft/Left/Bottom.get_tab_count() == 0:
+		$SplitLeft/Left.split_offset += $SplitLeft/Left/Bottom.get_rect().size.y-10
+		$SplitLeft/Left.clamp_split_offset()
 	if $SplitRight/Right/Top.get_tab_count() == 0:
 		if $SplitRight/Right/Bottom.get_tab_count() == 0:
 			right_requested = 10
@@ -139,7 +142,7 @@ func update_panels() -> void:
 	$SplitRight.split_offset += right_width - right_requested
 
 func _on_Left_dragged(_offset : int) -> void:
-	$Left.clamp_split_offset()
+	$SplitLeft/Left.clamp_split_offset()
 
 func _on_Right_dragged(_offset : int) -> void:
 	$SplitRight/Right.clamp_split_offset()

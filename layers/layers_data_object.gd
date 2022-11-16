@@ -18,13 +18,14 @@ func load_layers():
 		if layer:
 			layer.refresh()
 			layer.image.z_index = layers.find(layer)
-		if canvas:
-			if layer.image.get_parent() == null:
-				canvas.add_child(layer.image)
+#		if canvas:
+#			if layer.image.get_parent() == null:
+#				canvas.add_child(layer.image)
 func add_layer(new_layer:base_layer):
 	layers.append(new_layer)
-	if new_layer.image.get_parent() == null:
-		canvas.add_child(new_layer.image)
+#	if new_layer.image.get_parent() == null:
+#		pass
+#		canvas.add_child(new_layer.image)
 	_on_layers_changed()
 
 func select_layer_name(layer_name):

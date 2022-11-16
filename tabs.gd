@@ -141,3 +141,13 @@ func _on_auto_save_timer_timeout():
 		var tab_control = get_child(i)
 		if tab_control.has_method("auto_save"):
 			tab_control.auto_save()
+
+
+#func _on_mouse_entered():
+#	print("entered")
+#	mt_globals.main_window.left_cursor.visible = mt_globals.show_left_tool_icon
+#
+#
+#func _on_mouse_exited():
+#	print("exited")
+#	mt_globals.main_window.left_cursor.visible = false

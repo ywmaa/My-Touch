@@ -37,7 +37,7 @@ offset_right = 76.0
 offset_bottom = 16.0
 size_flags_horizontal = 3
 focus_mode = 2
-mouse_filter = 2
+mouse_filter = 0
 
 [node name="Add" type="TextureButton" parent="Buttons"]
 visible = false
@@ -113,4 +113,3 @@ script = ExtResource("3_yyid0")
 [connection signal="item_edited" from="Tree" to="Tree" method="_on_Tree_item_edited"]
 [connection signal="multi_selected" from="Tree" to="Tree" method="_on_tree_multi_selected"]
 [connection signal="nothing_selected" from="Tree" to="Tree" method="_on_tree_nothing_selected"]
-[connection signal="selection_changed" from="Tree" to="." method="_on_Tree_selection_changed"]

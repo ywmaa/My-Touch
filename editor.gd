@@ -74,6 +74,13 @@ const MENU = [
 	{ menu="Help/About", command="about" }
 ]
 
+@onready var left_cursor: Sprite2D = $LeftCursor
+
+func _input(event: InputEvent) -> void:
+	left_cursor.position = get_global_mouse_position() + Vector2(-32, 32)
+	for tool in ToolManager.TOOLS:
+		if tool.shortcut == event.as_text():
+			ToolManager.assign_tool(tool.tool,ToolManager.TOOLS.find(tool))
 
 
 func _ready() -> void:
@@ -112,7 +119,7 @@ func _ready() -> void:
 
 	
 	layout.load_panels()
-	tools = get_panel("Tools")
+	tools = get_panel("Tool Settings")
 #
 #	# Load recent projects
 	load_recents()

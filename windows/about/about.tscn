@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://5i28m5qeohlo"]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://windows/about/about.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://dfy6so7ye3xkk" path="res://windows/about/github.png" id="2"]
@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://idn7mtrc7awy" path="res://windows/about/patreon.png" id="4_ufusg"]
 [ext_resource type="Texture2D" uid="uid://cp12dubxif6qc" path="res://windows/about/itchio.png" id="5"]
 [ext_resource type="Texture2D" uid="uid://d4es6j4nr7mi2" path="res://windows/about/youtube.png" id="7"]
-[ext_resource type="Texture2D" uid="uid://b5pepyrk5c6u5" path="res://icon.png" id="8"]
+[ext_resource type="Texture2D" path="res://icon.png" id="8"]
 [ext_resource type="Texture2D" uid="uid://dy1gm657ka0qa" path="res://windows/about/discord.png" id="10"]
 
 [node name="About" type="PopupPanel"]

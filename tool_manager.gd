@@ -1,5 +1,23 @@
 extends Node
 
+
+signal color_changed(color, button)
+signal tool_changed(assigned_tool)
+
+var pen_pressure := 1.0
+var horizontal_mirror := false
+var vertical_mirror := false
+var pixel_perfect := false
+var selected_tool_color := Color("0086cf")
+
+
+const TOOLS = [
+	{ tool="Select", command="tool_none", shortcut="Shift+F", tooltip="select tool",settings_node=null },
+	{ tool="Move", command="tool_move", shortcut="Shift+G", tooltip="move tool" },
+	{ tool="Rotate", command="tool_rotate", shortcut="Shift+R", tooltip="rotate tool" },
+	{ tool="Scale", command="tool_scale", shortcut="Shift+S", tooltip="scale tool" },
+]
+var assigned_tool
 enum coordinates {xy,x,y}
 
 var direction : coordinates = coordinates.xy
@@ -16,6 +34,39 @@ var current_mode : tool_mode = tool_mode.none:
 		last_mode = current_mode
 		current_mode = new_mode
 
+
+
+
+func tool_none():
+	ToolManager.current_tool = ToolManager.tool_mode.none
+	ToolManager.current_mode = ToolManager.tool_mode.none
+func tool_move():
+	ToolManager.current_tool = ToolManager.tool_mode.move_image
+	ToolManager.current_mode = ToolManager.tool_mode.none
+func tool_rotate():
+	ToolManager.current_tool = ToolManager.tool_mode.rotate_image
+	ToolManager.current_mode = ToolManager.tool_mode.none
+func tool_scale():
+	ToolManager.current_tool = ToolManager.tool_mode.scale_image
+	ToolManager.current_mode = ToolManager.tool_mode.none
+
+
+
+func assign_tool(name: String, button: int) -> void:
+	assigned_tool = TOOLS[button]
+	if assigned_tool.has("settings_node"):
+		var panel: Node = assigned_tool.settings_node
+	
+	call(assigned_tool.command)
+	emit_signal("tool_changed",assigned_tool)
+	update_tool_cursors()
+
+
+
+func update_tool_cursors() -> void:
+	var cursor_icon = load("res://graphics/tools/%s.png" % assigned_tool.tool.to_lower())
+	mt_globals.main_window.left_cursor.texture = cursor_icon
+	
 
 func rotate(object,direction_point:Vector2):
 	object.look_at(direction_point)
