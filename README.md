@@ -30,6 +30,7 @@ the project has a lot of files from material maker/pixelorama and it is not orga
 
  multiple project syncing and combining (which will allow better collaborartion and projects/layers management)
 
+ Procedural Node System
 
 # Roadmap
  https://trello.com/b/ATaLIaII/my-touch
