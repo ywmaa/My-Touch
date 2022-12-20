@@ -7,11 +7,12 @@ anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -67.0625
+grow_horizontal = 0
+grow_vertical = 2
 focus_mode = 1
 text = "0.5"
-context_menu_enabled = false
-virtual_keyboard_enabled = false
-shortcut_keys_enabled = false
+select_all_on_focus = true
 caret_blink = true
 script = ExtResource("1")
 
@@ -21,6 +22,8 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
 mouse_filter = 2
 color = Color(0.501961, 0.501961, 0.501961, 1)
 
@@ -28,8 +31,5 @@ color = Color(0.501961, 0.501961, 0.501961, 1)
 layout_mode = 0
 mouse_filter = 2
 
-[connection signal="focus_entered" from="." to="." method="_on_FloatEdit_focus_entered"]
-[connection signal="focus_exited" from="." to="." method="_on_LineEdit_focus_exited"]
 [connection signal="resized" from="." to="." method="do_update"]
-[connection signal="text_changed" from="." to="." method="_on_LineEdit_text_changed"]
 [connection signal="resized" from="Slider" to="." method="do_update"]

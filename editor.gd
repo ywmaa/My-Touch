@@ -357,8 +357,12 @@ func export_png_image():
 	# Generate the image
 	var graph_edit : MTGraph = get_current_graph_edit()
 	var image : Image = Image.new()
-	image = graph_edit.canvas.get_texture().get_image()
-	image.save_png(files[0])
+	# Wait until the frame has finished before getting the texture.
+	await RenderingServer.frame_post_draw
+	# Save the image with the passed in path we got from the save dialog.
+	image = graph_edit.viewport.get_texture().get_image()
+	var cropped_image = image.get_region(Rect2(graph_edit.canvas.position, graph_edit.canvas.scale*graph_edit.canvas_size))
+	cropped_image.save_png(files[0])
 	
 func export_jpeg_image():
 	# Prompt for a target PNG file
@@ -376,7 +380,7 @@ func export_jpeg_image():
 	await get_tree().process_frame
 	var image : Image = Image.new()
 	image = graph_edit.canvas.get_texture().get_image()
-	image.save_png(files[0])
+	image.save_jpg(files[0])
 func refresh():
 	var project = get_current_project()
 	if project != null:
@@ -553,8 +557,7 @@ func view_center() -> void:
 
 func view_reset_zoom() -> void:
 	var graph_edit : MTGraph = get_current_graph_edit()
-	graph_edit.canvas.get_camera_2d().zoom = Vector2(1,1)
-	graph_edit.canvas.get_camera_2d().position = Vector2(0,0)
+	graph_edit.camera.zoom_100()
 
 func toggle_side_panels() -> void:
 	$VBoxContainer/Layout.toggle_side_panels()

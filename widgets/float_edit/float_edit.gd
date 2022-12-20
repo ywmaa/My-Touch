@@ -38,6 +38,8 @@ signal value_changed(value)
 signal value_changed_undo(value, merge_undo)
 
 func _ready() -> void:
+	connect("text_submitted",_on_LineEdit_text_entered)
+	connect("focus_exited",_on_LineEdit_text_entered)
 	do_update()
 
 
@@ -61,11 +63,6 @@ func get_modifiers(event):
 	return new_modifiers
 
 func _gui_input(event : InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.is_pressed() and !float_only:
-		var expression_editor : PopupPanel = load("res://widgets/float_edit/expression_editor.tscn").instantiate()
-		add_child(expression_editor)
-		expression_editor.edit_parameter(self)
-		accept_event()
 	if !slider.visible or !sliding and !editable:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -123,34 +120,18 @@ func _gui_input(event : InputEvent) -> void:
 				start_value = value
 				modifiers = get_modifiers(event)
 
-func _on_LineEdit_text_changed(_new_text : String) -> void:
-	pass
 
-func _on_LineEdit_text_entered(new_text : String, release = true) -> void:
-	if new_text.is_valid_float():
-		var new_value : float = new_text.to_float()
-		if abs(value-new_value) > 0.00001:
-			value = new_value
-			do_update()
-			emit_signal("value_changed", value)
-			emit_signal("value_changed_undo", value, false)
-			$Slider.visible = true
-	elif float_only or new_text == "":
-		do_update()
-		emit_signal("value_changed", value)
-		emit_signal("value_changed_undo", value, false)
-		$Slider.visible = true
-	else:
-		emit_signal("value_changed", new_text)
-		emit_signal("value_changed_undo", new_text, false)
-		$Slider.visible = false
+
+func _on_LineEdit_text_entered(new_text : String = text, release = true) -> void:
+	var exp : Expression = Expression.new()
+	exp.parse(new_text)
+	var new_value : float = exp.execute()
+	value = new_value
+	do_update()
+	emit_signal("value_changed", value)
+	emit_signal("value_changed_undo", value, false)
+	$Slider.visible = true
 	if release:
 		release_focus()
 
-func _on_FloatEdit_focus_entered():
-	select_all()
 
-func _on_LineEdit_focus_exited() -> void:
-	select(0, 0)
-	_on_LineEdit_text_entered(text, false)
-	select(0, 0)

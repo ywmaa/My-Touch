@@ -17,7 +17,7 @@ func update_image() -> void:
 	var image : Image = Image.new()
 	image.load(image_path)
 	texture_normal.create_from_image(image)
-	update()
+	queue_redraw()
 
 func do_set_image_path(path) -> void:
 	if path == null:
@@ -58,8 +58,7 @@ func _on_ImagePicker_pressed():
 	dialog.add_filter("*.tga;TGA Image")
 	dialog.add_filter("*.webp;WebP Image")
 	var files = dialog.select_files()
-	while files is GDScriptFunctionState:
-		files = yield(files, "completed")
+	files = await files.completed
 	if files.size() > 0:
 		set_image_path(files[0])
 

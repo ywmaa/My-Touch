@@ -210,17 +210,14 @@ func zoom_camera_percent(value: float) -> void:
 
 func zoom_changed() -> void:
 	update_transparent_checker_offset()
-#	if index == Cameras.MAIN:
-#		Global.zoom_level_button.text = str(round(100 / zoom.x)) + " %"
-#		Global.canvas.pixel_grid.update()
-#		_update_rulers()
-#		for guide in Global.current_project.guides:
-#			guide.width = zoom.x * 2
+#	Global.zoom_level_button.text = str(round(100 / zoom.x)) + " %"
+	viewport_container.canvas.pixel_grid.queue_redraw()
+#	_update_rulers()
+#	for guide in Global.current_project.guides:
+#		guide.width = zoom.x * 2
 #
-#		Global.canvas.selection.update_on_zoom(zoom.x)
+#	Global.canvas.selection.update_on_zoom(zoom.x)
 #
-#	elif index == Cameras.SMALL:
-#		Global.preview_zoom_slider.value = -zoom.x
 
 
 #func _update_rulers() -> void:

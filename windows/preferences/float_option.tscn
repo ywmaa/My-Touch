@@ -4,17 +4,6 @@
 [ext_resource type="Script" path="res://windows/preferences/float_option.gd" id="2"]
 
 [node name="FloatOption" instance=ExtResource("1")]
-offset_left = -67.0625
-grow_horizontal = 0
-grow_vertical = 2
 focus_mode = 2
 script = ExtResource("2")
 config_variable = null
-
-[node name="Slider" parent="." index="0"]
-layout_mode = 3
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="Cursor" parent="Slider" index="0"]
-layout_mode = 3

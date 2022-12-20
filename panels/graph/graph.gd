@@ -24,7 +24,8 @@ var canvas_size : Vector2:
 		transparent_checker.update_rect()
 
 
-@onready var canvas : SubViewport = $Viewport/canvas
+@onready var viewport : SubViewport = $Viewport
+@onready var canvas : Node2D = $Viewport/Canvas
 @onready var transparent_checker = $Viewport/TransparentChecker
 @onready var camera: Camera2D = get_node("Viewport/Camera2D")
 
@@ -124,7 +125,10 @@ func _input(event):
 			if ToolManager.current_tool == ToolManager.tool_mode.none:
 				dragging = true
 				drag_start = get_local_mouse_position()
-				pass # layer selection
+				layers.selected_layers = []
+				for layer in layers.layers:
+					if Rect2(drag_start,get_local_mouse_position()-drag_start).intersects(Rect2(canvas.position+layer.image.position,layer.image.get_rect().size*layer.image.scale),true):
+						layers.select_layer(layer)
 
 		elif dragging:
 			dragging = false
@@ -441,11 +445,6 @@ func auto_save():
 
 func center_view() -> void:
 	camera.fit_to_frame(canvas_size)
-
-
-
-
-
 
 
 

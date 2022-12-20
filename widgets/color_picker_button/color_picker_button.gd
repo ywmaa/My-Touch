@@ -8,13 +8,13 @@ signal color_changed_undo(c, previous)
 
 
 func _ready():
-	connect("color_changed", self, "on_color_changed")
-	connect("picker_created", self, "on_picker_created")
-	connect("popup_closed", self, "on_popup_closed")
+	connect("color_changed", on_color_changed)
+	connect("picker_created", on_picker_created)
+	connect("popup_closed", on_popup_closed)
 
 func set_color(c):
 	print(c)
-	.set_color(c)
+	super.set_pick_color(c)
 
 func get_drag_data(_position):
 	var preview = ColorRect.new()
@@ -36,7 +36,7 @@ func on_color_changed(c):
 	emit_signal("color_changed_undo", c, null)
 
 func on_picker_created():
-	get_popup().connect("about_to_show", self, "on_about_to_show")
+	get_popup().connect("about_to_show", on_about_to_show)
 	previous_color = color
 
 func on_about_to_show():

@@ -9,25 +9,22 @@ clip_contents = true
 script = ExtResource("1_q8631")
 
 [node name="Space3" type="Control" parent="."]
-layout_mode = 2
+layout_mode = 3
 anchors_preset = 0
 offset_right = 196.0
 
 [node name="Label" type="Label" parent="."]
-layout_mode = 2
 offset_top = 4.0
 offset_right = 196.0
 offset_bottom = 30.0
 text = "Position :"
 
 [node name="CanvasRes" type="HBoxContainer" parent="."]
-layout_mode = 2
 offset_top = 34.0
 offset_right = 196.0
 offset_bottom = 65.0
 
 [node name="Label1" type="Label" parent="CanvasRes"]
-layout_mode = 2
 offset_top = 2.0
 offset_right = 23.0
 offset_bottom = 28.0
@@ -36,7 +33,6 @@ text = "X : "
 
 [node name="PositionX" parent="CanvasRes" instance=ExtResource("2_8ltnj")]
 unique_name_in_owner = true
-layout_mode = 2
 anchors_preset = 0
 anchor_left = 0.0
 anchor_right = 0.0
@@ -54,14 +50,13 @@ max_value = 10000.0
 step = 1.0
 
 [node name="Space" type="Control" parent="CanvasRes"]
-layout_mode = 2
+layout_mode = 3
 anchors_preset = 0
 offset_left = 98.0
 offset_right = 98.0
 offset_bottom = 31.0
 
 [node name="Label2" type="Label" parent="CanvasRes"]
-layout_mode = 2
 offset_left = 102.0
 offset_top = 2.0
 offset_right = 125.0
@@ -71,7 +66,6 @@ text = "Y : "
 
 [node name="PositionY" parent="CanvasRes" instance=ExtResource("2_8ltnj")]
 unique_name_in_owner = true
-layout_mode = 2
 anchors_preset = 0
 anchor_left = 0.0
 anchor_right = 0.0
@@ -89,27 +83,24 @@ max_value = 10000.0
 step = 1.0
 
 [node name="Space4" type="Control" parent="."]
-layout_mode = 2
+layout_mode = 3
 anchors_preset = 0
 offset_top = 69.0
 offset_right = 196.0
 offset_bottom = 69.0
 
 [node name="Label2" type="Label" parent="."]
-layout_mode = 2
 offset_top = 73.0
 offset_right = 196.0
 offset_bottom = 99.0
 text = "Size :"
 
 [node name="CanvasRes2" type="HBoxContainer" parent="."]
-layout_mode = 2
 offset_top = 103.0
 offset_right = 196.0
 offset_bottom = 134.0
 
 [node name="Label1" type="Label" parent="CanvasRes2"]
-layout_mode = 2
 offset_top = 2.0
 offset_right = 23.0
 offset_bottom = 28.0
@@ -118,7 +109,6 @@ text = "X : "
 
 [node name="SizeX" parent="CanvasRes2" instance=ExtResource("2_8ltnj")]
 unique_name_in_owner = true
-layout_mode = 2
 anchors_preset = 0
 anchor_left = 0.0
 anchor_right = 0.0
@@ -136,14 +126,13 @@ max_value = 10000.0
 step = 1.0
 
 [node name="Space" type="Control" parent="CanvasRes2"]
-layout_mode = 2
+layout_mode = 3
 anchors_preset = 0
 offset_left = 98.0
 offset_right = 98.0
 offset_bottom = 31.0
 
 [node name="Label2" type="Label" parent="CanvasRes2"]
-layout_mode = 2
 offset_left = 102.0
 offset_top = 2.0
 offset_right = 125.0
@@ -153,7 +142,6 @@ text = "Y : "
 
 [node name="SizeY" parent="CanvasRes2" instance=ExtResource("2_8ltnj")]
 unique_name_in_owner = true
-layout_mode = 2
 anchors_preset = 0
 anchor_left = 0.0
 anchor_right = 0.0
@@ -171,27 +159,24 @@ max_value = 10000.0
 step = 1.0
 
 [node name="Space5" type="Control" parent="."]
-layout_mode = 2
+layout_mode = 3
 anchors_preset = 0
 offset_top = 138.0
 offset_right = 196.0
 offset_bottom = 138.0
 
 [node name="Label3" type="Label" parent="."]
-layout_mode = 2
 offset_top = 142.0
 offset_right = 196.0
 offset_bottom = 168.0
 text = "Scale :"
 
 [node name="CanvasRes3" type="HBoxContainer" parent="."]
-layout_mode = 2
 offset_top = 172.0
 offset_right = 196.0
 offset_bottom = 203.0
 
 [node name="Label1" type="Label" parent="CanvasRes3"]
-layout_mode = 2
 offset_top = 2.0
 offset_right = 23.0
 offset_bottom = 28.0
@@ -200,7 +185,6 @@ text = "X : "
 
 [node name="ScaleX" parent="CanvasRes3" instance=ExtResource("2_8ltnj")]
 unique_name_in_owner = true
-layout_mode = 2
 anchors_preset = 0
 anchor_left = 0.0
 anchor_right = 0.0
@@ -218,14 +202,13 @@ max_value = 10000.0
 step = 1.0
 
 [node name="Space" type="Control" parent="CanvasRes3"]
-layout_mode = 2
+layout_mode = 3
 anchors_preset = 0
 offset_left = 98.0
 offset_right = 98.0
 offset_bottom = 31.0
 
 [node name="Label2" type="Label" parent="CanvasRes3"]
-layout_mode = 2
 offset_left = 102.0
 offset_top = 2.0
 offset_right = 125.0
@@ -235,7 +218,6 @@ text = "Y : "
 
 [node name="ScaleY" parent="CanvasRes3" instance=ExtResource("2_8ltnj")]
 unique_name_in_owner = true
-layout_mode = 2
 anchors_preset = 0
 anchor_left = 0.0
 anchor_right = 0.0
@@ -251,3 +233,22 @@ value = 720.0
 min_value = 2.0
 max_value = 10000.0
 step = 1.0
+
+[connection signal="focus_entered" from="CanvasRes/PositionX" to="CanvasRes/PositionX" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="CanvasRes/PositionX" to="CanvasRes/PositionX" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="CanvasRes/PositionX" to="CanvasRes/PositionX" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="CanvasRes/PositionY" to="CanvasRes/PositionY" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="CanvasRes/PositionY" to="CanvasRes/PositionY" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="CanvasRes/PositionY" to="CanvasRes/PositionY" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="CanvasRes2/SizeX" to="CanvasRes2/SizeX" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="CanvasRes2/SizeX" to="CanvasRes2/SizeX" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="CanvasRes2/SizeX" to="CanvasRes2/SizeX" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="CanvasRes2/SizeY" to="CanvasRes2/SizeY" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="CanvasRes2/SizeY" to="CanvasRes2/SizeY" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="CanvasRes2/SizeY" to="CanvasRes2/SizeY" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="CanvasRes3/ScaleX" to="CanvasRes3/ScaleX" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="CanvasRes3/ScaleX" to="CanvasRes3/ScaleX" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="CanvasRes3/ScaleX" to="CanvasRes3/ScaleX" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="CanvasRes3/ScaleY" to="CanvasRes3/ScaleY" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="CanvasRes3/ScaleY" to="CanvasRes3/ScaleY" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="CanvasRes3/ScaleY" to="CanvasRes3/ScaleY" method="_on_LineEdit_text_changed" flags=18]

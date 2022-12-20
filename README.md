@@ -15,6 +15,8 @@ the project has a lot of files from material maker/pixelorama and it is not orga
 
 # goals
  easy to use photo editor
+ 
+ non destructive workflow
 
  blender like shortcuts
 

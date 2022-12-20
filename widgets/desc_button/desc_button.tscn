@@ -10,8 +10,5 @@ region = Rect2(64, 80, 16, 16)
 [node name="Button" type="Button"]
 icon = SubResource("1")
 script = ExtResource("2")
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [connection signal="pressed" from="." to="." method="_on_Button_pressed"]

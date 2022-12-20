@@ -1,7 +1,7 @@
 extends Resource
 class_name base_layer
 
-enum layer_type {image,project}
+enum layer_type {brush,image,project,mask}
 
 @export var image : Sprite2D = Sprite2D.new():
 	set(new_image):

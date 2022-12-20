@@ -30,14 +30,10 @@ func _draw() -> void:
 	for i in project.layers.layers:
 		var modulate_color := Color(1, 1, 1, 1)
 		if i.hidden == false:
-			
-			print(i.image.position)
-			
-			draw_texture(i.image.texture, i.image.position, modulate_color)
+			draw_texture_rect(i.image.texture,Rect2(i.image.position,i.image.get_rect().size*i.image.scale),false)
 #
 #	if Global.onion_skinning:
 #		refresh_onion()
-
 	draw_set_transform(position, rotation, scale)
 
 func _process(delta):
