@@ -24,8 +24,8 @@ var canvas_size : Vector2:
 		transparent_checker.update_rect()
 
 
-@onready var viewport : SubViewport = $Viewport
-@onready var canvas : Node2D = $Viewport/Canvas
+@onready var viewport : SubViewport = $Viewport/TransparentChecker/SubViewport
+@onready var canvas : Node2D = $Viewport/TransparentChecker/SubViewport/Canvas
 @onready var transparent_checker = $Viewport/TransparentChecker
 @onready var camera: Camera2D = get_node("Viewport/Camera2D")
 
@@ -127,7 +127,8 @@ func _input(event):
 				drag_start = get_local_mouse_position()
 				layers.selected_layers = []
 				for layer in layers.layers:
-					if Rect2(drag_start,get_local_mouse_position()-drag_start).intersects(Rect2(canvas.position+layer.image.position,layer.image.get_rect().size*layer.image.scale),true):
+					print(transparent_checker.global_position)
+					if Rect2(drag_start,get_local_mouse_position()-drag_start).intersects(Rect2(position+layer.image.position,layer.image.get_rect().size*layer.image.scale),true):
 						layers.select_layer(layer)
 
 		elif dragging:

@@ -8,7 +8,7 @@ var current_pixel := Vector2.ZERO
 var sprite_changed_this_frame := false  # For optimization purposes
 var move_preview_location := Vector2.ZERO
 
-@onready var project = get_parent().get_parent()
+@onready var project = get_parent().get_parent().get_parent().get_parent()
 @onready var pixel_grid = $PixelGrid
 
 
@@ -31,6 +31,7 @@ func _draw() -> void:
 		var modulate_color := Color(1, 1, 1, 1)
 		if i.hidden == false:
 			draw_texture_rect(i.image.texture,Rect2(i.image.position,i.image.get_rect().size*i.image.scale),false)
+		
 #
 #	if Global.onion_skinning:
 #		refresh_onion()
@@ -38,6 +39,7 @@ func _draw() -> void:
 
 func _process(delta):
 	queue_redraw()
+	get_parent().size = project.canvas_size
 
 func _input(event: InputEvent) -> void:
 	# Don't process anything below if the input isn't a mouse event, or Shift/Ctrl.
@@ -77,11 +79,11 @@ func _input(event: InputEvent) -> void:
 
 func camera_zoom() -> void:
 	# Set camera zoom based on the sprite size
-	var canvas_size = get_parent().get_parent().canvas_size
+	var canvas_size = project.canvas_size
 	var bigger_canvas_axis = max(canvas_size.x, canvas_size.y)
 	var zoom_max := Vector2(bigger_canvas_axis, bigger_canvas_axis) * 0.01
 
-	var camera = get_parent().get_node("Camera2D")
+	var camera = project.camera
 	if zoom_max > Vector2.ONE:
 		camera.zoom_max = zoom_max
 	else:
@@ -89,8 +91,7 @@ func camera_zoom() -> void:
 
 	camera.fit_to_frame(canvas_size)
 #		camera.save_values_to_project()
-	var transparent_checker = get_parent().get_node("TransparentChecker")
-	transparent_checker.update_rect()
+	project.transparent_checker.update_rect()
 
 
 #func update_texture(layer_i: int, frame_i := -1, project: Project = Global.current_project) -> void:

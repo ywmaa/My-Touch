@@ -27,13 +27,6 @@ func _ready() -> void:
 #	Global.rotation_level_spinbox.get_child(0).connect(
 #		"focus_exited", self, "_rotation_focus_exited"
 #	)
-#
-#	# signals regarding zoom stats
-#	Global.zoom_level_button.connect("pressed", self, "_zoom_button_pressed")
-#	Global.zoom_level_spinbox.connect("value_changed", self, "_zoom_value_changed")
-#	Global.zoom_level_spinbox.max_value = 100.0 / zoom_min.x
-#	Global.zoom_level_spinbox.get_child(0).connect("focus_exited", self, "_zoom_focus_exited")
-
 
 #func _rotation_button_pressed() -> void:
 #	Global.rotation_level_button.visible = false
@@ -60,28 +53,9 @@ func _rotation_value_changed(value) -> void:
 #	Global.rotation_level_spinbox.visible = false
 #	Global.rotation_level_spinbox.editable = false
 
-
-#func _zoom_button_pressed() -> void:
-#	Global.zoom_level_button.visible = false
-#	Global.zoom_level_spinbox.visible = true
-#	Global.zoom_level_spinbox.editable = true
-#	Global.zoom_level_spinbox.value = str2var(Global.zoom_level_button.text.replace("%", ""))
-#	# Since the actual LineEdit is the first child of SpinBox
-#	Global.zoom_level_spinbox.get_child(0).grab_focus()
-
-
 func _zoom_value_changed(value) -> void:
 	if index == Cameras.MAIN:
 		zoom_camera_percent(value)
-
-
-#func _zoom_focus_exited() -> void:
-#	if Global.zoom_level_spinbox.value != round(100 / zoom.x):  # If user pressed enter while editing
-#		if index == Cameras.MAIN:
-#			zoom_camera_percent(Global.zoom_level_spinbox.value)
-#	Global.zoom_level_button.visible = true
-#	Global.zoom_level_spinbox.visible = false
-#	Global.zoom_level_spinbox.editable = false
 
 
 func update_transparent_checker_offset() -> void:
@@ -136,13 +110,6 @@ func _input(event: InputEvent) -> void:
 
 #	save_values_to_project()
 
-#
-#func _has_selection_tool() -> bool:
-#	for slot in Tools._slots.values():
-#		if slot.tool_node is SelectionTool:
-#			return true
-#	return false
-
 
 # Rotate Camera
 func _rotate_camera_around_point(degrees: float, point: Vector2) -> void:
@@ -168,14 +135,14 @@ func _set_camera_rotation_degrees(degrees: float) -> void:
 
 # Zoom Camera
 func zoom_camera(dir: int) -> void:
-	var viewport_size = viewport_container.get_rect().size
+	var viewport_size = get_viewport().size
 	if mt_globals.smooth_zoom:
 		var zoom_margin = zoom * dir / 5
 		var new_zoom = zoom + zoom_margin
 		if new_zoom > zoom_min && new_zoom < zoom_max:
 			var new_offset = (
 				offset
-				+ (-0.5 * viewport_size + mouse_pos).rotated(rotation) * (zoom - new_zoom)
+				+ (-0.5 * viewport_size + mouse_pos).rotated(rotation) * (new_zoom - zoom)
 			)
 			var tween := create_tween().set_parallel()
 			tween.set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
@@ -192,12 +159,12 @@ func zoom_camera(dir: int) -> void:
 		if zoom > zoom_max:
 			zoom = zoom_max
 
-		offset = offset + (-0.5 * viewport_size + mouse_pos).rotated(rotation) * (prev_zoom - zoom)
+		offset = offset + (-0.5 * viewport_size + mouse_pos).rotated(rotation) * (zoom - prev_zoom)
 		zoom_changed()
 
 
 func zoom_camera_percent(value: float) -> void:
-	var percent: float = 100.0 / value
+	var percent: float = value / 100.0
 	var new_zoom = Vector2(percent, percent)
 	if mt_globals.smooth_zoom:
 		var tween := create_tween().set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
@@ -210,14 +177,12 @@ func zoom_camera_percent(value: float) -> void:
 
 func zoom_changed() -> void:
 	update_transparent_checker_offset()
-#	Global.zoom_level_button.text = str(round(100 / zoom.x)) + " %"
-	viewport_container.canvas.pixel_grid.queue_redraw()
+#	viewport_container.canvas.pixel_grid.queue_redraw()
 #	_update_rulers()
 #	for guide in Global.current_project.guides:
 #		guide.width = zoom.x * 2
 #
 #	Global.canvas.selection.update_on_zoom(zoom.x)
-#
 
 
 #func _update_rulers() -> void:
@@ -251,9 +216,9 @@ func fit_to_frame(size: Vector2) -> void:
 		size.y = max(abs(a.y - d.y), abs(b.y - c.y))
 
 	viewport_container = get_parent().get_parent()
-	var h_ratio := viewport_container.get_rect().size.x / size.x
-	var v_ratio := viewport_container.get_rect().size.y / size.y
-	var ratio = min(h_ratio, v_ratio)
+	var h_ratio := size.x / viewport_container.get_rect().size.x
+	var v_ratio := size.y / viewport_container.get_rect().size.y
+	var ratio = max(h_ratio, v_ratio)
 	if ratio == 0 or !viewport_container.visible:
 		ratio = 0.1  # Set it to a non-zero value just in case
 
