@@ -7,10 +7,10 @@
 [ext_resource type="Script" path="res://panels/graph/PixelGrid.gd" id="5_0h317"]
 [ext_resource type="Script" path="res://panels/graph/Camera2D.gd" id="7_deeh5"]
 
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_yo2wk"]
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_q6w5y"]
 blend_mode = 4
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ccx8q"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_e3sod"]
 shader = ExtResource("2_tnfrv")
 shader_parameter/size = null
 shader_parameter/alpha = null
@@ -22,11 +22,11 @@ shader_parameter/rect_size = null
 shader_parameter/follow_movement = null
 shader_parameter/follow_scale = null
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_2an04"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_mq88o"]
 viewport_path = NodePath("Viewport/TransparentChecker/SubViewport")
 
 [node name="SubViewportContainer" type="SubViewportContainer"]
-material = SubResource("CanvasItemMaterial_yo2wk")
+material = SubResource("CanvasItemMaterial_q6w5y")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -54,20 +54,19 @@ render_target_update_mode = 4
 
 [node name="TransparentChecker" type="ColorRect" parent="Viewport"]
 show_behind_parent = true
-material = SubResource("ShaderMaterial_ccx8q")
+material = SubResource("ShaderMaterial_e3sod")
 custom_minimum_size = Vector2(40, 40)
 mouse_filter = 2
 script = ExtResource("3_0v6hs")
 metadata/_edit_use_anchors_ = true
 
 [node name="Preview" type="TextureRect" parent="Viewport/TransparentChecker"]
-layout_mode = 1
-anchors_preset = 15
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = SubResource("ViewportTexture_2an04")
+texture = SubResource("ViewportTexture_mq88o")
 
 [node name="SubViewport" type="SubViewport" parent="Viewport/TransparentChecker"]
 disable_3d = true

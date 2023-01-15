@@ -22,10 +22,10 @@ func _process(delta):
 		visible = false
 		current_graph = mt_globals.main_window.get_current_graph_edit()
 		return
-	current_layer = current_graph.layers.selected_layers.front()
-	if !current_layer:
+	if current_graph.layers.selected_layers.is_empty():
 		visible = false
 		return
+	current_layer = current_graph.layers.selected_layers.front()
 	visible = true
 	if current_layer.image.position.x != %PositionX.value:
 		%PositionX.value = current_layer.image.position.x

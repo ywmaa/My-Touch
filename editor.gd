@@ -505,7 +505,7 @@ func edit_load_selection() -> void:
 		if graph_edit != null:
 			graph_edit.load_selection(files)
 
-func edit_save_selection() -> void:
+func edit_save_selection():
 	var project = get_current_project()
 	if project != null:
 		return await project.save_selection()
@@ -578,8 +578,7 @@ func get_doc_dir() -> String:
 	# We can use a globalized `res://` path here as the project isn't exported.
 	var devel_doc_path = ProjectSettings.globalize_path("res://doc/_build/html")
 	for p in [ release_doc_path, devel_doc_path ]:
-		var file = FileAccess.new()
-		if file.file_exists(p+"/index.html"):
+		if FileAccess.file_exists(p+"/index.html"):
 			return p
 	return ""
 

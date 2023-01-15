@@ -170,7 +170,7 @@ func _process(delta):
 	if ToolManager.current_tool == ToolManager.tool_mode.rotate_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
-				ToolManager.rotate(selected.image,canvas.get_mouse_position()-canvas.size/2.0)
+				ToolManager.rotate(selected.image,get_global_mouse_position()-canvas_size/2.0)
 	if ToolManager.current_tool == ToolManager.tool_mode.scale_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:

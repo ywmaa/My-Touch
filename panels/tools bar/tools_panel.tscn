@@ -15,12 +15,10 @@ follow_focus = true
 script = ExtResource("1_nw8yr")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-offset_right = 36.0
-offset_bottom = 490.0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="ToolButtons" type="HFlowContainer" parent="PanelContainer"]
-offset_right = 36.0
-offset_bottom = 490.0
+layout_mode = 2
 size_flags_vertical = 3

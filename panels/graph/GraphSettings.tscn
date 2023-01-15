@@ -10,54 +10,32 @@ focus_mode = 2
 script = ExtResource("1_arwtu")
 
 [node name="TabContainer" type="TabContainer" parent="."]
-offset_right = 196.0
-offset_bottom = 96.0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Graph Settings" type="VBoxContainer" parent="TabContainer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 31.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 size_flags_vertical = 3
 
 [node name="Space3" type="Control" parent="TabContainer/Graph Settings"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 196.0
+layout_mode = 2
 
 [node name="Label" type="Label" parent="TabContainer/Graph Settings"]
-offset_top = 4.0
-offset_right = 196.0
-offset_bottom = 30.0
+layout_mode = 2
 text = "Canvas Resolution :"
 
 [node name="CanvasRes" type="HBoxContainer" parent="TabContainer/Graph Settings"]
-offset_top = 34.0
-offset_right = 196.0
-offset_bottom = 65.0
+layout_mode = 2
 
 [node name="Label1" type="Label" parent="TabContainer/Graph Settings/CanvasRes"]
-offset_top = 2.0
-offset_right = 23.0
-offset_bottom = 28.0
+layout_mode = 2
 mouse_filter = 1
 text = "X : "
 
 [node name="CanvasX" parent="TabContainer/Graph Settings/CanvasRes" instance=ExtResource("2_8ltnj")]
 unique_name_in_owner = true
-anchors_preset = 0
-anchor_left = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 27.0
-offset_right = 94.0
-offset_bottom = 31.0
-grow_horizontal = 1
-grow_vertical = 1
+layout_mode = 2
 text = "1280"
 context_menu_enabled = false
 virtual_keyboard_enabled = false
@@ -70,31 +48,16 @@ max_value = 10000.0
 step = 1.0
 
 [node name="Space" type="Control" parent="TabContainer/Graph Settings/CanvasRes"]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 98.0
-offset_right = 98.0
-offset_bottom = 31.0
+layout_mode = 2
 
 [node name="Label2" type="Label" parent="TabContainer/Graph Settings/CanvasRes"]
-offset_left = 102.0
-offset_top = 2.0
-offset_right = 125.0
-offset_bottom = 28.0
+layout_mode = 2
 mouse_filter = 1
 text = "Y : "
 
 [node name="CanvasY" parent="TabContainer/Graph Settings/CanvasRes" instance=ExtResource("2_8ltnj")]
 unique_name_in_owner = true
-anchors_preset = 0
-anchor_left = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 129.0
-offset_right = 196.0
-offset_bottom = 31.0
-grow_horizontal = 1
-grow_vertical = 1
+layout_mode = 2
 text = "720"
 context_menu_enabled = false
 virtual_keyboard_enabled = false
@@ -108,33 +71,23 @@ step = 1.0
 
 [node name="HSeparator" type="HSeparator" parent="."]
 visible = false
-offset_top = 100.0
-offset_right = 196.0
-offset_bottom = 104.0
+layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 visible = false
-offset_left = 45.0
-offset_top = 108.0
-offset_right = 196.0
-offset_bottom = 139.0
+layout_mode = 2
 size_flags_horizontal = 8
 
 [node name="Apply" type="Button" parent="HBoxContainer"]
-offset_right = 52.0
-offset_bottom = 31.0
+layout_mode = 2
 text = "Apply"
 
 [node name="OK" type="Button" parent="HBoxContainer"]
-offset_left = 56.0
-offset_right = 87.0
-offset_bottom = 31.0
+layout_mode = 2
 text = "OK"
 
 [node name="Cancel" type="Button" parent="HBoxContainer"]
-offset_left = 91.0
-offset_right = 151.0
-offset_bottom = 31.0
+layout_mode = 2
 text = "Cancel"
 
 [connection signal="focus_entered" from="TabContainer/Graph Settings/CanvasRes/CanvasX" to="TabContainer/Graph Settings/CanvasRes/CanvasX" method="_on_FloatEdit_focus_entered" flags=18]
