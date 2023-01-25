@@ -84,6 +84,7 @@ func scale(object,amount:Vector2):
 
 
 func move(object,amount:Vector2):
+	
 	match direction:
 		coordinates.xy:
 			object.position += amount

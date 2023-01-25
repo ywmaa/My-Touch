@@ -4,27 +4,27 @@
 [ext_resource type="Texture2D" uid="uid://smcayrpruaar" path="res://theme/icons/icons.svg" id="3_50kty"]
 [ext_resource type="Script" path="res://panels/layers/layers_tree.gd" id="3_yyid0"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ybowk"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_nffln"]
 atlas = ExtResource("3_50kty")
 region = Rect2(32, 160, 16, 16)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_mq4bq"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_uwxk6"]
 atlas = ExtResource("3_50kty")
 region = Rect2(48, 160, 16, 16)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_hxxel"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_hoxi6"]
 atlas = ExtResource("3_50kty")
 region = Rect2(64, 160, 16, 16)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_xl37p"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_47pc5"]
 atlas = ExtResource("3_50kty")
 region = Rect2(80, 160, 16, 16)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_k4gb4"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_a8bl0"]
 atlas = ExtResource("3_50kty")
 region = Rect2(96, 160, 16, 16)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_64kmr"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_j2tju"]
 atlas = ExtResource("3_50kty")
 region = Rect2(0, 0, 16, 16)
 
@@ -41,38 +41,38 @@ mouse_filter = 0
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-texture_normal = SubResource("AtlasTexture_ybowk")
+texture_normal = SubResource("AtlasTexture_nffln")
 stretch_mode = 3
 
 [node name="Duplicate" type="TextureButton" parent="Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
-texture_normal = SubResource("AtlasTexture_mq4bq")
+texture_normal = SubResource("AtlasTexture_uwxk6")
 stretch_mode = 3
 
 [node name="Remove" type="TextureButton" parent="Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
-texture_normal = SubResource("AtlasTexture_hxxel")
+texture_normal = SubResource("AtlasTexture_hoxi6")
 stretch_mode = 3
 
 [node name="Up" type="TextureButton" parent="Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
-texture_normal = SubResource("AtlasTexture_xl37p")
+texture_normal = SubResource("AtlasTexture_47pc5")
 stretch_mode = 3
 
 [node name="Down" type="TextureButton" parent="Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
-texture_normal = SubResource("AtlasTexture_k4gb4")
+texture_normal = SubResource("AtlasTexture_a8bl0")
 stretch_mode = 3
 
 [node name="Config" type="TextureButton" parent="Buttons"]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-texture_normal = SubResource("AtlasTexture_64kmr")
+texture_normal = SubResource("AtlasTexture_j2tju")
 stretch_mode = 3
 
 [node name="Tree" type="Tree" parent="."]

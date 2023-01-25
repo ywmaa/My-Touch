@@ -13,6 +13,12 @@ func clear_image():
 	for layer in project_layers.layers:
 		layer.clear_image()
 
+func draw_image():
+	super.draw_image()
+	for layer in project_layers.layers:
+		layer.parent = image
+		layer.draw_image()
+
 func refresh():
 	image.texture = default_icon
 	project_layers.canvas = image

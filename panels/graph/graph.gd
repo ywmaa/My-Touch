@@ -63,7 +63,7 @@ func _ready() -> void:
 	
 	#default layer
 	var new_layer : base_layer = base_layer.new()
-	new_layer.init(layers.get_unused_layer_name(),default_icon,base_layer.layer_type.image)
+	new_layer.init(layers.get_unused_layer_name(),default_icon,base_layer.layer_type.image,canvas)
 	layers.add_layer(new_layer)
 	
 	center_view()
@@ -123,6 +123,8 @@ func _input(event):
 				else:
 					tool_shortcut(ToolManager.tool_mode.scale_image)
 			if ToolManager.current_tool == ToolManager.tool_mode.none:
+				ToolManager.current_mode = ToolManager.tool_mode.none
+				ToolManager.direction = ToolManager.coordinates.xy
 				dragging = true
 				drag_start = get_local_mouse_position()
 				layers.selected_layers = []
@@ -154,7 +156,7 @@ func _unhandled_input(event):
 
 func on_drop_image_file(path):
 	var new_layer : base_layer = base_layer.new()
-	new_layer.init(layers.get_unused_layer_name(),path,base_layer.layer_type.image)
+	new_layer.init(layers.get_unused_layer_name(),path,base_layer.layer_type.image,canvas)
 	layers.add_layer(new_layer)
 	
 func _process(delta):
@@ -163,15 +165,15 @@ func _process(delta):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	else:
 		Input.mouse_mode = Input.MOUSE_MODE_CONFINED
-	if ToolManager.current_tool == ToolManager.tool_mode.move_image:
+	if ToolManager.current_mode == ToolManager.tool_mode.move_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
 				ToolManager.move(selected.image,mouse_position_delta)
-	if ToolManager.current_tool == ToolManager.tool_mode.rotate_image:
+	if ToolManager.current_mode == ToolManager.tool_mode.rotate_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
 				ToolManager.rotate(selected.image,get_global_mouse_position()-canvas_size/2.0)
-	if ToolManager.current_tool == ToolManager.tool_mode.scale_image:
+	if ToolManager.current_mode == ToolManager.tool_mode.scale_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
 				ToolManager.scale(selected.image,mouse_position_delta * delta) 
@@ -270,7 +272,7 @@ func load_project_layer(filenames) -> void:
 		if data != null:
 			var new_project_layer = project_layer.new()
 			new_project_layer.project_layers = layers_object.new()
-			new_project_layer.init(file_name,default_icon,base_layer.layer_type.project)
+			new_project_layer.init(file_name,default_icon,base_layer.layer_type.project,canvas)
 			layers.add_layer(new_project_layer)
 		else:
 			var dialog : AcceptDialog = AcceptDialog.new()

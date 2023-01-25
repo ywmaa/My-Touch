@@ -28,9 +28,10 @@ func _draw() -> void:
 	draw_set_transform(position_tmp, rotation, scale_tmp)
 	# Draw current frame layers
 	for i in project.layers.layers:
-		var modulate_color := Color(1, 1, 1, 1)
-		if i.hidden == false:
-			draw_texture_rect(i.image.texture,Rect2(i.image.position,i.image.get_rect().size*i.image.scale),false)
+		if i.parent == null:
+			i.parent = self
+		i.draw_image()
+		
 		
 #
 #	if Global.onion_skinning:

@@ -10,22 +10,13 @@ func unload_layers():
 	for layer in layers:
 		if layer:
 			layer.clear_image()
-#		if canvas:
-#			if layer.image.get_parent() == canvas:
-#				canvas.add_child(layer.image)
 func load_layers():
 	for layer in layers:
 		if layer:
 			layer.refresh()
 			layer.image.z_index = layers.find(layer)
-#		if canvas:
-#			if layer.image.get_parent() == null:
-#				canvas.add_child(layer.image)
 func add_layer(new_layer:base_layer):
 	layers.append(new_layer)
-#	if new_layer.image.get_parent() == null:
-#		pass
-#		canvas.add_child(new_layer.image)
 	_on_layers_changed()
 
 func select_layer_name(layer_name):
@@ -55,14 +46,14 @@ func duplicate_layer(source_layer) -> void:
 	if source_layer is project_layer:
 		var layer = project_layer.new()
 		layer.project_layers = layers_object.new()
-		layer.init(source_layer.name,source_layer.image_path,base_layer.layer_type.project)
+		layer.init(source_layer.name,source_layer.image_path,base_layer.layer_type.project,source_layer.parent)
 		add_layer(layer)
 		select_layer(layer)
 		_on_layers_changed()
 		return
 	if source_layer is base_layer:
 		var layer = base_layer.new()
-		layer.init(get_unused_layer_name(),source_layer.image_path,source_layer.type)
+		layer.init(get_unused_layer_name(),source_layer.image_path,source_layer.type,source_layer.parent)
 		add_layer(layer)
 		select_layer(layer)
 		_on_layers_changed()

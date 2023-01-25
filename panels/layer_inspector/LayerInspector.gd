@@ -7,6 +7,9 @@ func _ready():
 	%PositionX.connect("value_changed",value_changed.bind(%PositionX))
 	%PositionY.connect("value_changed",value_changed.bind(%PositionY))
 
+	%Rotation.connect("value_changed",value_changed.bind(%Rotation))
+
+
 	%SizeX.connect("value_changed",value_changed.bind(%SizeX))
 	%SizeY.connect("value_changed",value_changed.bind(%SizeY))
 
@@ -32,6 +35,9 @@ func _process(delta):
 	if current_layer.image.position.y != %PositionY.value:
 		%PositionY.value = current_layer.image.position.y
 
+	if current_layer.image.rotation_degrees != %Rotation.value:
+		%Rotation.value = fmod(current_layer.image.rotation_degrees, 360)
+
 	if current_layer.image.get_rect().size.x != %SizeX.value:
 		%SizeX.value = current_layer.image.get_rect().size.x
 	if current_layer.image.get_rect().size.y != %SizeY.value:
@@ -49,6 +55,9 @@ func value_changed(value,property):
 		current_layer.image.position.x = %PositionX.value
 	if current_layer.image.position.y != %PositionY.value and property == %PositionY:
 		current_layer.image.position.y = %PositionY.value
+
+	if current_layer.image.rotation_degrees != %Rotation.value and property == %Rotation:
+		current_layer.image.rotation_degrees = fmod(%Rotation.value, 360)
 
 	if current_layer.image.scale.x != %ScaleX.value and property == %ScaleX:
 		current_layer.image.scale.x = %ScaleX.value

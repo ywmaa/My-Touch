@@ -1,7 +1,7 @@
 extends VBoxContainer
 
 # The layer object
-var layers
+var layers : layers_object
 
 @onready var tree = $Tree
 #func _ready():
@@ -16,8 +16,8 @@ func _process(delta):
 		set_layers(mt_globals.main_window.get_current_graph_edit().layers)
 	else:
 		set_layers([])
-func set_layers(layers) -> void:
-	layers = layers
+func set_layers(_layers) -> void:
+	layers = _layers
 	tree.layers = layers
 	if layers:
 		layers.load_layers()
