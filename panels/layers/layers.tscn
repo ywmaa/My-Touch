@@ -29,7 +29,8 @@ atlas = ExtResource("3_50kty")
 region = Rect2(0, 0, 16, 16)
 
 [node name="Layers" type="VBoxContainer"]
-mouse_filter = 2
+focus_mode = 2
+mouse_filter = 0
 script = ExtResource("1_wunpw")
 
 [node name="Buttons" type="HBoxContainer" parent="."]

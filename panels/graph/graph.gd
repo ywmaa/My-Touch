@@ -1,7 +1,7 @@
 extends SubViewportContainer
 class_name MTGraph
 
-var clipboard_file_path = "user://my_touch_clipboard.tres"
+var clipboard_file_path = "user://my_touch_clipboard.res"
 var undo_redo := UndoRedo.new()
 var tiles: Tiles
 var has_focus

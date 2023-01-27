@@ -46,9 +46,9 @@ func _on_Duplicate_pressed():
 		layers.duplicate_layer(current.get_meta("layer"))
 
 func _on_Remove_pressed():
-	var current = tree.get_selected()
-	if current != null:
-		layers.remove_layer(current.get_meta("layer"))
+	for layer in layers.selected_layers:
+		layers.remove_layer(layers.find_layer(layer.name))
+
 
 func _on_Up_pressed():
 	var current = tree.get_selected()
@@ -69,8 +69,6 @@ func _on_Config_pressed():
 		popup.configure_layer(layers, current.get_meta("layer"))
 
 func _input(event):
-	if !has_focus:
-		return
 	if Input.is_action_just_pressed("delete"):
 		_on_Remove_pressed()
 

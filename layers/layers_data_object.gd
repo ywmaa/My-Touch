@@ -20,12 +20,16 @@ func add_layer(new_layer:base_layer):
 	_on_layers_changed()
 
 func select_layer_name(layer_name):
-	for l in layers:
-		if l.name == layer_name:
-			if !selected_layers.has(l):
-				selected_layers.append(l) 
+	if find_layer(layer_name) == null:
+		return
+	if !selected_layers.has(find_layer(layer_name)):
+		selected_layers.append(find_layer(layer_name)) 
 	_on_layers_changed()
-
+func find_layer(name:String):
+	for l in layers:
+		if l.name == name:
+			return l
+	return null
 
 func select_layer(layer : base_layer) -> void:
 	if layers.has(layer):
@@ -60,16 +64,9 @@ func duplicate_layer(source_layer) -> void:
 		return
 
 func remove_layer(layer : base_layer) -> void:
-	var need_reselect : bool = (layer in selected_layers)
 	var layers_array = find_parent_array(layer)
-	layer.clear_image()
 	layers_array.erase(layer)
-	if need_reselect:
-		selected_layers = []
-		if !layers.is_empty():
-			select_layer(layers[0])
-			_on_layers_changed()
-			return
+	layer.clear_image()
 	_on_layers_changed()
 
 func move_layer_into(layer : base_layer, target_layer : base_layer, index : int = -1) -> void:
