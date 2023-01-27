@@ -7,6 +7,7 @@
 [node name="Project Settings" type="VBoxContainer"]
 clip_contents = true
 focus_mode = 2
+mouse_filter = 0
 script = ExtResource("1_arwtu")
 
 [node name="TabContainer" type="TabContainer" parent="."]

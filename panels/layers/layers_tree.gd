@@ -121,7 +121,9 @@ func _on_tree_nothing_selected():
 
 
 func _on_tree_multi_selected(item, column, selected):
+#	item.set_selectable(column,true)
 	
+	print(selected)
 	if selected:
 		if !selected_items.has(item):
 			selected_items.append(item)

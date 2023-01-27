@@ -40,6 +40,7 @@ signal value_changed_undo(value, merge_undo)
 func _ready() -> void:
 	connect("text_submitted",_on_LineEdit_text_entered)
 	connect("focus_exited",_on_LineEdit_text_entered)
+	connect("mouse_exited",_on_LineEdit_text_entered)
 	do_update()
 
 
@@ -123,6 +124,7 @@ func _gui_input(event : InputEvent) -> void:
 
 
 func _on_LineEdit_text_entered(new_text : String = text, release = true) -> void:
+	new_text = str(new_text.to_float())
 	var exp : Expression = Expression.new()
 	exp.parse(new_text)
 	var new_value : float = exp.execute()

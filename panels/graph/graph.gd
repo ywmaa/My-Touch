@@ -93,6 +93,17 @@ func _draw():
 func _input(event):
 	if !visible or has_focus == false:
 		return
+	#handle shortcuts
+	if event.is_action_pressed("move"):
+		tool_shortcut(ToolManager.tool_mode.move_image)
+	if event.is_action_pressed("rotate"):
+		tool_shortcut(ToolManager.tool_mode.rotate_image)
+	if event.is_action_pressed("scale"):
+		tool_shortcut(ToolManager.tool_mode.scale_image)
+	if event.is_action_pressed("lock_x"):
+		ToolManager.lock_x()
+	if event.is_action_pressed("lock_y"):
+		ToolManager.lock_y()
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
 		if event.pressed:
 			if ToolManager.current_mode != ToolManager.tool_mode.none:
@@ -138,21 +149,6 @@ func _input(event):
 			queue_redraw()
 			var drag_end = get_local_mouse_position()
 		
-
-func _unhandled_input(event):
-
-	#handle shortcuts
-	if event.is_action_pressed("move"):
-		tool_shortcut(ToolManager.tool_mode.move_image)
-	if event.is_action_pressed("rotate"):
-		tool_shortcut(ToolManager.tool_mode.rotate_image)
-	if event.is_action_pressed("scale"):
-		tool_shortcut(ToolManager.tool_mode.scale_image)
-	if event.is_action_pressed("lock_x"):
-		ToolManager.lock_x()
-	if event.is_action_pressed("lock_y"):
-		ToolManager.lock_y()
-
 
 func on_drop_image_file(path):
 	var new_layer : base_layer = base_layer.new()

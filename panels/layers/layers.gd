@@ -2,15 +2,12 @@ extends VBoxContainer
 
 # The layer object
 var layers : layers_object
-
+var has_focus
 @onready var tree = $Tree
-#func _ready():
-#	mt_globals.main_window.get_node("/root/Editor/VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects").connect("tab_changed",update_signal)
-#func update_signal():
-#	mt_globals.main_window.get_current_graph_edit().connect("graph_changed",update_layers)
-#	set_layers(mt_globals.main_window.get_current_graph_edit().layers)
-#func update_layers():
-#	set_layers(mt_globals.main_window.get_current_graph_edit().layers)
+func _ready():
+	tree.connect("selection_changed",_on_Tree_selection_changed)
+	self.connect("mouse_entered",_on_mouse_entered)
+	self.connect("mouse_exited",_on_mouse_exited)
 func _process(delta):
 	if mt_globals.main_window.get_current_graph_edit():
 		set_layers(mt_globals.main_window.get_current_graph_edit().layers)
@@ -26,9 +23,9 @@ func set_layers(_layers) -> void:
 		tree.update_from_layers([], [])
 
 func _on_Tree_selection_changed(new_selected) -> void:
-	layers.selected_layers.clear()
+	mt_globals.main_window.get_current_graph_edit().layers.selected_layers.clear()
 	for item in new_selected:
-		layers.select_layer(item.get_meta("layer"))
+		mt_globals.main_window.get_current_graph_edit().layers.select_layer(item.get_meta("layer"))
 
 func _on_Add_pressed():
 	var menu = preload("res://panels/layers/add_layer_menu.tscn").instantiate()
@@ -72,5 +69,14 @@ func _on_Config_pressed():
 		popup.configure_layer(layers, current.get_meta("layer"))
 
 func _input(event):
+	if !has_focus:
+		return
 	if Input.is_action_just_pressed("delete"):
 		_on_Remove_pressed()
+
+func _on_mouse_entered():
+	has_focus = true
+
+
+func _on_mouse_exited():
+	has_focus = false
