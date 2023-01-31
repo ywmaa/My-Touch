@@ -15,6 +15,9 @@ func _ready():
 
 	%ScaleX.connect("value_changed",value_changed.bind(%ScaleX))
 	%ScaleY.connect("value_changed",value_changed.bind(%ScaleY))
+	
+	%Opacity.connect("value_changed",value_changed.bind(%Opacity))
+	
 
 
 func _process(delta):
@@ -47,6 +50,9 @@ func _process(delta):
 		%ScaleX.value = current_layer.image.scale.x
 	if current_layer.image.scale.y != %ScaleY.value:
 		%ScaleY.value = current_layer.image.scale.y
+		
+	if current_layer.opacity != %Opacity.value:
+		%Opacity.value = current_layer.opacity
 
 
 func value_changed(value,property):
@@ -63,3 +69,6 @@ func value_changed(value,property):
 		current_layer.image.scale.x = %ScaleX.value
 	if current_layer.image.scale.y != %ScaleY.value and property == %ScaleY:
 		current_layer.image.scale.y = %ScaleY.value
+		
+	if current_layer.opacity != %Opacity.value and property == %Opacity:
+		current_layer.opacity = %Opacity.value

@@ -54,6 +54,7 @@ func set_current():
 	emit_signal("graph_changed")
 	# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	add_child(context_menu)
 	self.connect("mouse_entered",_on_mouse_entered)
 	self.connect("mouse_exited",_on_mouse_exited)
 	layers.canvas = canvas
@@ -90,10 +91,32 @@ func _draw():
 #		draw_polyline() # free select
 		draw_rect(Rect2(drag_start,get_local_mouse_position()-drag_start),Color(0.5,0.5,0.5),false)
 
+var context_menu : PopupMenu = PopupMenu.new()
+
+func create_add_context_menu(pos: Vector2 = get_global_mouse_position()):
+	context_menu.clear()
+	context_menu.add_item("Import Image")
+	context_menu.add_item("Text Layer")
+	context_menu.add_item("Selection Layer")
+	context_menu.connect("id_pressed",add_context_menu_item_pressed)
+	context_menu.position = pos
+	context_menu.visible = true
+
+func add_context_menu_item_pressed(id: int):
+	match id:
+		0: #import image
+			mt_globals.main_window.import_image()
+		1: #text layer
+			pass
+		2: #selection layer
+			pass
+
 func _input(event):
 	if !visible or has_focus == false:
 		return
 	#handle shortcuts
+	if event.is_action_pressed("add_context_menu"):
+		create_add_context_menu()
 	if event.is_action_pressed("move"):
 		tool_shortcut(ToolManager.tool_mode.move_image)
 	if event.is_action_pressed("rotate"):
@@ -150,7 +173,7 @@ func _input(event):
 			var drag_end = get_local_mouse_position()
 		
 
-func on_drop_image_file(path):
+func on_import_image_file(path):
 	var new_layer : base_layer = base_layer.new()
 	new_layer.init(layers.get_unused_layer_name(),path,base_layer.layer_type.image,canvas)
 	layers.add_layer(new_layer)
@@ -368,7 +391,7 @@ func update_tab_title() -> void:
 		get_parent().set_tab_title(get_index(), title)
 
 func load_file(filename) -> bool:
-	var data = ResourceLoader.load(filename,"") as SaveProject
+	var data = ResourceLoader.load(filename) as SaveProject
 	if data != null:
 		save_path = filename
 		for child in canvas.get_children():
@@ -421,7 +444,7 @@ func save_as() -> bool:
 func save_file(filename) -> bool:
 	var data : SaveProject = SaveProject.new()
 	data.layers = layers 
-	data.canvas_size = canvas.size 
+	data.canvas_size = canvas_size
 	ResourceSaver.save(data,filename)
 	save_path = filename
 	set_need_save(false)

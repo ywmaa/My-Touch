@@ -16,6 +16,7 @@ const TOOLS = [
 	{ tool="Move", command="tool_move", shortcut="Shift+G", tooltip="move tool" },
 	{ tool="Rotate", command="tool_rotate", shortcut="Shift+R", tooltip="rotate tool" },
 	{ tool="Scale", command="tool_scale", shortcut="Shift+S", tooltip="scale tool" },
+	{ tool="Add", command="add_context", shortcut="", tooltip="Add Context" },
 ]
 var assigned_tool
 enum coordinates {xy,x,y}
@@ -50,14 +51,16 @@ func tool_scale():
 	ToolManager.current_tool = ToolManager.tool_mode.scale_image
 	ToolManager.current_mode = ToolManager.tool_mode.none
 
-
+func add_context():
+	mt_globals.main_window.get_current_graph_edit().create_add_context_menu()
 
 func assign_tool(name: String, button: int) -> void:
 	assigned_tool = TOOLS[button]
-	if assigned_tool.has("settings_node"):
-		var panel: Node = assigned_tool.settings_node
+
 	
 	call(assigned_tool.command)
+	if assigned_tool.tool == "Add":
+		return
 	emit_signal("tool_changed",assigned_tool)
 	update_tool_cursors()
 

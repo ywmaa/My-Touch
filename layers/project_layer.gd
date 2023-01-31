@@ -7,6 +7,7 @@ var default_icon = preload("res://icon.png")
 
 func _init():
 	type = layer_type.project
+	affect_children_opacity = true
 
 func clear_image():
 	super.clear_image()

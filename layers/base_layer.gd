@@ -1,7 +1,7 @@
 extends Resource
 class_name base_layer
 
-enum layer_type {brush,image,project,mask}
+enum layer_type {brush,image,project,mask,light,postprocess,primitive_shape}
 
 
 @export var image : Sprite2D = Sprite2D.new()
@@ -20,6 +20,24 @@ enum layer_type {brush,image,project,mask}
 @export var image_path : String
 
 @export var parent : Node
+
+@export var opacity : float:
+	set(new_opacity):
+		new_opacity = clamp(new_opacity,0.0,1.0)
+		if image:
+			if affect_children_opacity:
+				image.modulate.a = new_opacity
+			image.self_modulate.a = new_opacity
+		opacity = new_opacity
+	get:
+		if image:
+			if affect_children_opacity:
+				return image.modulate.a
+			return image.self_modulate.a
+		
+		return opacity
+		
+@export var affect_children_opacity :bool = false
 
 var texture = ImageTexture.new()
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=2 format=3 uid="uid://cnklugdj83gdx"]
 
 [ext_resource type="Script" path="res://widgets/editable_label/editable_label.gd" id="1"]
 

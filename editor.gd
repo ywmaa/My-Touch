@@ -64,7 +64,7 @@ const MENU = [
 	{ menu="View/Center view", command="view_center", shortcut="C" },
 	{ menu="View/Reset zoom", command="view_reset_zoom", shortcut="Control+0" },
 	{ menu="View/-" },
-	{ menu="View/Show or Hide side panels", command="toggle_side_panels", shortcut="Control+Space" },
+	{ menu="View/Touch Friendly Mode", command="touch_mode_switch", shortcut="Control+Space" },
 	{ menu="View/Panels", submenu="show_panels" },
 	{ menu="View/Fullscreen", command="fullscreen", shortcut="F11"},
 
@@ -394,6 +394,7 @@ func open_file_location():
 			path = ""
 			for s in path_array:
 				path += s + "/"
+			
 			OS.shell_open(path)
 func close_project() -> void:
 	projects.close_tab()
@@ -558,7 +559,7 @@ func view_reset_zoom() -> void:
 	var graph_edit : MTGraph = get_current_graph_edit()
 	graph_edit.camera.zoom_100()
 
-func toggle_side_panels() -> void:
+func touch_mode_switch() -> void:
 	$VBoxContainer/Layout.toggle_side_panels()
 	
 func fullscreen():
@@ -602,8 +603,21 @@ func about() -> void:
 
 
 
-# Handle dropped files
 
+#image import
+func import_image() -> void:
+	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	add_child(dialog)
+	dialog.min_size = Vector2(500, 500)
+	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
+	dialog.add_filter("*.jpg,*.jpeg,*.png,*.svg,*.webp;Image files")
+	var files = await dialog.select_files()
+	if files.size() > 0:
+		var graph_edit : MTGraph = get_current_graph_edit()
+		on_files_dropped(files)
+
+# Handle dropped files
 func on_files_dropped(files : PackedStringArray) -> void:
 	for f in files:
 		var file = FileAccess.open(f, FileAccess.READ)
@@ -615,7 +629,7 @@ func on_files_dropped(files : PackedStringArray) -> void:
 				do_load_project(f)
 			"jpg", "jpeg", "png", "svg", "webp":
 				if get_current_graph_edit():
-					get_current_graph_edit().on_drop_image_file(f)
+					get_current_graph_edit().on_import_image_file(f)
 
 
 

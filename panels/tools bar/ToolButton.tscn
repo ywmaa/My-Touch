@@ -11,7 +11,7 @@ mouse_default_cursor_shape = 2
 
 [node name="Background" type="NinePatchRect" parent="."]
 visible = false
-anchors_preset = 15
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -20,7 +20,7 @@ texture = ExtResource("1_1mply")
 
 [node name="Icon" type="TextureRect" parent="."]
 custom_minimum_size = Vector2(22, 22)
-anchors_preset = 15
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 1.0
