@@ -331,7 +331,7 @@ border_width_bottom = 1
 border_color = Color(0.0745098, 0.0745098, 0.0745098, 1)
 
 [sub_resource type="FontFile" id="120"]
-fallbacks = [ExtResource("15_q7pbt")]
+fallbacks = Array[Font]([ExtResource("15_q7pbt")])
 face_index = null
 embolden = null
 transform = null

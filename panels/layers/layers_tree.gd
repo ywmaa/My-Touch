@@ -8,7 +8,7 @@ var editing : bool = false
 const ICON_LAYER_PAINT = preload("res://panels/layers/icons/layer_paint.tres")
 const ICON_LAYER_PROC = preload("res://panels/layers/icons/layer_proc.tres")
 const ICON_LAYER_MASK = preload("res://panels/layers/icons/layer_mask.tres")
-const ICONS = [ ICON_LAYER_PAINT, ICON_LAYER_PROC, ICON_LAYER_MASK ]
+const ICONS = [ ICON_LAYER_PAINT, ICON_LAYER_PROC, ICON_LAYER_PROC, ICON_LAYER_MASK, ICON_LAYER_PROC]
 
 var BUTTON_SHOWN = preload("res://panels/layers/icons/visible.tres")
 var BUTTON_HIDDEN = preload("res://panels/layers/icons/not_visible.tres")
@@ -122,8 +122,6 @@ func _on_tree_nothing_selected():
 
 func _on_tree_multi_selected(item, column, selected):
 #	item.set_selectable(column,true)
-	
-	print(selected)
 	if selected:
 		if !selected_items.has(item):
 			selected_items.append(item)

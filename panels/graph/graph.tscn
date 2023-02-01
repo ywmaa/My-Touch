@@ -7,10 +7,10 @@
 [ext_resource type="Script" path="res://panels/graph/PixelGrid.gd" id="5_0h317"]
 [ext_resource type="Script" path="res://panels/graph/Camera2D.gd" id="7_deeh5"]
 
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_rwfr1"]
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_5paps"]
 blend_mode = 4
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_0861l"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kqxb3"]
 shader = ExtResource("2_tnfrv")
 shader_parameter/size = 10.0
 shader_parameter/alpha = 1.0
@@ -22,11 +22,11 @@ shader_parameter/rect_size = Vector2(0, 0)
 shader_parameter/follow_movement = false
 shader_parameter/follow_scale = false
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_l4atv"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_tq154"]
 viewport_path = NodePath("Viewport/TransparentChecker/SubViewport")
 
 [node name="SubViewportContainer" type="SubViewportContainer"]
-material = SubResource("CanvasItemMaterial_rwfr1")
+material = SubResource("CanvasItemMaterial_5paps")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -54,7 +54,7 @@ render_target_update_mode = 4
 
 [node name="TransparentChecker" type="ColorRect" parent="Viewport"]
 show_behind_parent = true
-material = SubResource("ShaderMaterial_0861l")
+material = SubResource("ShaderMaterial_kqxb3")
 custom_minimum_size = Vector2(40, 40)
 mouse_filter = 2
 script = ExtResource("3_0v6hs")
@@ -66,13 +66,15 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = SubResource("ViewportTexture_l4atv")
+texture = SubResource("ViewportTexture_tq154")
 
 [node name="SubViewport" type="SubViewport" parent="Viewport/TransparentChecker"]
 disable_3d = true
 transparent_bg = true
 snap_2d_transforms_to_pixel = true
 snap_2d_vertices_to_pixel = true
+gui_disable_input = true
+gui_snap_controls_to_pixels = false
 render_target_update_mode = 4
 
 [node name="Canvas" type="Node2D" parent="Viewport/TransparentChecker/SubViewport"]
@@ -82,7 +84,6 @@ script = ExtResource("4_xoqb2")
 script = ExtResource("5_0h317")
 
 [node name="Camera2D" type="Camera2D" parent="Viewport"]
-current = true
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 script = ExtResource("7_deeh5")

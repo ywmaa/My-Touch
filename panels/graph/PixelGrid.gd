@@ -6,7 +6,6 @@ func _draw() -> void:
 		return
 
 	var zoom_percentage = 100.0 / mt_globals.main_window.get_current_graph_edit().camera.zoom.x
-	print(zoom_percentage)
 	if zoom_percentage < mt_globals.pixel_grid_show_at_zoom:
 		return
 

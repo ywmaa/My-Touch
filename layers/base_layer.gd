@@ -1,9 +1,9 @@
 extends Resource
 class_name base_layer
 
-enum layer_type {brush,image,project,mask,light,postprocess,primitive_shape}
+enum layer_type {brush, image, project, mask, text, light, postprocess, primitive_shape}
 
-
+@export var main_object : Node = null
 @export var image : Sprite2D = Sprite2D.new()
 		
 @export var icon : Sprite2D = Sprite2D.new()
@@ -14,8 +14,8 @@ enum layer_type {brush,image,project,mask,light,postprocess,primitive_shape}
 @export var hidden : bool :
 	set(new_hidden):
 		hidden = new_hidden
-		if image:
-			image.visible = !hidden
+		if main_object:
+			main_object.visible = !hidden
 		
 @export var image_path : String
 
@@ -24,16 +24,16 @@ enum layer_type {brush,image,project,mask,light,postprocess,primitive_shape}
 @export var opacity : float:
 	set(new_opacity):
 		new_opacity = clamp(new_opacity,0.0,1.0)
-		if image:
+		if main_object:
 			if affect_children_opacity:
-				image.modulate.a = new_opacity
-			image.self_modulate.a = new_opacity
+				main_object.modulate.a = new_opacity
+			main_object.self_modulate.a = new_opacity
 		opacity = new_opacity
 	get:
-		if image:
+		if main_object:
 			if affect_children_opacity:
-				return image.modulate.a
-			return image.self_modulate.a
+				return main_object.modulate.a
+			return main_object.self_modulate.a
 		
 		return opacity
 		
@@ -41,11 +41,12 @@ enum layer_type {brush,image,project,mask,light,postprocess,primitive_shape}
 
 var texture = ImageTexture.new()
 
-func init(image_name: String,path: String,layer_type : layer_type,_parent : Node):
-	name = image_name
+func init(_name: String,path: String,layer_type : layer_type,_parent : Node):
+	name = _name
 	image_path = path
 	type = layer_type
 	parent = _parent
+	main_object = image
 	refresh()
 
 func clear_image():
@@ -65,3 +66,8 @@ func refresh():
 			image.texture = texture
 			image.name = name
 			icon.texture = texture
+
+func get_copy(_name: String = "copy"):
+	var layer = base_layer.new()
+	layer.init(_name,image_path,type,parent)
+	return layer

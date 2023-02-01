@@ -56,7 +56,6 @@ const MENU = [
 	{ menu="Edit/-" },
 	{ menu="Edit/Load Selection", command="edit_load_selection" },
 	{ menu="Edit/Save Selection", command="edit_save_selection" },
-	{ menu="Edit/Load Project as image", command="edit_load_project_as_image" },
 	{ menu="Edit/-" },
 	{ menu="Edit/Set theme", submenu="set_theme" },
 	{ menu="Edit/Preferences", command="edit_preferences" },
@@ -617,7 +616,7 @@ func import_image() -> void:
 		var graph_edit : MTGraph = get_current_graph_edit()
 		on_files_dropped(files)
 
-# Handle dropped files
+#Handle dropped files
 func on_files_dropped(files : PackedStringArray) -> void:
 	for f in files:
 		var file = FileAccess.open(f, FileAccess.READ)

@@ -96,8 +96,12 @@ var context_menu : PopupMenu = PopupMenu.new()
 func create_add_context_menu(pos: Vector2 = get_global_mouse_position()):
 	context_menu.clear()
 	context_menu.add_item("Import Image")
+	context_menu.add_item("Load Project As Image")
+	context_menu.add_separator()
 	context_menu.add_item("Text Layer")
 	context_menu.add_item("Selection Layer")
+	
+	
 	context_menu.connect("id_pressed",add_context_menu_item_pressed)
 	context_menu.position = pos
 	context_menu.visible = true
@@ -106,10 +110,15 @@ func add_context_menu_item_pressed(id: int):
 	match id:
 		0: #import image
 			mt_globals.main_window.import_image()
-		1: #text layer
+		1: #project layer
+			mt_globals.main_window.edit_load_project_as_image()
+		3: #text layer
+			var new_text_layer = text_layer.new()
+			new_text_layer.init(layers.get_unused_layer_name(),default_icon,base_layer.layer_type.text,canvas)
+			layers.add_layer(new_text_layer)
+		4: #selection layer
 			pass
-		2: #selection layer
-			pass
+		
 
 func _input(event):
 	if !visible or has_focus == false:
@@ -162,15 +171,20 @@ func _input(event):
 				dragging = true
 				drag_start = get_local_mouse_position()
 				layers.selected_layers = []
-				for layer in layers.layers:
-					print(transparent_checker.global_position)
-					if Rect2(drag_start,get_local_mouse_position()-drag_start).intersects(Rect2(position+layer.image.position,layer.image.get_rect().size*layer.image.scale),true):
-						layers.select_layer(layer)
-
+				
 		elif dragging:
 			dragging = false
 			queue_redraw()
 			var drag_end = get_local_mouse_position()
+			var canvas_position : Vector2 = size/2-camera.offset*(camera.zoom)
+			for layer in layers.layers:
+				var mouse_rect : Rect2
+				if drag_end - drag_start < Vector2.ZERO:
+					mouse_rect = Rect2(drag_end,abs(drag_end-drag_start))
+				else:
+					mouse_rect = Rect2(drag_start,abs(drag_end-drag_start))
+				if mouse_rect.intersects(Rect2(canvas_position+(layer.main_object.position*camera.zoom)-(layer.main_object.get_rect().size*layer.main_object.scale*camera.zoom/2),layer.main_object.get_rect().size*layer.main_object.scale*camera.zoom),true):
+					layers.select_layer(layer)
 		
 
 func on_import_image_file(path):
@@ -187,15 +201,15 @@ func _process(delta):
 	if ToolManager.current_mode == ToolManager.tool_mode.move_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
-				ToolManager.move(selected.image,mouse_position_delta)
+				ToolManager.move(selected.main_object,mouse_position_delta)
 	if ToolManager.current_mode == ToolManager.tool_mode.rotate_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
-				ToolManager.rotate(selected.image,get_global_mouse_position()-canvas_size/2.0)
+				ToolManager.rotate(selected.main_object,get_global_mouse_position()-canvas_size/2.0)
 	if ToolManager.current_mode == ToolManager.tool_mode.scale_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
-				ToolManager.scale(selected.image,mouse_position_delta * delta) 
+				ToolManager.scale(selected.main_object,mouse_position_delta * delta) 
 
 	previous_mouse_position = get_global_mouse_position()
 
@@ -309,19 +323,19 @@ func tool_shortcut(index): # handle tools list
 	if index == ToolManager.tool_mode.move_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
-				add_to_undo_history([selected.image, "position", selected.image.position])
+				add_to_undo_history([selected.main_object, "position", selected.main_object.position])
 			send_changed_signal()
 			ToolManager.current_mode = ToolManager.tool_mode.move_image
 	if index == ToolManager.tool_mode.rotate_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
-				add_to_undo_history([selected.image, "rotation", selected.image.rotation])
+				add_to_undo_history([selected.main_object, "rotation", selected.main_object.rotation])
 			send_changed_signal()
 			ToolManager.current_mode = ToolManager.tool_mode.rotate_image
 	if index == ToolManager.tool_mode.scale_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
-				add_to_undo_history([selected.image, "scale", selected.image.scale])
+				add_to_undo_history([selected.main_object, "scale", selected.main_object.scale])
 			send_changed_signal()
 			ToolManager.current_mode = ToolManager.tool_mode.scale_image
 func new_project() -> void:

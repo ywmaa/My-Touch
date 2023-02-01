@@ -14,7 +14,8 @@ func load_layers():
 	for layer in layers:
 		if layer:
 			layer.refresh()
-			layer.image.z_index = layers.find(layer)
+			if layer.image:
+				layer.image.z_index = layers.find(layer)
 func add_layer(new_layer:base_layer):
 	layers.append(new_layer)
 	_on_layers_changed()
@@ -47,21 +48,10 @@ func _on_layers_changed() -> void:
 	
 
 func duplicate_layer(source_layer) -> void:
-	if source_layer is project_layer:
-		var layer = project_layer.new()
-		layer.project_layers = layers_object.new()
-		layer.init(source_layer.name,source_layer.image_path,base_layer.layer_type.project,source_layer.parent)
-		add_layer(layer)
-		select_layer(layer)
-		_on_layers_changed()
-		return
-	if source_layer is base_layer:
-		var layer = base_layer.new()
-		layer.init(get_unused_layer_name(),source_layer.image_path,source_layer.type,source_layer.parent)
-		add_layer(layer)
-		select_layer(layer)
-		_on_layers_changed()
-		return
+	var layer = source_layer.get_copy(get_unused_layer_name())
+	add_layer(layer)
+	select_layer(layer)
+	_on_layers_changed()
 
 func remove_layer(layer : base_layer) -> void:
 	var layers_array = find_parent_array(layer)
