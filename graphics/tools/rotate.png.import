@@ -2,22 +2,23 @@
 
 importer="texture"
 type="CompressedTexture2D"
-path="res://.godot/imported/move.png-bc555194b0f9779564808d082f7da476.ctex"
+uid="uid://ju0h3gauir21"
+path="res://.godot/imported/rotate.png-fa6c278cc7b287b19e71f0ea20fbafb5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://graphics/tools/move.png"
-dest_files=["res://.godot/imported/move.png-bc555194b0f9779564808d082f7da476.ctex"]
+source_file="res://graphics/tools/rotate.png"
+dest_files=["res://.godot/imported/rotate.png-fa6c278cc7b287b19e71f0ea20fbafb5.ctex"]
 
 [params]
 
 compress/mode=0
+compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1
-compress/bptc_ldr=0
 compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=false

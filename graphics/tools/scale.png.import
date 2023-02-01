@@ -2,22 +2,23 @@
 
 importer="texture"
 type="CompressedTexture2D"
-path="res://.godot/imported/move.png-bc555194b0f9779564808d082f7da476.ctex"
+uid="uid://dux408bom8bpj"
+path="res://.godot/imported/scale.png-8777a483110abeff2473de0b24627623.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://graphics/tools/move.png"
-dest_files=["res://.godot/imported/move.png-bc555194b0f9779564808d082f7da476.ctex"]
+source_file="res://graphics/tools/scale.png"
+dest_files=["res://.godot/imported/scale.png-8777a483110abeff2473de0b24627623.ctex"]
 
 [params]
 
 compress/mode=0
+compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1
-compress/bptc_ldr=0
 compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=false

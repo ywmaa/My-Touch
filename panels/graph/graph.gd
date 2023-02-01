@@ -193,7 +193,7 @@ func on_import_image_file(path):
 	layers.add_layer(new_layer)
 	
 func _process(delta):
-	mouse_position_delta = get_global_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
+	mouse_position_delta = get_local_mouse_position() - previous_mouse_position if smooth_mode == false else Input.get_last_mouse_velocity() * delta
 	if ToolManager.current_mode == ToolManager.tool_mode.none:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	else:
@@ -204,14 +204,18 @@ func _process(delta):
 				ToolManager.move(selected.main_object,mouse_position_delta)
 	if ToolManager.current_mode == ToolManager.tool_mode.rotate_image:
 		if layers.selected_layers:
+			var canvas_position : Vector2 = size/2-camera.offset*(camera.zoom)
+			
+			
 			for selected in layers.selected_layers:
-				ToolManager.rotate(selected.main_object,get_global_mouse_position()-canvas_size/2.0)
+				var object_pos = canvas_position+(selected.main_object.position*camera.zoom)-(selected.main_object.get_rect().size*selected.main_object.scale*camera.zoom/4)
+				ToolManager.rotate(selected.main_object,object_pos.angle_to_point(get_local_mouse_position()) - object_pos.angle_to_point(previous_mouse_position))
 	if ToolManager.current_mode == ToolManager.tool_mode.scale_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
 				ToolManager.scale(selected.main_object,mouse_position_delta * delta) 
 
-	previous_mouse_position = get_global_mouse_position()
+	previous_mouse_position = get_local_mouse_position()
 
 # Cut / copy / paste / duplicate
 

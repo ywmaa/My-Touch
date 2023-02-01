@@ -9,7 +9,7 @@ var horizontal_mirror := false
 var vertical_mirror := false
 var pixel_perfect := false
 var selected_tool_color := Color("0086cf")
-
+var effect_scaling_factor : float = 1.0
 
 const TOOLS = [
 	{ tool="Select", command="tool_none", shortcut="Shift+F", tooltip="select tool",settings_node=null },
@@ -36,7 +36,11 @@ var current_mode : tool_mode = tool_mode.none:
 		current_mode = new_mode
 
 
-
+func _input(event):
+	if Input.is_key_pressed(KEY_SHIFT):
+		effect_scaling_factor = 0.25
+	else:
+		effect_scaling_factor = 1.0
 
 func tool_none():
 	ToolManager.current_tool = ToolManager.tool_mode.none
@@ -71,30 +75,29 @@ func update_tool_cursors() -> void:
 	mt_globals.main_window.left_cursor.texture = cursor_icon
 	
 
-func rotate(object,direction_point:Vector2):
-	object.look_at(direction_point)
-	object.rotate(PI/2) 
+func rotate(object, rotation_amount:float):
+	object.rotation += rotation_amount *effect_scaling_factor
 
 
 func scale(object,amount:Vector2):
 	match direction:
 		coordinates.xy:
-			object.scale += amount
+			object.scale += amount *effect_scaling_factor
 		coordinates.x:
-			object.scale.x += amount.x
+			object.scale.x += amount.x *effect_scaling_factor
 		coordinates.y:
-			object.scale.y += amount.y
+			object.scale.y += amount.y *effect_scaling_factor
 
 
 func move(object,amount:Vector2):
 	
 	match direction:
 		coordinates.xy:
-			object.position += amount
+			object.position += amount *effect_scaling_factor
 		coordinates.x:
-			object.position.x += amount.x
+			object.position.x += amount.x *effect_scaling_factor
 		coordinates.y:
-			object.position.y += amount.y
+			object.position.y += amount.y *effect_scaling_factor
 
 func lock_x():
 	if direction == coordinates.x:

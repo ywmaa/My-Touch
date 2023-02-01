@@ -2,22 +2,23 @@
 
 importer="texture"
 type="CompressedTexture2D"
-path="res://.godot/imported/cursor.png-ec52e08e6c0fbad330d6ed2fbc2d8785.ctex"
+uid="uid://2hbn5kifmorq"
+path="res://.godot/imported/Select.png-0444f1202dad15ff15f8629b845a092b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://graphics/cursor.png"
-dest_files=["res://.godot/imported/cursor.png-ec52e08e6c0fbad330d6ed2fbc2d8785.ctex"]
+source_file="res://graphics/tools/cursors/Select.png"
+dest_files=["res://.godot/imported/Select.png-0444f1202dad15ff15f8629b845a092b.ctex"]
 
 [params]
 
 compress/mode=0
+compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1
-compress/bptc_ldr=0
 compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=false
