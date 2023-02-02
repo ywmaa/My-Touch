@@ -3,13 +3,13 @@ class_name base_layer
 
 enum layer_type {brush, image, project, mask, text, light, postprocess, primitive_shape}
 
-@export var main_object : Node = null
+var main_object : Node
 @export var image : Sprite2D = Sprite2D.new()
-		
+
 @export var icon : Sprite2D = Sprite2D.new()
 
 @export var name : String
-		
+
 @export var type : layer_type = layer_type.image
 @export var hidden : bool :
 	set(new_hidden):
@@ -17,9 +17,9 @@ enum layer_type {brush, image, project, mask, text, light, postprocess, primitiv
 		if main_object:
 			main_object.visible = !hidden
 		
-@export var image_path : String
+@export_global_dir var image_path : String
 
-@export var parent : Node
+var parent : Node
 
 @export var opacity : float:
 	set(new_opacity):
@@ -50,10 +50,14 @@ func init(_name: String,path: String,layer_type : layer_type,_parent : Node):
 	refresh()
 
 func clear_image():
+	if image == null:
+		return
 	if image.get_parent() != null:
 		image.get_parent().remove_child(image)
 	parent = null
 func draw_image():
+	if image == null:
+		return
 	if image.get_parent() != parent:
 		if image.get_parent() != null:
 			image.get_parent().remove_child(image)
@@ -66,6 +70,7 @@ func refresh():
 			image.texture = texture
 			image.name = name
 			icon.texture = texture
+			main_object = image
 
 func get_copy(_name: String = "copy"):
 	var layer = base_layer.new()

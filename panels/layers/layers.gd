@@ -9,6 +9,10 @@ func _ready():
 	self.connect("mouse_entered",_on_mouse_entered)
 	self.connect("mouse_exited",_on_mouse_exited)
 func _process(delta):
+	if !mt_globals.main_window.get_current_graph_edit():
+		visible = false
+		return
+	visible = true
 	if mt_globals.main_window.get_current_graph_edit():
 		set_layers(mt_globals.main_window.get_current_graph_edit().layers)
 	else:

@@ -304,7 +304,6 @@ func load_project_layer(filenames) -> void:
 		if file == null:
 			continue
 		file_name = file.get_path_absolute()
-		file.close()
 		var data = ResourceLoader.load(file_name) as SaveProject
 		if data != null:
 			var new_project_layer = project_layer.new()
@@ -412,11 +411,6 @@ func load_file(filename) -> bool:
 	var data = ResourceLoader.load(filename) as SaveProject
 	if data != null:
 		save_path = filename
-		for child in canvas.get_children():
-			if child is Camera2D:
-				continue
-			remove_child(child)
-			
 		layers = data.layers
 		layers.canvas = canvas
 		canvas_size = data.canvas_size

@@ -30,6 +30,7 @@ func refresh():
 		for layer in data.layers.layers:
 			project_layers.add_layer(layer)
 		project_layers.load_layers()
+		main_object = image
 
 func get_copy(_name: String = "copy"):
 	var layer = project_layer.new()

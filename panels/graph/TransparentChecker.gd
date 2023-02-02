@@ -7,6 +7,10 @@ func _ready() -> void:
 
 
 func update_rect() -> void:
+	if !mt_globals.main_window.get_current_graph_edit():
+		visible = false
+		return
+	visible = true
 	size = mt_globals.main_window.get_current_graph_edit().canvas_size
 	fit_rect(mt_globals.main_window.get_current_graph_edit().tiles.get_bounding_rect())
 	material.set_shader_parameter("size", mt_globals.checker_size)

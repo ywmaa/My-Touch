@@ -38,7 +38,7 @@ func draw_image():
 			text_label.get_parent().remove_child(image)
 		parent.add_child(text_label)
 func refresh():
-	pass
+	main_object = text_label
 
 func get_copy(_name: String = "copy"):
 	var layer = text_layer.new()
