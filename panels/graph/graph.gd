@@ -260,7 +260,6 @@ func load_selection(filenames) -> void:
 		if file == null:
 			continue
 		file_name = file.get_path_absolute()
-		file.close()
 		var data = ResourceLoader.load(file_name) as SaveProject
 		if data != null:
 			layers.layers.append_array(data.layers.layers)
@@ -481,7 +480,9 @@ func center_view() -> void:
 	camera.fit_to_frame(canvas_size)
 
 
-
+func close():
+	layers.unload_layers()
+	
 
 func _on_mouse_entered():
 	has_focus = true

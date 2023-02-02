@@ -1,8 +1,8 @@
 extends Resource
 class_name layers_object
 
-@export var layers = []
-var selected_layers : Array = []
+@export var layers : Array[base_layer] = []
+var selected_layers : Array[base_layer] = []
 var canvas
 
 signal layers_changed
@@ -13,11 +13,18 @@ func unload_layers():
 func load_layers():
 	for layer in layers:
 		if layer:
+			layer.parent = canvas
 			layer.refresh()
-			if layer.image:
-				layer.image.z_index = layers.find(layer)
+			if layer.main_object:
+				layer.main_object.z_index = layers.find(layer)
 func add_layer(new_layer:base_layer):
 	layers.append(new_layer)
+	_on_layers_changed()
+
+func remove_layer(layer : base_layer) -> void:
+	var layers_array = find_parent_array(layer)
+	layers_array.erase(layer)
+	layer.clear_image()
 	_on_layers_changed()
 
 func select_layer_name(layer_name):
@@ -53,11 +60,7 @@ func duplicate_layer(source_layer) -> void:
 	select_layer(layer)
 	_on_layers_changed()
 
-func remove_layer(layer : base_layer) -> void:
-	var layers_array = find_parent_array(layer)
-	layers_array.erase(layer)
-	layer.clear_image()
-	_on_layers_changed()
+
 
 func move_layer_into(layer : base_layer, target_layer : base_layer, index : int = -1) -> void:
 	assert(layer != null)

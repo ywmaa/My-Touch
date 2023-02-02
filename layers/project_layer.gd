@@ -23,13 +23,12 @@ func draw_image():
 func refresh():
 	image.texture = default_icon
 	project_layers.canvas = image
-	var data = ResourceLoader.load(name) as SaveProject
+	var data = ResourceLoader.load(name,"",ResourceLoader.CACHE_MODE_IGNORE) as SaveProject
 	if data != null:
-		for layer in project_layers.layers:
-			project_layers.remove_layer(layer)
-		for layer in data.layers.layers:
-			project_layers.add_layer(layer)
-		project_layers.load_layers()
+		if project_layers.layers != data.layers.layers:
+			project_layers.unload_layers()
+			project_layers.layers = data.layers.layers
+			project_layers.load_layers()
 		main_object = image
 
 func get_copy(_name: String = "copy"):

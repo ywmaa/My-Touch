@@ -3,7 +3,7 @@ class_name base_layer
 
 enum layer_type {brush, image, project, mask, text, light, postprocess, primitive_shape}
 
-var main_object : Node
+var main_object : Node = null
 @export var image : Sprite2D = Sprite2D.new()
 
 @export var icon : Sprite2D = Sprite2D.new()
@@ -20,6 +20,7 @@ var main_object : Node
 @export_global_dir var image_path : String
 
 var parent : Node
+
 
 @export var opacity : float:
 	set(new_opacity):

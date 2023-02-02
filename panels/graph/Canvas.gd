@@ -21,8 +21,6 @@ func _draw() -> void:
 	draw_set_transform(position_tmp, rotation, scale_tmp)
 	# Draw current frame layers
 	for i in project.layers.layers:
-		if i.parent == null:
-			i.parent = self
 		i.draw_image()
 		
 		

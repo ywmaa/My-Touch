@@ -78,13 +78,13 @@ func do_close_custom_action(_action : String, _tab : int, dialog : AcceptDialog)
 
 
 func do_close_tab(tab = 0) -> void:
+	mt_globals.main_window.get_current_graph_edit().close()
 	for child in get_child(tab).get_children():
 		remove_child(child)
 	get_child(tab).queue_free()
 	$Tabs.remove_tab(tab)
 	var control = get_child(tab)
 	remove_child(control)
-#	control.free()
 	current_tab = -1
 	if $Tabs.get_tab_count() == 0:
 		emit_signal("no_more_tabs")
