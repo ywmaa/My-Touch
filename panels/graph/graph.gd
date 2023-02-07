@@ -139,9 +139,20 @@ func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
 		if event.pressed:
 			if ToolManager.current_mode != ToolManager.tool_mode.none:
+				if layers.selected_layers:
+					for selected in layers.selected_layers:
+						match ToolManager.current_mode:
+							ToolManager.tool_mode.move_image:
+								undo_redo.add_do_property(selected.main_object, "position", selected.main_object.position)
+							ToolManager.tool_mode.rotate_image:
+								undo_redo.add_do_property(selected.main_object, "rotation", selected.main_object.rotation)
+							ToolManager.tool_mode.scale_image:
+								undo_redo.add_do_property(selected.main_object, "scale", selected.main_object.scale)
+					undo_redo.commit_action()
+					for selected in layers.selected_layers:
+						undo_redo.undo()
 				ToolManager.current_mode = ToolManager.tool_mode.none
 				ToolManager.direction = ToolManager.coordinates.xy
-				undo()
 	
 	if event is InputEventMouseMotion and dragging:
 		queue_redraw()
@@ -149,23 +160,49 @@ func _input(event):
 		if event.pressed:
 			if ToolManager.current_tool == ToolManager.tool_mode.move_image:
 				if ToolManager.current_mode == ToolManager.tool_mode.move_image:
+					if layers.selected_layers:
+						for selected in layers.selected_layers:
+							undo_redo.add_do_property(selected.main_object, "position", selected.main_object.position)
+						get_node("/root/Editor/MessageLabel").show_step(undo_redo.get_history_count())
+						undo_redo.commit_action()
 					ToolManager.current_mode = ToolManager.tool_mode.none
 					ToolManager.direction = ToolManager.coordinates.xy
 				else:
 					tool_shortcut(ToolManager.tool_mode.move_image)
 			if ToolManager.current_tool == ToolManager.tool_mode.rotate_image:
 				if ToolManager.current_mode == ToolManager.tool_mode.rotate_image:
+					if layers.selected_layers:
+						for selected in layers.selected_layers:
+							undo_redo.add_do_property(selected.main_object, "rotation", selected.main_object.rotation)
+						undo_redo.commit_action()
+						get_node("/root/Editor/MessageLabel").show_step(undo_redo.get_history_count())
 					ToolManager.current_mode = ToolManager.tool_mode.none
 					ToolManager.direction = ToolManager.coordinates.xy
 				else:
 					tool_shortcut(ToolManager.tool_mode.rotate_image)
 			if ToolManager.current_tool == ToolManager.tool_mode.scale_image:
 				if ToolManager.current_mode == ToolManager.tool_mode.scale_image:
+					if layers.selected_layers:
+						for selected in layers.selected_layers:
+							undo_redo.add_do_property(selected.main_object, "scale", selected.main_object.scale)
+						undo_redo.commit_action()
+						get_node("/root/Editor/MessageLabel").show_step(undo_redo.get_history_count())
 					ToolManager.current_mode = ToolManager.tool_mode.none
 					ToolManager.direction = ToolManager.coordinates.xy
 				else:
 					tool_shortcut(ToolManager.tool_mode.scale_image)
 			if ToolManager.current_tool == ToolManager.tool_mode.none:
+				if layers.selected_layers:
+					for selected in layers.selected_layers:
+						match ToolManager.current_mode:
+							ToolManager.tool_mode.move_image:
+								undo_redo.add_do_property(selected.main_object, "position", selected.main_object.position)
+							ToolManager.tool_mode.rotate_image:
+								undo_redo.add_do_property(selected.main_object, "rotation", selected.main_object.rotation)
+							ToolManager.tool_mode.scale_image:
+								undo_redo.add_do_property(selected.main_object, "scale", selected.main_object.scale)
+					undo_redo.commit_action()
+					get_node("/root/Editor/MessageLabel").show_step(undo_redo.get_history_count())
 				ToolManager.current_mode = ToolManager.tool_mode.none
 				ToolManager.direction = ToolManager.coordinates.xy
 				dragging = true
@@ -324,20 +361,23 @@ func refresh():
 func tool_shortcut(index): # handle tools list
 	if index == ToolManager.tool_mode.move_image:
 		if layers.selected_layers:
+			undo_redo.create_action("Move Layers")
 			for selected in layers.selected_layers:
-				add_to_undo_history([selected.main_object, "position", selected.main_object.position])
+				undo_redo.add_undo_property(selected.main_object,"position",selected.main_object.position)
 			send_changed_signal()
 			ToolManager.current_mode = ToolManager.tool_mode.move_image
 	if index == ToolManager.tool_mode.rotate_image:
 		if layers.selected_layers:
+			undo_redo.create_action("Rotate Layers")
 			for selected in layers.selected_layers:
-				add_to_undo_history([selected.main_object, "rotation", selected.main_object.rotation])
+				undo_redo.add_undo_property(selected.main_object,"rotation",selected.main_object.rotation)
 			send_changed_signal()
 			ToolManager.current_mode = ToolManager.tool_mode.rotate_image
 	if index == ToolManager.tool_mode.scale_image:
 		if layers.selected_layers:
+			undo_redo.create_action("Scale Layers")
 			for selected in layers.selected_layers:
-				add_to_undo_history([selected.main_object, "scale", selected.main_object.scale])
+				undo_redo.add_undo_property(selected.main_object,"scale",selected.main_object.scale)
 			send_changed_signal()
 			ToolManager.current_mode = ToolManager.tool_mode.scale_image
 func new_project() -> void:
@@ -361,18 +401,13 @@ func send_changed_signal() -> void:
 
 
 @export var undo_limit : int = 32
-func add_to_undo_history(data:Array): # syntax : [object,str(property_name),value]
-	undo_redo.create_action(data[1],0)
-	undo_redo.add_undo_property(data[0],data[1],data[2])
-#	undo_redo.add_do_property(data[0],data[1],data[2])
-	undo_redo.commit_action()
-	get_node("/root/Editor/MessageLabel").show_step(undo_redo.get_history_count())
 func undo():
 	undo_redo.undo()
-	
+	get_node("/root/Editor/MessageLabel").show_message("Current Step : " + str(undo_redo.get_current_action()))
 
 func redo():
 	undo_redo.redo()
+	get_node("/root/Editor/MessageLabel").show_message("Current Step : " + str(undo_redo.get_current_action()))
 
 func _exit_tree():
 	save_config()
