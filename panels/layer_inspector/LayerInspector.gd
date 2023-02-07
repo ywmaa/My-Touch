@@ -2,6 +2,8 @@ extends VBoxContainer
 
 var current_graph : MTGraph 
 var current_layer : base_layer
+var locked_aspect_icon = load("res://graphics/misc/lock_aspect.png")
+var unlocked_aspect_icon = load("res://graphics/misc/lock_aspect_2.png")
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	%PositionX.connect("value_changed",value_changed.bind(%PositionX))
@@ -20,7 +22,17 @@ func _ready():
 	
 	%LabelText.connect("text_changed",value_changed.bind(%LabelText))
 	
+	$CanvasRes3/Aspect.connect("pressed",func():
+		if current_layer.lock_aspect == true:
+			current_layer.lock_aspect = false
+			$CanvasRes3/Aspect.icon = unlocked_aspect_icon
+		else:
+			current_layer.lock_aspect = true
+			$CanvasRes3/Aspect.icon = locked_aspect_icon
+		)
 	
+
+
 
 
 func _process(delta):
@@ -55,6 +67,12 @@ func _process(delta):
 		%ScaleX.value = current_layer.main_object.scale.x
 	if current_layer.main_object.scale.y != %ScaleY.value:
 		%ScaleY.value = current_layer.main_object.scale.y
+		
+	if current_layer.lock_aspect == true:
+		if $CanvasRes3/Aspect.icon != locked_aspect_icon:
+			$CanvasRes3/Aspect.icon = locked_aspect_icon
+		else:
+			$CanvasRes3/Aspect.icon = unlocked_aspect_icon
 		
 	if current_layer.opacity != %Opacity.value:
 		%Opacity.value = current_layer.opacity

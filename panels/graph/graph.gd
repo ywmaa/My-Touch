@@ -250,7 +250,7 @@ func _process(delta):
 	if ToolManager.current_mode == ToolManager.tool_mode.scale_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
-				ToolManager.scale(selected.main_object,mouse_position_delta * delta) 
+				ToolManager.scale(selected.main_object,mouse_position_delta * delta,selected.lock_aspect) 
 
 	previous_mouse_position = get_local_mouse_position()
 
@@ -403,11 +403,11 @@ func send_changed_signal() -> void:
 @export var undo_limit : int = 32
 func undo():
 	undo_redo.undo()
-	get_node("/root/Editor/MessageLabel").show_message("Current Step : " + str(undo_redo.get_current_action()))
+	get_node("/root/Editor/MessageLabel").show_message("Current Step : " + str(undo_redo.get_current_action() + 1))
 
 func redo():
 	undo_redo.redo()
-	get_node("/root/Editor/MessageLabel").show_message("Current Step : " + str(undo_redo.get_current_action()))
+	get_node("/root/Editor/MessageLabel").show_message("Current Step : " + str(undo_redo.get_current_action() + 1))
 
 func _exit_tree():
 	save_config()

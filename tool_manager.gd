@@ -79,14 +79,20 @@ func rotate(object, rotation_amount:float):
 	object.rotation += rotation_amount *effect_scaling_factor
 
 
-func scale(object,amount:Vector2):
+func scale(object,amount:Vector2,lock_aspect:bool):
 	match direction:
 		coordinates.xy:
 			object.scale += amount *effect_scaling_factor
+			if lock_aspect:
+				object.scale.y = object.scale.x
 		coordinates.x:
 			object.scale.x += amount.x *effect_scaling_factor
+			if lock_aspect:
+				object.scale.y = object.scale.x
 		coordinates.y:
 			object.scale.y += amount.y *effect_scaling_factor
+			if lock_aspect:
+				object.scale.x = object.scale.y
 
 
 func move(object,amount:Vector2):

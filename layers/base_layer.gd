@@ -37,7 +37,8 @@ var parent : Node
 			return main_object.self_modulate.a
 		
 		return opacity
-		
+
+@export var lock_aspect : bool = true
 @export var affect_children_opacity :bool = false
 
 var texture = ImageTexture.new()

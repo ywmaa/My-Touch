@@ -70,6 +70,30 @@ min_value = 2.0
 max_value = 10000.0
 step = 1.0
 
+[node name="Space4" type="Control" parent="TabContainer/Graph Settings"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="TabContainer/Graph Settings"]
+layout_mode = 2
+text = "Anti Aliasing :"
+
+[node name="CanvasRes2" type="HBoxContainer" parent="TabContainer/Graph Settings"]
+layout_mode = 2
+
+[node name="AntiAliasing" type="OptionButton" parent="TabContainer/Graph Settings/CanvasRes2"]
+unique_name_in_owner = true
+layout_mode = 2
+item_count = 4
+selected = 0
+popup/item_0/text = "Disabled (Fastest)"
+popup/item_0/id = 0
+popup/item_1/text = "2x (Average)"
+popup/item_1/id = 1
+popup/item_2/text = "4x (Slow)"
+popup/item_2/id = 2
+popup/item_3/text = "8x (Slowest)"
+popup/item_3/id = 3
+
 [node name="HSeparator" type="HSeparator" parent="."]
 visible = false
 layout_mode = 2

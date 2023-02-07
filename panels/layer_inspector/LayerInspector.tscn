@@ -1,13 +1,16 @@
-[gd_scene load_steps=4 format=3 uid="uid://csvl0avx42734"]
+[gd_scene load_steps=5 format=3 uid="uid://csvl0avx42734"]
 
 [ext_resource type="Script" path="res://panels/layer_inspector/LayerInspector.gd" id="1_q8631"]
 [ext_resource type="Script" path="res://panels/graph/settingsfloat.gd" id="2_8a3vq"]
 [ext_resource type="PackedScene" uid="uid://4qtbqefr5vwd" path="res://windows/preferences/float_option.tscn" id="2_8ltnj"]
+[ext_resource type="Texture2D" uid="uid://do418dfoolgwc" path="res://graphics/misc/lock_aspect_2.png" id="4_b6yy1"]
 
 [node name="ScrollContainer" type="ScrollContainer"]
-offset_top = 430.0
-offset_right = 207.0
-offset_bottom = 430.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Layer Inspector" type="VBoxContainer" parent="."]
 clip_contents = true
@@ -167,6 +170,13 @@ value = 720.0
 min_value = 2.0
 max_value = 10000.0
 step = 1.0
+
+[node name="Space2" type="Control" parent="Layer Inspector/CanvasRes3"]
+layout_mode = 2
+
+[node name="Aspect" type="Button" parent="Layer Inspector/CanvasRes3"]
+layout_mode = 2
+icon = ExtResource("4_b6yy1")
 
 [node name="Space" type="Control" parent="Layer Inspector"]
 layout_mode = 2
