@@ -15,7 +15,7 @@ the project has a lot of files from material maker/pixelorama and it is not orga
 
 # goals
  easy to use photo editor 
-@@ (Needs Feedback)@@
+@@ (Needs Feedback)
  
  non destructive workflow 
 - (In-Progress)
