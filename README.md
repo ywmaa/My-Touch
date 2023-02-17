@@ -14,23 +14,23 @@ The current version of Godot for the project is : Godot 4 RC 2
 the project has a lot of files from material maker/pixelorama and it is not organised, yet.
 
 # goals
- easy to use photo editor
+ easy to use photo editor ![#1589F0](Needs Feedback)
  
- non destructive workflow
+ non destructive workflow ![#f03c15](In-Progress)
 
- blender like shortcuts
+ blender like shortcuts ![#c5f015](Done)
 
- AI Tools (StableDiffusion,Upscaling,Object Select Tool)
+ AI Tools (StableDiffusion,Upscaling,Object Select Tool) ![#f03c15](To-Do)
 
- powerfull and customizable tools
+ powerfull and customizable tools ![#f03c15](In-Progress)
 
- easy addons system (future work)
+ easy addons system ![#f03c15](future work)
 
- version control support for projects
+ version control support for projects ![#c5f015](Done)
 
- multiple project syncing and combining (which will allow better collaborartion and projects/layers management)
+ multiple project syncing and combining (which will allow better collaborartion and projects/layers management) ![#c5f015](Done)
 
- Procedural Node System
+ Procedural Node System ![#f03c15](To-Do)
 
 # Roadmap
  https://trello.com/b/ATaLIaII/my-touch
