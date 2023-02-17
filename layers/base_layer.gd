@@ -38,7 +38,7 @@ var parent : Node
 		
 		return opacity
 
-@export var lock_aspect : bool = true
+@export var lock_aspect : bool = false
 @export var affect_children_opacity :bool = false
 
 var texture = ImageTexture.new()

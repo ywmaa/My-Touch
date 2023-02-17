@@ -27,13 +27,13 @@ func _make_custom_tooltip(for_text):
 	panel.set_layer(item.get_meta("layer"))
 	return panel
 
-func update_from_layers(layers_array : Array, selected_layers) -> void:
+func update_from_layers(layers_array : Array, selected_layers:Array[base_layer]) -> void:
 	if !editing:
 		selected_items.clear()
 		clear()
 		do_update_from_layers(layers_array, create_item(), selected_layers)
 
-func do_update_from_layers(layers_array : Array, item : TreeItem, selected_layers) -> void:
+func do_update_from_layers(layers_array : Array, item : TreeItem, selected_layers:Array[base_layer]) -> void:
 	for l in layers_array:
 		var new_item = create_item()
 		new_item.set_text(0, l.name)

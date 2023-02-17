@@ -21,8 +21,10 @@ var current_tab = -1 :
 signal tab_changed
 signal no_more_tabs
 
-func add_child(control, legible_unique_name = false,i=0) -> void:
-	super.add_child(control, legible_unique_name)
+func _ready():
+	self.connect("child_entered_tree",added_child)
+
+func added_child(control) -> void:
 	if !(control is TabBar):
 		$Tabs.add_tab(control.name)
 		move_child(control, $Tabs.get_tab_count()-1)

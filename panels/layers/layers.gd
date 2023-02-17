@@ -27,7 +27,8 @@ func set_layers(_layers) -> void:
 		tree.update_from_layers([], [])
 
 func _on_Tree_selection_changed(new_selected) -> void:
-	mt_globals.main_window.get_current_graph_edit().layers.selected_layers.clear()
+	var empty_layers_array : Array[base_layer] = []
+	mt_globals.main_window.get_current_graph_edit().layers.selected_layers = empty_layers_array
 	for item in new_selected:
 		mt_globals.main_window.get_current_graph_edit().layers.select_layer(item.get_meta("layer"))
 

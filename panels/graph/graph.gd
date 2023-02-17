@@ -284,7 +284,7 @@ func select_all():
 func select_none():
 	layers.selected_layers = []
 func select_invert():
-	var inverted_selections : Array = []
+	var inverted_selections : Array[base_layer] = []
 	for layer in layers.layers:
 		if layer in layers.selected_layers:
 			continue
