@@ -1,4 +1,5 @@
 extends Panel
+class_name MainWindow
 var quitting : bool = false
 
 var recent_files = []
@@ -204,7 +205,7 @@ func new_project() -> void:
 	graph_edit.update_tab_title()
 
 func new_graph_panel():
-	var graph_edit = preload("res://panels/graph/graph.tscn").instantiate()
+	var graph_edit = load("res://panels/graph/graph.tscn").instantiate()
 	projects.add_child(graph_edit)
 	projects.current_tab = graph_edit.get_index()
 	return graph_edit
@@ -215,7 +216,8 @@ func load_project() -> void:
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
-	dialog.add_filter("*.mt.tres;My Touch files")
+	dialog.add_filter("*.mt.tres;My Touch text files")
+
 	if mt_globals.config.has_section_key("path", "project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
@@ -279,15 +281,16 @@ func _on_LoadRecent_id_pressed(id) -> void:
 	do_load_project(recent_files[id])
 
 func load_recents() -> void:
-	var f = FileAccess.open("user://recent_files.bin", FileAccess.READ)
+	var f = FileAccess.open("user://recent_files.cache", FileAccess.READ)
 	if f != null:
-		recent_files = JSON.new().parse_string(f.get_as_text())
+		recent_files = JSON.parse_string(f.get_as_text())
+		
 		f = null
 
 func save_recents() -> void:
-	var f = FileAccess.open("user://recent_files.bin", FileAccess.READ)
+	var f = FileAccess.open("user://recent_files.cache", FileAccess.WRITE)
 	if f != null:
-		f.store_string(JSON.new().stringify(recent_files))
+		f.store_string(JSON.stringify(recent_files))
 	f = null
 
 func add_recent(path, save = true) -> void:
@@ -496,7 +499,8 @@ func edit_load_selection() -> void:
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
-	dialog.add_filter("*.mt.tres;My Touch files")
+	dialog.add_filter("*.mt.tres;My Touch text files")
+
 	if mt_globals.config.has_section_key("path", "project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
@@ -516,7 +520,8 @@ func edit_load_project_as_image() -> void:
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
-	dialog.add_filter("*.mt.tres;My Touch files")
+	dialog.add_filter("*.mt.tres;My Touch text files")
+
 	if mt_globals.config.has_section_key("path", "project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
@@ -610,10 +615,13 @@ func import_image() -> void:
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
-	dialog.add_filter("*.jpg,*.jpeg,*.png,*.svg,*.webp;Image files")
+	dialog.add_filter("*.jpg,*.jpeg;JPEG Image")
+	dialog.add_filter("*.png;PNG Image")
+	dialog.add_filter("*.svg;SVG Image")
+	dialog.add_filter("*.tga;TGA Image")
+	dialog.add_filter("*.webp;WebP Image")
 	var files = await dialog.select_files()
 	if files.size() > 0:
-		var graph_edit : MTGraph = get_current_graph_edit()
 		on_files_dropped(files)
 
 #Handle dropped files

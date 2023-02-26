@@ -35,7 +35,7 @@ func _ready():
 
 
 
-func _process(delta):
+func _process(_delta):
 	if !mt_globals.main_window.get_current_graph_edit():
 		visible = false
 		return

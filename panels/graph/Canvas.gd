@@ -11,6 +11,10 @@ func _ready() -> void:
 
 
 func _draw() -> void:
+	if mt_globals.main_window.get_current_graph_edit() != project:
+		for i in project.layers.layers:
+			i.clear_image()
+		return
 #	var current_cels: Array = Global.current_project.frames[Global.current_project.current_frame].cels
 #	var current_layer: int = Global.current_project.current_layer
 	var position_tmp := position
@@ -26,7 +30,7 @@ func _draw() -> void:
 		
 	draw_set_transform(position, rotation, scale)
 
-func _process(delta):
+func _process(_delta):
 	queue_redraw()
 	get_parent().size = project.canvas_size
 

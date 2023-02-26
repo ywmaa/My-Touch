@@ -2,8 +2,8 @@ extends base_layer
 class_name project_layer
 
 
-var default_icon = preload("res://icon.png")
-@export var project_layers : Resource
+var project_layers : layers_object = layers_object.new()
+
 
 func _init():
 	type = layer_type.project
@@ -21,9 +21,9 @@ func draw_image():
 		layer.draw_image()
 
 func refresh():
-	image.texture = default_icon
+	super.refresh()
 	project_layers.canvas = image
-	var data = ResourceLoader.load(name,"",ResourceLoader.CACHE_MODE_IGNORE) as SaveProject
+	var data = ResourceLoader.load(name,"",ResourceLoader.CACHE_MODE_REUSE) as SaveProject
 	if data != null:
 		if project_layers.layers != data.layers.layers:
 			project_layers.unload_layers()

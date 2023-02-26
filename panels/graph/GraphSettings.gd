@@ -9,7 +9,7 @@ func _ready():
 	%AntiAliasing.connect("item_selected",value_changed)
 	self.connect("mouse_entered",_on_mouse_entered)
 	self.connect("mouse_exited",_on_mouse_exited)
-func _process(delta):
+func _process(_delta):
 	if !mt_globals.main_window.get_current_graph_edit():
 		return
 	if !project or project != mt_globals.main_window.get_current_graph_edit():

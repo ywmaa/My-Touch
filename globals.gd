@@ -4,7 +4,7 @@ extends Node
 @onready var menu_manager = $MenuManager
 
 # warning-ignore:unused_class_variable
-var main_window
+var main_window : MainWindow
 var show_left_tool_icon := true
 var config : ConfigFile = ConfigFile.new()
 

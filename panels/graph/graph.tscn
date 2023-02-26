@@ -87,3 +87,11 @@ script = ExtResource("5_0h317")
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 script = ExtResource("7_deeh5")
+
+[node name="TopBar" type="HBoxContainer" parent="."]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+
+[node name="Menu" type="HBoxContainer" parent="TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3

@@ -8,14 +8,14 @@ var default_icon = preload("res://icon.png")
 
 # we don't need an image or texture so we will override everything 
 # and reset all images and textures to free memory
-func init(_name: String,path: String,layer_type : layer_type,_parent : Node):
+func init(_name: String,_path: String,p_layer_type : layer_type,_parent : Node):
 	name = _name
-	type = layer_type
+	type = p_layer_type
 	parent = _parent
 	main_object = text_label
 	text_label.text = "Hello World" #Default Text
 	text_label.fit_content = true
-	text_label.autowrap_mode = 0
+	text_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	text_label.bbcode_enabled = true
 	refresh()
 

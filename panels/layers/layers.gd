@@ -8,7 +8,7 @@ func _ready():
 	tree.connect("selection_changed",_on_Tree_selection_changed)
 	self.connect("mouse_entered",_on_mouse_entered)
 	self.connect("mouse_exited",_on_mouse_exited)
-func _process(delta):
+func _process(_delta):
 	if !mt_globals.main_window.get_current_graph_edit():
 		visible = false
 		return
@@ -33,13 +33,7 @@ func _on_Tree_selection_changed(new_selected) -> void:
 		mt_globals.main_window.get_current_graph_edit().layers.select_layer(item.get_meta("layer"))
 
 func _on_Add_pressed():
-	var menu = preload("res://panels/layers/add_layer_menu.tscn").instantiate()
-	add_child(menu)
-	var button_rect = $Buttons/Add.get_global_rect()
-	menu.connect("id_pressed", _on_add_layer_menu)
-	menu.connect("id_pressed", menu.queue_free)
-	menu.connect("popup_hide", menu.queue_free)
-	menu.popup(Rect2(Vector2(button_rect.position.x, button_rect.end.y), get_minimum_size()))
+	pass
 
 func _on_add_layer_menu(id):
 	layers.add_layer(id)
@@ -66,14 +60,9 @@ func _on_Down_pressed():
 		layers.move_layer_down(current.get_meta("layer"))
 
 func _on_Config_pressed():
-	var current = tree.get_selected()
-	if current != null:
-		var layer = current.get_meta("layer")
-		var popup = preload("res://panels/layers/layer_config_popup.tscn").instantiate()
-		add_child(popup)
-		popup.configure_layer(layers, current.get_meta("layer"))
+	pass
 
-func _input(event):
+func _input(_event):
 	if Input.is_action_just_pressed("delete"):
 		_on_Remove_pressed()
 

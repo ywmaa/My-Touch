@@ -67,11 +67,11 @@ func save_config() -> void:
 	for p in panels:
 		var config_panel_name = p.replace(" ", "_").replace("(", "_").replace(")", "_")
 		var location = panels[p].get_parent()
-		var hidden = false
+		var is_hidden = false
 		if location == null:
-			hidden = panels[p].get_meta("hidden")
+			is_hidden = panels[p].get_meta("is_hidden")
 			location = panels[p].get_meta("parent_tab_container")
-		mt_globals.config.set_value("layout", config_panel_name+"_hidden", hidden)
+		mt_globals.config.set_value("layout", config_panel_name+"_is_hidden", is_hidden)
 		for l in PANEL_POSITIONS.keys():
 			if location == get_node(PANEL_POSITIONS[l]):
 				mt_globals.config.set_value("layout", config_panel_name+"_location", l)
@@ -152,5 +152,5 @@ func _on_tab_changed(_tab):
 
 func _on_Layout_resized():
 # warning-ignore:narrowing_conversion
-	split_offset -= get_rect().size.x - previous_width
+	split_offset -= int(get_rect().size.x - previous_width)
 	previous_width = get_rect().size.x

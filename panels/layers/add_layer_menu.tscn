@@ -1,4 +1,0 @@
-[gd_scene format=3 uid="uid://jx87h44b2er7"]
-
-[node name="AddLayerMenu" type="PopupMenu"]
-visible = true

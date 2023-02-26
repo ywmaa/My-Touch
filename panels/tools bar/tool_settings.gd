@@ -2,7 +2,7 @@ extends ScrollContainer
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	if ToolManager.assigned_tool:
 		if ToolManager.assigned_tool.has("settings_node"):
 			var panel: Node = ToolManager.assigned_tool.settings_node

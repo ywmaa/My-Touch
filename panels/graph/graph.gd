@@ -316,8 +316,7 @@ func save_selection() -> void:
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
-	dialog.add_filter("*.mt.tres;My Touch files")
-	var main_window = mt_globals.main_window
+	dialog.add_filter("*.mt.tres;My Touch text files")
 	if mt_globals.config.has_section_key("path", "project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
@@ -340,10 +339,9 @@ func load_project_layer(filenames) -> void:
 		if file == null:
 			continue
 		file_name = file.get_path_absolute()
-		var data = ResourceLoader.load(file_name) as SaveProject
+		var data = ResourceLoader.load(file_name,"",ResourceLoader.CACHE_MODE_IGNORE) as SaveProject
 		if data != null:
 			var new_project_layer = project_layer.new()
-			new_project_layer.project_layers = layers_object.new()
 			new_project_layer.init(file_name,default_icon,base_layer.layer_type.project,canvas)
 			layers.add_layer(new_project_layer)
 		else:
@@ -463,7 +461,7 @@ func load_file(filename) -> bool:
 func save() -> bool:
 	var status
 	if save_path != null:
-		status = await save_file(save_path)
+		status = save_file(save_path)
 	else:
 		status = await save_as()
 	return status
@@ -475,8 +473,8 @@ func save_as() -> bool:
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
-	dialog.add_filter("*.mt.tres;My Touch files")
-	var main_window = mt_globals.main_window
+	dialog.add_filter("*.mt.tres;My Touch text files")
+
 	if mt_globals.config.has_section_key("path", "project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
@@ -503,7 +501,7 @@ func set_need_save(ns = true) -> void:
 
 func auto_save():
 	if save_path != null and need_save:
-		await save_file(save_path)
+		save_file(save_path)
 		get_node("/root/Editor/MessageLabel").show_message("auto saved")
 		
 

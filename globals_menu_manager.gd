@@ -97,12 +97,12 @@ func on_menu_id_pressed(id, menu_def, object) -> void:
 				parameters.append(!object.callv(command, parameters))
 			object.callv(command, parameters)
 
-func on_menu_about_to_popup(menu_def, object, name : String, menu : PopupMenu) -> void:
+func on_menu_about_to_popup(menu_def, object, menu_name : String, menu : PopupMenu) -> void:
 	var mode = ""
 	if object.has_method("get_current_mode"):
 		mode = object.get_current_mode()
 	for i in menu_def.size():
-		if menu_def[i].menu != name:
+		if menu_def[i].menu != menu_name:
 			continue
 		if menu_def[i].has("submenu"):
 			pass

@@ -10,26 +10,19 @@ size_flags_vertical = 3
 script = ExtResource("1")
 
 [node name="RecentLabel" type="Label" parent="."]
-offset_right = 100.0
-offset_bottom = 26.0
+layout_mode = 2
 text = "Recent"
 
 [node name="RecentList" type="ItemList" parent="."]
-offset_top = 30.0
-offset_right = 100.0
-offset_bottom = 30.0
+layout_mode = 2
 size_flags_vertical = 3
 
 [node name="FavLabel" type="Label" parent="."]
-offset_top = 34.0
-offset_right = 100.0
-offset_bottom = 60.0
+layout_mode = 2
 text = "Favorite"
 
 [node name="FavList" type="ItemList" parent="."]
-offset_top = 64.0
-offset_right = 100.0
-offset_bottom = 64.0
+layout_mode = 2
 size_flags_vertical = 3
 
 [connection signal="gui_input" from="RecentList" to="." method="_on_RecentList_gui_input"]

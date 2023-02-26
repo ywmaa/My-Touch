@@ -125,9 +125,9 @@ func _gui_input(event : InputEvent) -> void:
 
 func _on_LineEdit_text_entered(new_text : String = text, release = true) -> void:
 	new_text = str(new_text.to_float())
-	var exp : Expression = Expression.new()
-	exp.parse(new_text)
-	var new_value : float = exp.execute()
+	var expr : Expression = Expression.new()
+	expr.parse(new_text)
+	var new_value : float = expr.execute()
 	value = new_value
 	do_update()
 	emit_signal("value_changed", value)

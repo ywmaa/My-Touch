@@ -9,11 +9,12 @@
 
 # Notes for contributers
 
-The current version of Godot for the project is : Godot 4 RC 2
+The current version of Godot for the project is : Godot 4 RC 5
 
 the project has a lot of files from material maker/pixelorama and it is not organised, yet.
 
 # goals
+
  easy to use photo editor 
 ! (Needs Feedback)
  

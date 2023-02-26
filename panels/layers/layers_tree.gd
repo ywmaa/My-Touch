@@ -1,5 +1,5 @@
 extends Tree
-
+class_name LayersTree
 var layers = null
 var selected_items : Array[TreeItem]
 var just_selected : bool = false
@@ -59,9 +59,9 @@ func item_is_child(i1 : TreeItem, i2 : TreeItem):
 		i1 = i1.get_parent()
 	return false
 
-func can_drop_data(position : Vector2, data):
+func can_drop_data(p_position : Vector2, data):
 	drop_mode_flags = DROP_MODE_ON_ITEM | DROP_MODE_INBETWEEN
-	var target_item = get_item_at_position(position)
+	var target_item = get_item_at_position(p_position)
 	if target_item != null and !item_is_child(target_item, data):
 		return true
 	return false
@@ -73,26 +73,27 @@ static func get_item_index(item : TreeItem) -> int:
 		rv += 1
 	return rv
 
-func drop_data(position : Vector2, data):
-	var target_item : TreeItem = get_item_at_position(position)
+func drop_data(p_position : Vector2, data):
+	var target_item : TreeItem = get_item_at_position(p_position)
 	if data != null and target_item != null and !item_is_child(target_item, data):
 		var layer = data.get_meta("layer")
-		match get_drop_section_at_position(position):
+		match get_drop_section_at_position(p_position):
 			0:
 				layers.move_layer_into(layer, target_item.get_meta("layer"))
 			-1:
 				if target_item.get_parent() != null:
-					layers.move_layer_into(layer, target_item.get_parent().get_meta("layer"), get_item_index(target_item))
+					
+					layers.move_layer_into(layer, target_item.get_parent().get_meta("layer"), LayersTree.get_item_index(target_item))
 				else:
 					print("Cannot move item")
 			1:
 				if target_item.get_parent() != null:
-					layers.move_layer_into(layer, target_item.get_parent().get_meta("layer"), get_item_index(target_item)+1)
+					layers.move_layer_into(layer, target_item.get_parent().get_meta("layer"), LayersTree.get_item_index(target_item)+1)
 				else:
 					print("Cannot move item")
 		_on_layers_changed()
 
-func _on_tree_button_clicked(item, column, id, mouse_button_index):
+func _on_tree_button_clicked(item, _column, _id, _mouse_button_index):
 	var l = item.get_meta("layer")
 	l.hidden = !l.hidden
 	_on_layers_changed()
@@ -120,7 +121,7 @@ func _on_tree_nothing_selected():
 	emit_signal("selection_changed", selected_items)
 
 
-func _on_tree_multi_selected(item, column, selected):
+func _on_tree_multi_selected(item, _column, selected):
 #	item.set_selectable(column,true)
 	if selected:
 		if !selected_items.has(item):

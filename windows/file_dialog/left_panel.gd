@@ -19,8 +19,8 @@ func _ready():
 	update_lists()
 
 func _exit_tree():
-	mt_globals.config.set_value("file_dialog", "recents", JSON.new().stringify(recents))
-	mt_globals.config.set_value("file_dialog", "favorites", JSON.new().stringify(favorites))
+	mt_globals.config.set_value("file_dialog", "recents", JSON.stringify(recents))
+	mt_globals.config.set_value("file_dialog", "favorites", JSON.stringify(favorites))
 
 func add_recent(file_path : String):
 	if recents.find(file_path) != -1:
@@ -34,10 +34,10 @@ func add_favorite(file_path : String):
 		update_lists()
 
 func my_basename(s : String) -> String:
-	var slash_pos : int = s.find("/")
+	var slash_pos : int = s.rfind("/")
 	if slash_pos == -1 or slash_pos+1 == s.length():
 		return s
-	return s.right(slash_pos+1)
+	return s.right(-(slash_pos+1))
 
 func update_lists():
 	$FavList.clear()

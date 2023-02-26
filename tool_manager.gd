@@ -36,7 +36,7 @@ var current_mode : tool_mode = tool_mode.none:
 		current_mode = new_mode
 
 
-func _input(event):
+func _input(_event):
 	if Input.is_key_pressed(KEY_SHIFT):
 		effect_scaling_factor = 0.25
 	else:
@@ -58,7 +58,7 @@ func tool_scale():
 func add_context():
 	mt_globals.main_window.get_current_graph_edit().create_add_context_menu()
 
-func assign_tool(name: String, button: int) -> void:
+func assign_tool(_p_name: String, button: int) -> void:
 	assigned_tool = TOOLS[button]
 
 	

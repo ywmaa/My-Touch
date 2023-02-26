@@ -14,7 +14,6 @@ func set_text(t) -> void:
 	$Label.text = t
 
 func _on_gui_input(ev) -> void:
-	print("input")
 	if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
 		$Label.visible = false
 		$Editor.text = $Label.text

@@ -1,7 +1,7 @@
 extends Resource
 class_name layers_object
 
-@export var layers : Array[base_layer] = []
+@export var layers : Array[base_layer]
 var selected_layers : Array[base_layer] = []
 var canvas
 

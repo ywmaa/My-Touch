@@ -43,10 +43,10 @@ var parent : Node
 
 var texture = ImageTexture.new()
 
-func init(_name: String,path: String,layer_type : layer_type,_parent : Node):
+func init(_name: String,path: String,p_layer_type : layer_type,_parent : Node):
 	name = _name
 	image_path = path
-	type = layer_type
+	type = p_layer_type
 	parent = _parent
 	main_object = image
 	refresh()
@@ -56,7 +56,8 @@ func clear_image():
 		return
 	if image.get_parent() != null:
 		image.get_parent().remove_child(image)
-	parent = null
+	if parent != null:
+		parent = null
 func draw_image():
 	if image == null:
 		return
