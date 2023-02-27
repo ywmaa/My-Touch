@@ -31,8 +31,8 @@ jobs:
       - name: Build Android
         run: ./android/build/gradlew --no-daemon build
       - name: export game
-        id: export
         if: always()
+        id: export
         uses: firebelley/godot-export@master
         with:
           godot_executable_download_url: https://downloads.tuxfamily.org/godotengine/4.0/rc6/Godot_v4.0-rc6_linux.x86_64.zip
@@ -43,6 +43,7 @@ jobs:
           wine_path: ${{ steps.wine_install.outputs.WINE_PATH }}
           use_godot_4: true
       - name: Upload Artifacts
+        if: always()
         uses: actions/upload-artifact@v1
         with:
           name: all-platforms

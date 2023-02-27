@@ -2,14 +2,14 @@ name: "Dispatch Export"
 on:
   workflow_dispatch:
     inputs:
+      action_type:
+        description: "Action Type - Release|Action"
+        required: true
+        default: "Action"
       godot_version:
         description: "Godot Version"
         required: true
         default: "4.0"
-      export_folder:
-        description: "Export Folder - Repository Path"
-        required: true
-        default: "./my/build/destination"
       export_name:
         description: "Export Name"
         required: true
@@ -29,15 +29,56 @@ on:
 
 env:
   GODOT_VERSION: ${{ github.event.inputs.godot_version }}
-  EXPORT_FOLDER: ${{ github.event.inputs.export_folder }}
+  ACTION_TYPE: ${{ github.event.inputs.action_type }}
   EXPORT_NAME: ${{ github.event.inputs.export_name }}
   EXPORT_VERSION: ${{ github.event.inputs.export_version }}
   RELEASE_ANDROID: ${{ github.event.inputs.release_android }}
   ITCH_IO: ${{ github.event.inputs.itch_io }}
 
 jobs:
-  export_game:
+  release_app:
     runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.action_type == 'Release'}}
+    name: Export Program Job
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3.0.2
+      - name: install wine
+        id: wine_install
+        run: |
+          sudo apt install wine64
+          echo "WINE_PATH=$(which wine64)" >> $GITHUB_OUTPUT
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+      - name: Build Android
+        run: ./android/build/gradlew --no-daemon build
+      - name: export game
+        id: export
+        uses: firebelley/godot-export@master
+        with:
+          godot_executable_download_url: https://downloads.tuxfamily.org/godotengine/4.0/rc6/Godot_v4.0-rc6_linux.x86_64.zip
+          godot_export_templates_download_url: https://downloads.tuxfamily.org/godotengine/4.0/rc6/Godot_v4.0-rc6_export_templates.tpz
+          relative_project_path: ./ # build the standard project
+          relative_export_path: ./my/build/destination # move export output to this directory relative to git root
+          archive_output: true
+          wine_path: ${{ steps.wine_install.outputs.WINE_PATH }}
+          use_godot_4: true
+      - name: create release
+        uses: ncipollo/release-action@v1.11.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: true
+          tag: ${EXPORT_NAME} v${EXPORT_VERSION}
+          artifacts: ${{ steps.export.outputs.archive_directory }}/* # Added "/*" at the end is glob pattern match for this action
+
+  action_export_app:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.action_type == 'Action'}}
     name: Export Program Job
     steps:
       - name: checkout
@@ -64,14 +105,13 @@ jobs:
           godot_executable_download_url: https://downloads.tuxfamily.org/godotengine/4.0/rc6/Godot_v4.0-rc6_linux.x86_64.zip
           godot_export_templates_download_url: https://downloads.tuxfamily.org/godotengine/4.0/rc6/Godot_v4.0-rc6_export_templates.tpz
           relative_project_path: ./ # build the standard project
-          relative_export_path: ${EXPORT_FOLDER} # move export output to this directory relative to git root
+          relative_export_path: ./build # move export output to this directory relative to git root
           archive_output: true
           wine_path: ${{ steps.wine_install.outputs.WINE_PATH }}
           use_godot_4: true
-      - name: create release
-        uses: ncipollo/release-action@v1.11.2
+      - name: Upload Artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          generateReleaseNotes: true
-          tag: ${EXPORT_NAME} v${EXPORT_VERSION}
-          artifacts: ${{ steps.export.outputs.archive_directory }}/* # Added "/*" at the end is glob pattern match for this action
+          name: all-platforms
+          path: ./build
