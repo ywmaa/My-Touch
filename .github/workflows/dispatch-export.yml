@@ -55,7 +55,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
       - name: Build Android
-        run: ./gradlew --no-daemon build
+        run: ./android/build/gradlew --no-daemon build
       - name: export game
         id: export
         uses: firebelley/godot-export@master
