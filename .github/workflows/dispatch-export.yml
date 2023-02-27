@@ -1,0 +1,66 @@
+name: "Dispatch Export"
+on:
+  workflow_dispatch:
+    inputs:
+      godot_version:
+        description: "Godot Version"
+        required: true
+        default: "4.0"
+      export_folder:
+        description: "Export Folder - Repository Path"
+        required: true
+        default: "./my/build/destination"
+      export_name:
+        description: "Export Name"
+        required: true
+        default: "AMSG"
+      release_android:
+        description: "Android Release Build"
+        required: false
+        default: "false"
+      itch_io:
+        description: "Itch.io Build"
+        required: false
+        default: "false"
+
+env:
+  GODOT_VERSION: ${{ github.event.inputs.godot_version }}
+  EXPORT_FOLDER: ${{ github.event.inputs.export_folder }}
+  EXPORT_NAME: ${{ github.event.inputs.export_name }}
+  RELEASE_ANDROID: ${{ github.event.inputs.release_android }}
+  ITCH_IO: ${{ github.event.inputs.itch_io }}
+
+jobs:
+  export_game:
+    runs-on: ubuntu-latest
+    name: Export Game Job
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3.0.2
+      - name: get tag from version
+        id: tag_version
+        run: |
+          echo "TAG_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      - name: install wine
+        id: wine_install
+        run: |
+          sudo apt install wine64
+          echo "WINE_PATH=$(which wine64)" >> $GITHUB_OUTPUT
+      - name: export game
+        id: export
+        uses: firebelley/godot-export@master
+        with:
+          godot_executable_download_url: https://downloads.tuxfamily.org/godotengine/4.0/rc6/Godot_v4.0-rc6_linux.x86_64.zip
+          godot_export_templates_download_url: https://downloads.tuxfamily.org/godotengine/4.0/rc6/Godot_v4.0-rc6_export_templates.tpz
+          relative_project_path: ./ # build the standard project
+          relative_export_path: ${EXPORT_FOLDER} # move export output to this directory relative to git root
+          archive_output: true
+          wine_path: ${{ steps.wine_install.outputs.WINE_PATH }}
+          use_godot_4: true
+      - name: create release
+        uses: ncipollo/release-action@v1.11.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: true
+          tag: v${{ steps.tag_version.outputs.TAG_VERSION }}
+          artifacts: ${{ steps.export.outputs.archive_directory }}/* # Added "/*" at the end is glob pattern match for this action
