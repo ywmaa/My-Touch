@@ -39,7 +39,7 @@ jobs:
   release_app:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.action_type == 'Release'}}
-    name: Export Program Job
+    name: Release Program Job
     steps:
       - name: checkout
         uses: actions/checkout@v3.0.2

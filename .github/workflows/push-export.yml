@@ -6,11 +6,10 @@ on:
 env:
   GODOT_VERSION: 4.0
   EXPORT_NAME: My Touch
-  ITCH_IO: ${{ false }} #set to true if you want to enable automatic itch.io deploy
   RELEASE_ANDROID: ${{ true }} #set to  true if you want to enable automatic android release export
 
 jobs:
-  export_game:
+  export_program:
     runs-on: ubuntu-latest
     name: Export Program Job
     steps:
