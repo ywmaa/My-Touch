@@ -16,10 +16,6 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3.0.2
-      - name: get tag from version
-        id: tag_version
-        run: |
-          echo "TAG_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
       - name: install wine
         id: wine_install
         run: |
@@ -30,9 +26,10 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
+      - name: Build Android
+        run: ./gradlew --no-daemon build
       - name: export game
         id: export
         uses: firebelley/godot-export@master
