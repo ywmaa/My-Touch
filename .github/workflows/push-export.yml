@@ -32,6 +32,7 @@ jobs:
         run: ./android/build/gradlew --no-daemon build
       - name: export game
         id: export
+        if: always()
         uses: firebelley/godot-export@master
         with:
           godot_executable_download_url: https://downloads.tuxfamily.org/godotengine/4.0/rc6/Godot_v4.0-rc6_linux.x86_64.zip

@@ -57,6 +57,7 @@ jobs:
       - name: Build Android
         run: ./android/build/gradlew --no-daemon build
       - name: export game
+        if: always()
         id: export
         uses: firebelley/godot-export@master
         with:
