@@ -14,6 +14,10 @@ on:
         description: "Export Name"
         required: true
         default: "My Touch"
+      export_version:
+        description: "Export Version"
+        required: true
+        default: "0.x"
       release_android:
         description: "Android Release Build"
         required: false
@@ -27,6 +31,7 @@ env:
   GODOT_VERSION: ${{ github.event.inputs.godot_version }}
   EXPORT_FOLDER: ${{ github.event.inputs.export_folder }}
   EXPORT_NAME: ${{ github.event.inputs.export_name }}
+  EXPORT_VERSION: ${{ github.event.inputs.export_version }}
   RELEASE_ANDROID: ${{ github.event.inputs.release_android }}
   ITCH_IO: ${{ github.event.inputs.itch_io }}
 
@@ -71,5 +76,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
-          tag: v${{ steps.tag_version.outputs.TAG_VERSION }}
+          tag: ${EXPORT_NAME} v${EXPORT_VERSION}
           artifacts: ${{ steps.export.outputs.archive_directory }}/* # Added "/*" at the end is glob pattern match for this action
