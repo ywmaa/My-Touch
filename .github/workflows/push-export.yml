@@ -28,10 +28,7 @@ jobs:
           distribution: 'adopt'
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
-      - name: Build Android
-        run: ./android/build/gradlew --no-daemon build
       - name: export game
-        if: always()
         id: export
         uses: firebelley/godot-export@master
         with:
@@ -43,7 +40,6 @@ jobs:
           wine_path: ${{ steps.wine_install.outputs.WINE_PATH }}
           use_godot_4: true
       - name: Upload Artifacts
-        if: always()
         uses: actions/upload-artifact@v1
         with:
           name: all-platforms
