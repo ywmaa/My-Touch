@@ -1,7 +1,0 @@
-[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://c77jyl63aq405"]
-
-[ext_resource type="Texture2D" uid="uid://smcayrpruaar" path="res://theme/icons/icons.svg" id="1_2pupx"]
-
-[resource]
-atlas = ExtResource("1_2pupx")
-region = Rect2(32, 80, 16, 16)
