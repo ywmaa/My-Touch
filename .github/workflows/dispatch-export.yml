@@ -84,7 +84,7 @@ jobs:
       - name: Install rsync 📚
         if: env.RELEASE_GITHUB_PAGES == 'true'
         run: |
-          apt-get update && apt-get install -y rsync
+          sudo apt install rsync -y 
       - name: Unzip web build
         if: env.RELEASE_GITHUB_PAGES == 'true'
         run: |
