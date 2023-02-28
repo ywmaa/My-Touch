@@ -25,97 +25,58 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="TabContainer" type="TabContainer" parent="VBoxContainer"]
-offset_right = 347.0
-offset_bottom = 354.0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="General" type="VBoxContainer" parent="VBoxContainer/TabContainer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 31.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TabContainer/General"]
-offset_right = 347.0
-offset_bottom = 31.0
+layout_mode = 2
 
 [node name="Label" type="Label" parent="VBoxContainer/TabContainer/General/HBoxContainer"]
-offset_top = 2.0
-offset_right = 79.0
-offset_bottom = 28.0
+layout_mode = 2
 text = "Language:"
 
 [node name="Language" type="OptionButton" parent="VBoxContainer/TabContainer/General/HBoxContainer"]
-offset_left = 83.0
-offset_right = 97.0
-offset_bottom = 31.0
+layout_mode = 2
 script = ExtResource("4")
 config_variable = "locale"
 
 [node name="InstallLanguage" type="Button" parent="VBoxContainer/TabContainer/General/HBoxContainer"]
-offset_left = 101.0
-offset_right = 157.0
-offset_bottom = 31.0
+layout_mode = 2
 text = "Install"
 
 [node name="DownloadLanguage" type="Button" parent="VBoxContainer/TabContainer/General/HBoxContainer"]
-offset_left = 161.0
-offset_right = 248.0
-offset_bottom = 31.0
+layout_mode = 2
 text = "Download"
 
 [node name="Space1" type="Control" parent="VBoxContainer/TabContainer/General"]
-layout_mode = 3
-anchors_preset = 0
-offset_top = 35.0
-offset_right = 347.0
-offset_bottom = 35.0
+layout_mode = 2
 
 [node name="ConfirmQuit" parent="VBoxContainer/TabContainer/General" instance=ExtResource("1")]
-offset_top = 39.0
-offset_right = 347.0
-offset_bottom = 70.0
+layout_mode = 2
 config_variable = "confirm_quit"
 
 [node name="ConfirmCloseProject" parent="VBoxContainer/TabContainer/General" instance=ExtResource("1")]
-offset_top = 74.0
-offset_right = 347.0
-offset_bottom = 105.0
+layout_mode = 2
 text = "Confirm when closing a project"
 config_variable = "confirm_close_project"
 
 [node name="Space3" type="Control" parent="VBoxContainer/TabContainer/General"]
-layout_mode = 3
-anchors_preset = 0
-offset_top = 109.0
-offset_right = 347.0
-offset_bottom = 109.0
+layout_mode = 2
 
 [node name="GuiScale" type="HBoxContainer" parent="VBoxContainer/TabContainer/General"]
-offset_top = 113.0
-offset_right = 347.0
-offset_bottom = 144.0
+layout_mode = 2
 
 [node name="Label" type="Label" parent="VBoxContainer/TabContainer/General/GuiScale"]
-offset_top = 2.0
-offset_right = 141.0
-offset_bottom = 28.0
+layout_mode = 2
 text = "UI scale (0 = auto):"
 
 [node name="GuiScale" parent="VBoxContainer/TabContainer/General/GuiScale" instance=ExtResource("3")]
-anchors_preset = 0
-anchor_left = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 145.0
-offset_right = 212.0
-offset_bottom = 31.0
-grow_horizontal = 1
-grow_vertical = 1
+layout_mode = 2
 config_variable = "ui_scale"
 value = 0.0
 max_value = 2.0
@@ -123,74 +84,40 @@ step = 0.01
 float_only = true
 
 [node name="Space2" type="Control" parent="VBoxContainer/TabContainer/General"]
-layout_mode = 3
-anchors_preset = 0
-offset_top = 148.0
-offset_right = 347.0
-offset_bottom = 148.0
+layout_mode = 2
 
 [node name="EnableVSync" parent="VBoxContainer/TabContainer/General" instance=ExtResource("1")]
-offset_top = 152.0
-offset_right = 347.0
-offset_bottom = 183.0
+layout_mode = 2
 text = "Enable VSync"
 config_variable = "vsync"
 
 [node name="FPSLimit" type="HBoxContainer" parent="VBoxContainer/TabContainer/General"]
-offset_top = 187.0
-offset_right = 347.0
-offset_bottom = 218.0
+layout_mode = 2
 
 [node name="Label1" type="Label" parent="VBoxContainer/TabContainer/General/FPSLimit"]
-offset_top = 2.0
-offset_right = 71.0
-offset_bottom = 28.0
+layout_mode = 2
 mouse_filter = 1
 text = "FPS limit:"
 
 [node name="FPSLimit" parent="VBoxContainer/TabContainer/General/FPSLimit" instance=ExtResource("3")]
-anchors_preset = 0
-anchor_left = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 75.0
-offset_right = 142.0
-offset_bottom = 31.0
-grow_horizontal = 1
-grow_vertical = 1
+layout_mode = 2
 text = "145"
 config_variable = "fps_limit"
 value = 145.0
 min_value = 20.0
 max_value = 200.0
 step = 1.0
-float_only = true
 
 [node name="Space" type="Control" parent="VBoxContainer/TabContainer/General/FPSLimit"]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 146.0
-offset_right = 146.0
-offset_bottom = 31.0
+layout_mode = 2
 
 [node name="Label2" type="Label" parent="VBoxContainer/TabContainer/General/FPSLimit"]
-offset_left = 150.0
-offset_top = 2.0
-offset_right = 254.0
-offset_bottom = 28.0
+layout_mode = 2
 mouse_filter = 1
 text = "Idle FPS limit:"
 
 [node name="IdleFPSLimit" parent="VBoxContainer/TabContainer/General/FPSLimit" instance=ExtResource("3")]
-anchors_preset = 0
-anchor_left = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 258.0
-offset_right = 325.0
-offset_bottom = 31.0
-grow_horizontal = 1
-grow_vertical = 1
+layout_mode = 2
 text = "145"
 config_variable = "idle_fps_limit"
 value = 20.0
@@ -200,32 +127,22 @@ step = 1.0
 float_only = true
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
-offset_top = 358.0
-offset_right = 347.0
-offset_bottom = 362.0
+layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
-offset_left = 196.0
-offset_top = 366.0
-offset_right = 347.0
-offset_bottom = 397.0
+layout_mode = 2
 size_flags_horizontal = 8
 
 [node name="Apply" type="Button" parent="VBoxContainer/HBoxContainer"]
-offset_right = 52.0
-offset_bottom = 31.0
+layout_mode = 2
 text = "Apply"
 
 [node name="OK" type="Button" parent="VBoxContainer/HBoxContainer"]
-offset_left = 56.0
-offset_right = 87.0
-offset_bottom = 31.0
+layout_mode = 2
 text = "OK"
 
 [node name="Cancel" type="Button" parent="VBoxContainer/HBoxContainer"]
-offset_left = 91.0
-offset_right = 151.0
-offset_bottom = 31.0
+layout_mode = 2
 text = "Cancel"
 
 [connection signal="about_to_popup" from="." to="." method="_on_Preferences_about_to_show"]

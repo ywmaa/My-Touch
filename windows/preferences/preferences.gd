@@ -10,7 +10,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func edit_preferences(c : ConfigFile) -> void:
 	config = c
-	update_controls(self)
+	update_controls($VBoxContainer/TabContainer/General)
 	popup_centered()
 
 func update_controls(p : Node) -> void:
@@ -26,11 +26,11 @@ func update_config(p : Node) -> void:
 		update_config(c)
 
 func _on_Apply_pressed():
-	update_config(self)
+	update_config($VBoxContainer/TabContainer/General)
 	emit_signal("config_changed")
 
 func _on_OK_pressed():
-	update_config(self)
+	update_config($VBoxContainer/TabContainer/General)
 	emit_signal("config_changed")
 	queue_free()
 
@@ -52,7 +52,7 @@ func _on_InstallLanguage_pressed():
 	add_child(dialog)
 	dialog.rect_min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
-	dialog.mode = FileDialog.MODE_OPEN_FILE
+	dialog.mode = FileDialog.FILE_MODE_OPEN_FILE
 	dialog.add_filter("*.po,*.translation,*.csv;Translation file")
 	var files = await dialog.select_files()
 	if files.size() > 0:

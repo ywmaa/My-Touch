@@ -155,8 +155,11 @@ func on_config_changed() -> void:
 		# If scale is set to 0 (auto), scale everything if the display requires it (crude hiDPI support).
 		# This prevents UI elements from being too small on hiDPI displays.
 		ui_scale = 2 if DisplayServer.screen_get_dpi() >= 192 and DisplayServer.window_get_size().x >= 2048 else 1
-#	get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_DISABLED, SceneTree.STRETCH_ASPECT_IGNORE, Vector2(), ui_scale)
-
+	get_tree().root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
+	get_tree().root.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_IGNORE
+	get_tree().root.content_scale_size = Vector2i()
+	get_tree().root.content_scale_factor = ui_scale
+	
 func create_menu_show_panels(menu : PopupMenu) -> void:
 	menu.clear()
 	var panels = layout.get_panel_list()
@@ -327,7 +330,7 @@ func save_project_as(project : Control = null) -> bool:
 
 func save_all_projects() -> void:
 	for i in range(projects.get_tab_count()):
-		var result = await projects.get_tab(i).save()
+		await projects.get_tab(i).save()
 
 
 

@@ -23,8 +23,10 @@ signal no_more_tabs
 
 func _ready():
 	self.connect("child_entered_tree",added_child)
+	
 
 func added_child(control) -> void:
+	
 	if !(control is TabBar):
 		$Tabs.add_tab(control.name)
 		move_child(control, $Tabs.get_tab_count()-1)
@@ -38,10 +40,10 @@ func close_tab(tab = null) -> void:
 		do_close_tab(tab)
 
 func get_tab_count() -> int:
-	return $Tabs.get_tab_count()
+	return $Tabs.tab_count
 
 func get_tab(i : int) -> Control:
-	return $Tabs.get_child(i) as Control
+	return get_child(i)
 
 func check_save_tabs() -> bool:
 	for i in range($Tabs.get_tab_count()):

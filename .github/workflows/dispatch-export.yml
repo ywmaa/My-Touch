@@ -18,6 +18,10 @@ on:
         description: "Export Version"
         required: true
         default: "0.x"
+      release_github_page:
+        description: "Upload To Github Pages"
+        required: false
+        default: "false"
       release_android:
         description: "Android Release Build"
         required: false
@@ -32,6 +36,7 @@ env:
   ACTION_TYPE: ${{ github.event.inputs.action_type }}
   EXPORT_NAME: ${{ github.event.inputs.export_name }}
   EXPORT_VERSION: ${{ github.event.inputs.export_version }}
+  RELEASE_GITHUB_PAGES: ${{ github.event.inputs.release_github_page }}
   RELEASE_ANDROID: ${{ github.event.inputs.release_android }}
   ITCH_IO: ${{ github.event.inputs.itch_io }}
 
@@ -75,6 +80,22 @@ jobs:
           generateReleaseNotes: true
           tag: v${{env.EXPORT_VERSION}}
           artifacts: ${{ steps.export.outputs.archive_directory }}/* # Added "/*" at the end is glob pattern match for this action
+      # Installing rsync is needed in order to deploy to GitHub Pages. Without it, the build will fail.
+      - name: Install rsync 📚
+        if: env.RELEASE_GITHUB_PAGES == 'true'
+        run: |
+          apt-get update && apt-get install -y rsync
+      - name: Unzip web build
+        if: env.RELEASE_GITHUB_PAGES == 'true'
+        run: |
+          unzip ./my/build/destination/Web.zip -d ./my/build/destination/Web
+      - name: Deploy to GitHub Pages 🚀
+        if: env.RELEASE_GITHUB_PAGES == 'true'
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: master # The branch the action should deploy to.
+          FOLDER: ./my/build/destination/Web # The folder the action should deploy.
 
   action_export_app:
     runs-on: ubuntu-latest

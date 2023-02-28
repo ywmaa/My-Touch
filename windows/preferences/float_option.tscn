@@ -6,4 +6,4 @@
 [node name="FloatOption" instance=ExtResource("1")]
 focus_mode = 2
 script = ExtResource("2")
-config_variable = null
+config_variable = ""
