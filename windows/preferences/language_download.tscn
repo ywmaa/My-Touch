@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://cwfe0atbf1rta"]
+
+[ext_resource type="Script" path="res://windows/preferences/language_download.gd" id="1"]
+
+[node name="LanguageDownload" type="PopupPanel"]
+visible = true
+script = ExtResource("1")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 96.0
+offset_bottom = 96.0
+
+[node name="Languages" type="GridContainer" parent="ScrollContainer"]
+columns = 3
+
+[connection signal="popup_hide" from="." to="." method="queue_free"]

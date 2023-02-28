@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://cliund3ivs7rq"]
+
+[ext_resource type="Script" path="res://widgets/render_counter/render_counter.gd" id="1_ot0hb"]
+
+[node name="RenderCounter" type="HBoxContainer" groups=["render_counter"]]
+offset_right = 158.0
+offset_bottom = 20.0
+script = ExtResource("1_ot0hb")
+
+[node name="FpsCounter" type="Label" parent="."]
+layout_mode = 2
+size_flags_vertical = 1
+
+[node name="GpuRam" type="Label" parent="."]
+layout_mode = 2
+size_flags_vertical = 1
+mouse_filter = 0
+
+[node name="MemUpdateTimer" type="Timer" parent="."]
+autostart = true
+
+[connection signal="gui_input" from="." to="." method="_on_RenderCounter_gui_input"]
+[connection signal="timeout" from="MemUpdateTimer" to="." method="_on_MemUpdateTimer_timeout"]

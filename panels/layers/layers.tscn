@@ -1,0 +1,110 @@
+[gd_scene load_steps=10 format=3 uid="uid://bl3eyxekgo6ue"]
+
+[ext_resource type="Script" path="res://panels/layers/layers.gd" id="1_wunpw"]
+[ext_resource type="Texture2D" uid="uid://smcayrpruaar" path="res://theme/icons/icons.svg" id="3_50kty"]
+[ext_resource type="Script" path="res://panels/layers/layers_tree.gd" id="3_yyid0"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7cyw1"]
+atlas = ExtResource("3_50kty")
+region = Rect2(32, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qjm6f"]
+atlas = ExtResource("3_50kty")
+region = Rect2(48, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d5ube"]
+atlas = ExtResource("3_50kty")
+region = Rect2(64, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q251o"]
+atlas = ExtResource("3_50kty")
+region = Rect2(80, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_76em3"]
+atlas = ExtResource("3_50kty")
+region = Rect2(96, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3imb6"]
+atlas = ExtResource("3_50kty")
+region = Rect2(0, 0, 16, 16)
+
+[node name="Layers" type="VBoxContainer"]
+focus_mode = 2
+mouse_filter = 0
+script = ExtResource("1_wunpw")
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+mouse_filter = 0
+
+[node name="Add" type="TextureButton" parent="Buttons"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 3
+texture_normal = SubResource("AtlasTexture_7cyw1")
+stretch_mode = 3
+
+[node name="Duplicate" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+texture_normal = SubResource("AtlasTexture_qjm6f")
+stretch_mode = 3
+
+[node name="Remove" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+texture_normal = SubResource("AtlasTexture_d5ube")
+stretch_mode = 3
+
+[node name="Up" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+texture_normal = SubResource("AtlasTexture_q251o")
+stretch_mode = 3
+
+[node name="Down" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+texture_normal = SubResource("AtlasTexture_76em3")
+stretch_mode = 3
+
+[node name="Config" type="TextureButton" parent="Buttons"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+texture_normal = SubResource("AtlasTexture_3imb6")
+stretch_mode = 3
+
+[node name="Tree" type="Tree" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_default_cursor_shape = 13
+columns = 2
+allow_reselect = true
+hide_folding = true
+hide_root = true
+drop_mode_flags = 3
+select_mode = 2
+script = ExtResource("3_yyid0")
+
+[connection signal="pressed" from="Buttons/Add" to="." method="_on_Add_pressed"]
+[connection signal="pressed" from="Buttons/Duplicate" to="." method="_on_Duplicate_pressed"]
+[connection signal="pressed" from="Buttons/Remove" to="." method="_on_Remove_pressed"]
+[connection signal="pressed" from="Buttons/Up" to="." method="_on_Up_pressed"]
+[connection signal="pressed" from="Buttons/Down" to="." method="_on_Down_pressed"]
+[connection signal="pressed" from="Buttons/Config" to="." method="_on_Config_pressed"]
+[connection signal="button_clicked" from="Tree" to="Tree" method="_on_tree_button_clicked"]
+[connection signal="cell_selected" from="Tree" to="Tree" method="_on_Tree_cell_selected"]
+[connection signal="gui_input" from="Tree" to="Tree" method="_on_Tree_gui_input"]
+[connection signal="item_edited" from="Tree" to="Tree" method="_on_Tree_item_edited"]
+[connection signal="multi_selected" from="Tree" to="Tree" method="_on_tree_multi_selected"]
+[connection signal="nothing_selected" from="Tree" to="Tree" method="_on_tree_nothing_selected"]

@@ -1,0 +1,257 @@
+[gd_scene load_steps=5 format=3 uid="uid://csvl0avx42734"]
+
+[ext_resource type="Script" path="res://panels/layer_inspector/LayerInspector.gd" id="1_q8631"]
+[ext_resource type="Script" path="res://panels/graph/settingsfloat.gd" id="2_8a3vq"]
+[ext_resource type="PackedScene" uid="uid://4qtbqefr5vwd" path="res://windows/preferences/float_option.tscn" id="2_8ltnj"]
+[ext_resource type="Texture2D" uid="uid://do418dfoolgwc" path="res://graphics/misc/lock_aspect_2.png" id="4_b6yy1"]
+
+[node name="ScrollContainer" type="ScrollContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Layer Inspector" type="VBoxContainer" parent="."]
+clip_contents = true
+layout_mode = 2
+script = ExtResource("1_q8631")
+
+[node name="Space3" type="Control" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Layer Inspector"]
+layout_mode = 2
+text = "Position :"
+
+[node name="CanvasRes" type="HBoxContainer" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="Label1" type="Label" parent="Layer Inspector/CanvasRes"]
+layout_mode = 2
+mouse_filter = 1
+text = "X : "
+
+[node name="PositionX" parent="Layer Inspector/CanvasRes" instance=ExtResource("2_8ltnj")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1280"
+script = ExtResource("2_8a3vq")
+value = 1280.0
+min_value = 2.0
+max_value = 10000.0
+step = 1.0
+
+[node name="Space" type="Control" parent="Layer Inspector/CanvasRes"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Layer Inspector/CanvasRes"]
+layout_mode = 2
+mouse_filter = 1
+text = "Y : "
+
+[node name="PositionY" parent="Layer Inspector/CanvasRes" instance=ExtResource("2_8ltnj")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "720"
+script = ExtResource("2_8a3vq")
+value = 720.0
+min_value = 2.0
+max_value = 10000.0
+step = 1.0
+
+[node name="Space6" type="Control" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="Layer Inspector"]
+layout_mode = 2
+text = "Rotation :"
+
+[node name="CanvasRes4" type="HBoxContainer" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="Label1" type="Label" parent="Layer Inspector/CanvasRes4"]
+layout_mode = 2
+mouse_filter = 1
+text = "Degrees : "
+
+[node name="Rotation" parent="Layer Inspector/CanvasRes4" instance=ExtResource("2_8ltnj")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "90"
+script = ExtResource("2_8a3vq")
+value = 0.0
+min_value = -360.0
+max_value = 360.0
+step = 1.0
+
+[node name="Space4" type="Control" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Layer Inspector"]
+layout_mode = 2
+text = "Size :"
+
+[node name="CanvasRes2" type="HBoxContainer" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="Label1" type="Label" parent="Layer Inspector/CanvasRes2"]
+layout_mode = 2
+mouse_filter = 1
+text = "X : "
+
+[node name="SizeX" parent="Layer Inspector/CanvasRes2" instance=ExtResource("2_8ltnj")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1280"
+script = ExtResource("2_8a3vq")
+value = 1280.0
+min_value = 2.0
+max_value = 10000.0
+step = 1.0
+
+[node name="Space" type="Control" parent="Layer Inspector/CanvasRes2"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Layer Inspector/CanvasRes2"]
+layout_mode = 2
+mouse_filter = 1
+text = "Y : "
+
+[node name="SizeY" parent="Layer Inspector/CanvasRes2" instance=ExtResource("2_8ltnj")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "720"
+script = ExtResource("2_8a3vq")
+value = 720.0
+min_value = 2.0
+max_value = 10000.0
+step = 1.0
+
+[node name="Space5" type="Control" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="Layer Inspector"]
+layout_mode = 2
+text = "Scale :"
+
+[node name="CanvasRes3" type="HBoxContainer" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="Label1" type="Label" parent="Layer Inspector/CanvasRes3"]
+layout_mode = 2
+mouse_filter = 1
+text = "X : "
+
+[node name="ScaleX" parent="Layer Inspector/CanvasRes3" instance=ExtResource("2_8ltnj")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1280"
+script = ExtResource("2_8a3vq")
+value = 1280.0
+min_value = 2.0
+max_value = 10000.0
+step = 1.0
+
+[node name="Space" type="Control" parent="Layer Inspector/CanvasRes3"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Layer Inspector/CanvasRes3"]
+layout_mode = 2
+mouse_filter = 1
+text = "Y : "
+
+[node name="ScaleY" parent="Layer Inspector/CanvasRes3" instance=ExtResource("2_8ltnj")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "720"
+script = ExtResource("2_8a3vq")
+value = 720.0
+min_value = 2.0
+max_value = 10000.0
+step = 1.0
+
+[node name="Space2" type="Control" parent="Layer Inspector/CanvasRes3"]
+layout_mode = 2
+
+[node name="Aspect" type="Button" parent="Layer Inspector/CanvasRes3"]
+layout_mode = 2
+icon = ExtResource("4_b6yy1")
+
+[node name="Space" type="Control" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="Object Visibility" type="Label" parent="Layer Inspector"]
+layout_mode = 2
+text = "Object Visibility :"
+
+[node name="CanvasRes5" type="HBoxContainer" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="Label1" type="Label" parent="Layer Inspector/CanvasRes5"]
+layout_mode = 2
+mouse_filter = 1
+text = "Opacity : "
+
+[node name="Opacity" parent="Layer Inspector/CanvasRes5" instance=ExtResource("2_8ltnj")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1"
+script = ExtResource("2_8a3vq")
+value = 1.0
+step = 0.1
+float_only = true
+
+[node name="Space7" type="Control" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="Object Specific" type="Label" parent="Layer Inspector"]
+layout_mode = 2
+text = "Object Specific Properties :"
+
+[node name="TextProperties" type="PanelContainer" parent="Layer Inspector"]
+layout_mode = 2
+
+[node name="CanvasRes5" type="HBoxContainer" parent="Layer Inspector/TextProperties"]
+layout_mode = 2
+
+[node name="Label1" type="Label" parent="Layer Inspector/TextProperties/CanvasRes5"]
+layout_mode = 2
+mouse_filter = 1
+text = "Text : "
+
+[node name="LabelText" type="LineEdit" parent="Layer Inspector/TextProperties/CanvasRes5"]
+unique_name_in_owner = true
+layout_mode = 2
+expand_to_text_length = true
+
+[connection signal="focus_entered" from="Layer Inspector/CanvasRes/PositionX" to="Layer Inspector/CanvasRes/PositionX" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="Layer Inspector/CanvasRes/PositionX" to="Layer Inspector/CanvasRes/PositionX" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="Layer Inspector/CanvasRes/PositionX" to="Layer Inspector/CanvasRes/PositionX" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="Layer Inspector/CanvasRes/PositionY" to="Layer Inspector/CanvasRes/PositionY" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="Layer Inspector/CanvasRes/PositionY" to="Layer Inspector/CanvasRes/PositionY" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="Layer Inspector/CanvasRes/PositionY" to="Layer Inspector/CanvasRes/PositionY" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="Layer Inspector/CanvasRes4/Rotation" to="Layer Inspector/CanvasRes4/Rotation" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="Layer Inspector/CanvasRes4/Rotation" to="Layer Inspector/CanvasRes4/Rotation" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="Layer Inspector/CanvasRes4/Rotation" to="Layer Inspector/CanvasRes4/Rotation" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="Layer Inspector/CanvasRes2/SizeX" to="Layer Inspector/CanvasRes2/SizeX" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="Layer Inspector/CanvasRes2/SizeX" to="Layer Inspector/CanvasRes2/SizeX" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="Layer Inspector/CanvasRes2/SizeX" to="Layer Inspector/CanvasRes2/SizeX" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="Layer Inspector/CanvasRes2/SizeY" to="Layer Inspector/CanvasRes2/SizeY" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="Layer Inspector/CanvasRes2/SizeY" to="Layer Inspector/CanvasRes2/SizeY" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="Layer Inspector/CanvasRes2/SizeY" to="Layer Inspector/CanvasRes2/SizeY" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="Layer Inspector/CanvasRes3/ScaleX" to="Layer Inspector/CanvasRes3/ScaleX" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="Layer Inspector/CanvasRes3/ScaleX" to="Layer Inspector/CanvasRes3/ScaleX" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="Layer Inspector/CanvasRes3/ScaleX" to="Layer Inspector/CanvasRes3/ScaleX" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="Layer Inspector/CanvasRes3/ScaleY" to="Layer Inspector/CanvasRes3/ScaleY" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="Layer Inspector/CanvasRes3/ScaleY" to="Layer Inspector/CanvasRes3/ScaleY" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="Layer Inspector/CanvasRes3/ScaleY" to="Layer Inspector/CanvasRes3/ScaleY" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="Layer Inspector/CanvasRes5/Opacity" to="Layer Inspector/CanvasRes5/Opacity" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="Layer Inspector/CanvasRes5/Opacity" to="Layer Inspector/CanvasRes5/Opacity" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="Layer Inspector/CanvasRes5/Opacity" to="Layer Inspector/CanvasRes5/Opacity" method="_on_LineEdit_text_changed" flags=18]

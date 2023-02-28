@@ -1,0 +1,14 @@
+[remap]
+
+importer="image"
+type="Image"
+uid="uid://dqqwlm8fmdaxn"
+path="res://.godot/imported/pixel_image.png-784ca73536c36ae6f978ae15c7ce40f2.image"
+
+[deps]
+
+source_file="res://graphics/pixel_image.png"
+dest_files=["res://.godot/imported/pixel_image.png-784ca73536c36ae6f978ae15c7ce40f2.image"]
+
+[params]
+

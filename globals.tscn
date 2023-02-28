@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://b0igiux6glv0u"]
+
+[ext_resource type="Script" path="res://globals.gd" id="1_vp3v5"]
+[ext_resource type="Script" path="res://globals_menu_manager.gd" id="2_bbou4"]
+
+[node name="Globals" type="Node"]
+script = ExtResource("1_vp3v5")
+
+[node name="MenuManager" type="Node" parent="."]
+script = ExtResource("2_bbou4")
