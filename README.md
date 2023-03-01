@@ -9,7 +9,7 @@
 
 # Notes for contributers
 
-The current version of Godot for the project is : Godot 4 RC 6
+The current version of Godot for the project is : Godot 4.0 Stable
 
 the project has a lot of files from material maker/pixelorama and it is not organised, yet.
 
@@ -56,6 +56,6 @@ the project has a lot of files from material maker/pixelorama and it is not orga
 
 ### mac os
 
-### html5 (still thinking)
+### html5
 
 ### android
