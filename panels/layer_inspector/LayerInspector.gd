@@ -22,6 +22,12 @@ func _ready():
 	
 	%LabelText.connect("text_changed",value_changed.bind(%LabelText))
 	
+	
+	%SelectShape.connect("item_selected",value_changed.bind(%SelectShape))
+	%SelectShader.connect("item_selected",value_changed.bind(%SelectShader))
+	%SelectColor.connect("color_changed",value_changed.bind(%SelectColor))
+	
+	
 	$CanvasRes3/Aspect.connect("pressed",func():
 		if current_layer.lock_aspect == true:
 			current_layer.lock_aspect = false
@@ -85,6 +91,18 @@ func _process(_delta):
 		$TextProperties.visible = false
 
 
+	if current_layer is selection_layer:
+		$SelectionProperties.visible = true
+		if current_layer.main_object.color != %SelectColor.color:
+			%SelectColor.color = current_layer.main_object.color
+		if current_layer.main_object.shape != %SelectShape.selected:
+			%SelectShape.selected = current_layer.main_object.shape
+		if current_layer.main_object.shader != %SelectShader.selected:
+			%SelectShader.selected = current_layer.main_object.shader
+	else:
+		$SelectionProperties.visible = false
+
+
 func value_changed(value,property):
 	
 	if current_layer.main_object.position.x != %PositionX.value and property == %PositionX:
@@ -106,3 +124,13 @@ func value_changed(value,property):
 	if property == %LabelText:
 		if current_layer.main_object.text != %LabelText.text:
 			current_layer.main_object.text = %LabelText.text
+
+	if property == %SelectColor:
+		if current_layer.main_object.color != %SelectColor.color:
+			current_layer.main_object.color = %SelectColor.color
+	if property == %SelectShape:
+		if current_layer.main_object.shape != %SelectShape.selected:
+			current_layer.main_object.shape = %SelectShape.selected
+	if property == %SelectShader:
+		if current_layer.main_object.shader != %SelectShader.selected:
+			current_layer.main_object.shader = %SelectShader.selected

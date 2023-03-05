@@ -117,7 +117,9 @@ func add_context_menu_item_pressed(id: int):
 			new_text_layer.init(layers.get_unused_layer_name(),default_icon,base_layer.layer_type.text,canvas)
 			layers.add_layer(new_text_layer)
 		4: #selection layer
-			pass
+			var new_selection_layer = selection_layer.new()
+			new_selection_layer.init(layers.get_unused_layer_name(),default_icon,base_layer.layer_type.mask,canvas)
+			layers.add_layer(new_selection_layer)
 		
 
 func _input(event):
@@ -201,26 +203,30 @@ func _input(event):
 								undo_redo.add_do_property(selected.main_object, "rotation", selected.main_object.rotation)
 							ToolManager.tool_mode.scale_image:
 								undo_redo.add_do_property(selected.main_object, "scale", selected.main_object.scale)
+				if ToolManager.current_mode == ToolManager.tool_mode.none:
+					layers.selected_layers = []
+				else:
 					undo_redo.commit_action()
 					get_node("/root/Editor/MessageLabel").show_step(undo_redo.get_history_count())
 				ToolManager.current_mode = ToolManager.tool_mode.none
 				ToolManager.direction = ToolManager.coordinates.xy
 				dragging = true
 				drag_start = get_local_mouse_position()
-				layers.selected_layers = []
+				
 				
 		elif dragging:
 			dragging = false
 			queue_redraw()
 			var drag_end = get_local_mouse_position()
-			var canvas_position : Vector2 = size/2-camera.offset*(camera.zoom)
+			
 			for layer in layers.layers:
 				var mouse_rect : Rect2
 				if drag_end - drag_start < Vector2.ZERO:
 					mouse_rect = Rect2(drag_end,abs(drag_end-drag_start))
 				else:
 					mouse_rect = Rect2(drag_start,abs(drag_end-drag_start))
-				if mouse_rect.intersects(Rect2(canvas_position+(layer.main_object.position*camera.zoom)-(layer.main_object.get_rect().size*layer.main_object.scale*camera.zoom/2),layer.main_object.get_rect().size*layer.main_object.scale*camera.zoom),true):
+					
+				if mouse_rect.intersects(layer.get_rect(),true):
 					layers.select_layer(layer)
 		
 

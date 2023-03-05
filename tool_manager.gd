@@ -35,12 +35,31 @@ var current_mode : tool_mode = tool_mode.none:
 		last_mode = current_mode
 		current_mode = new_mode
 
+var draw_x_axis : bool = false
+var draw_y_axis : bool = false
+var axis_position : Vector2 = Vector2.ZERO
 
 func _input(_event):
 	if Input.is_key_pressed(KEY_SHIFT):
 		effect_scaling_factor = 0.25
 	else:
 		effect_scaling_factor = 1.0
+func _process(delta):
+	if current_mode == ToolManager.tool_mode.move_image || current_mode == ToolManager.tool_mode.scale_image:
+		axis_position = mt_globals.main_window.get_current_graph_edit().layers.selected_layers[0].main_object.position
+		match direction:
+			coordinates.xy:
+				draw_x_axis = true
+				draw_y_axis = true
+			coordinates.x:
+				draw_x_axis = true
+				draw_y_axis = false
+			coordinates.y:
+				draw_x_axis = false
+				draw_y_axis = true
+	else:
+		draw_x_axis = false
+		draw_y_axis = false
 
 func tool_none():
 	ToolManager.current_tool = ToolManager.tool_mode.none
@@ -96,7 +115,6 @@ func scale(object,amount:Vector2,lock_aspect:bool):
 
 
 func move(object,amount:Vector2):
-	
 	match direction:
 		coordinates.xy:
 			object.position += amount *effect_scaling_factor

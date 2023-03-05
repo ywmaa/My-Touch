@@ -1,7 +1,7 @@
 extends Resource
 class_name base_layer
 
-enum layer_type {brush, image, project, mask, text, light, postprocess, primitive_shape}
+enum layer_type {brush, image, project, mask, text, light, postprocess}
 
 var main_object : Node = null
 @export var image : Sprite2D = Sprite2D.new()
@@ -79,3 +79,10 @@ func get_copy(_name: String = "copy"):
 	var layer = base_layer.new()
 	layer.init(_name,image_path,type,parent)
 	return layer
+
+
+func get_rect() -> Rect2:
+	var graph : MTGraph = mt_globals.main_window.get_current_graph_edit()
+	var camera = graph.camera
+	var canvas_position : Vector2 = graph.size/2-camera.offset*(camera.zoom)
+	return Rect2(canvas_position+(main_object.position*camera.zoom)-(main_object.get_rect().size*main_object.scale*camera.zoom/2),main_object.get_rect().size*main_object.scale*camera.zoom)

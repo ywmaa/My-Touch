@@ -44,3 +44,10 @@ func get_copy(_name: String = "copy"):
 	var layer = text_layer.new()
 	layer.init(_name,image_path,type,parent)
 	return layer
+
+func get_rect() -> Rect2:
+	var text_size = Vector2(text_label.get_content_width(),text_label.get_content_height())
+	var graph : MTGraph = mt_globals.main_window.get_current_graph_edit()
+	var camera = graph.camera
+	var canvas_position : Vector2 = graph.size/2-camera.offset*(camera.zoom)
+	return Rect2(canvas_position+(main_object.position*camera.zoom),text_size*main_object.scale*camera.zoom)

@@ -25,6 +25,11 @@ func _draw() -> void:
 	for i in project.layers.layers:
 		i.draw_image()
 		
+	# Draw Axis
+	if ToolManager.draw_x_axis:
+		draw_line(ToolManager.axis_position * Vector2(-100000,1), ToolManager.axis_position * Vector2(100000,1), Color(1,0,0), -1, true)
+	if ToolManager.draw_y_axis:
+		draw_line(ToolManager.axis_position * Vector2(1,-100000), ToolManager.axis_position * Vector2(1,100000), Color(0,1,0), -1, true)
 		
 	draw_set_transform(position, rotation, scale)
 
