@@ -6,35 +6,41 @@
 
 [node name="Project Settings" type="VBoxContainer"]
 clip_contents = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 focus_mode = 2
 mouse_filter = 0
 script = ExtResource("1_arwtu")
 
-[node name="TabContainer" type="TabContainer" parent="."]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Graph Settings" type="VBoxContainer" parent="TabContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Space3" type="Control" parent="TabContainer/Graph Settings"]
+[node name="Graph Settings" type="VBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Space3" type="Control" parent="ScrollContainer/Graph Settings"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="TabContainer/Graph Settings"]
+[node name="Label" type="Label" parent="ScrollContainer/Graph Settings"]
 layout_mode = 2
 text = "Canvas Resolution :"
 
-[node name="CanvasRes" type="HBoxContainer" parent="TabContainer/Graph Settings"]
+[node name="CanvasRes" type="HBoxContainer" parent="ScrollContainer/Graph Settings"]
 layout_mode = 2
 
-[node name="Label1" type="Label" parent="TabContainer/Graph Settings/CanvasRes"]
+[node name="Label1" type="Label" parent="ScrollContainer/Graph Settings/CanvasRes"]
 layout_mode = 2
 mouse_filter = 1
 text = "X : "
 
-[node name="CanvasX" parent="TabContainer/Graph Settings/CanvasRes" instance=ExtResource("2_8ltnj")]
+[node name="CanvasX" parent="ScrollContainer/Graph Settings/CanvasRes" instance=ExtResource("2_8ltnj")]
 unique_name_in_owner = true
 layout_mode = 2
 text = "1280"
@@ -48,15 +54,15 @@ min_value = 2.0
 max_value = 10000.0
 step = 1.0
 
-[node name="Space" type="Control" parent="TabContainer/Graph Settings/CanvasRes"]
+[node name="Space" type="Control" parent="ScrollContainer/Graph Settings/CanvasRes"]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="TabContainer/Graph Settings/CanvasRes"]
+[node name="Label2" type="Label" parent="ScrollContainer/Graph Settings/CanvasRes"]
 layout_mode = 2
 mouse_filter = 1
 text = "Y : "
 
-[node name="CanvasY" parent="TabContainer/Graph Settings/CanvasRes" instance=ExtResource("2_8ltnj")]
+[node name="CanvasY" parent="ScrollContainer/Graph Settings/CanvasRes" instance=ExtResource("2_8ltnj")]
 unique_name_in_owner = true
 layout_mode = 2
 text = "720"
@@ -70,17 +76,17 @@ min_value = 2.0
 max_value = 10000.0
 step = 1.0
 
-[node name="Space4" type="Control" parent="TabContainer/Graph Settings"]
+[node name="Space4" type="Control" parent="ScrollContainer/Graph Settings"]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="TabContainer/Graph Settings"]
+[node name="Label2" type="Label" parent="ScrollContainer/Graph Settings"]
 layout_mode = 2
 text = "Anti Aliasing :"
 
-[node name="CanvasRes2" type="HBoxContainer" parent="TabContainer/Graph Settings"]
+[node name="CanvasRes2" type="HBoxContainer" parent="ScrollContainer/Graph Settings"]
 layout_mode = 2
 
-[node name="AntiAliasing" type="OptionButton" parent="TabContainer/Graph Settings/CanvasRes2"]
+[node name="AntiAliasing" type="OptionButton" parent="ScrollContainer/Graph Settings/CanvasRes2"]
 unique_name_in_owner = true
 layout_mode = 2
 item_count = 4
@@ -94,30 +100,9 @@ popup/item_2/id = 2
 popup/item_3/text = "8x (Slowest)"
 popup/item_3/id = 3
 
-[node name="HSeparator" type="HSeparator" parent="."]
-visible = false
-layout_mode = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 8
-
-[node name="Apply" type="Button" parent="HBoxContainer"]
-layout_mode = 2
-text = "Apply"
-
-[node name="OK" type="Button" parent="HBoxContainer"]
-layout_mode = 2
-text = "OK"
-
-[node name="Cancel" type="Button" parent="HBoxContainer"]
-layout_mode = 2
-text = "Cancel"
-
-[connection signal="focus_entered" from="TabContainer/Graph Settings/CanvasRes/CanvasX" to="TabContainer/Graph Settings/CanvasRes/CanvasX" method="_on_FloatEdit_focus_entered" flags=18]
-[connection signal="focus_exited" from="TabContainer/Graph Settings/CanvasRes/CanvasX" to="TabContainer/Graph Settings/CanvasRes/CanvasX" method="_on_LineEdit_focus_exited" flags=18]
-[connection signal="text_changed" from="TabContainer/Graph Settings/CanvasRes/CanvasX" to="TabContainer/Graph Settings/CanvasRes/CanvasX" method="_on_LineEdit_text_changed" flags=18]
-[connection signal="focus_entered" from="TabContainer/Graph Settings/CanvasRes/CanvasY" to="TabContainer/Graph Settings/CanvasRes/CanvasY" method="_on_FloatEdit_focus_entered" flags=18]
-[connection signal="focus_exited" from="TabContainer/Graph Settings/CanvasRes/CanvasY" to="TabContainer/Graph Settings/CanvasRes/CanvasY" method="_on_LineEdit_focus_exited" flags=18]
-[connection signal="text_changed" from="TabContainer/Graph Settings/CanvasRes/CanvasY" to="TabContainer/Graph Settings/CanvasRes/CanvasY" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="ScrollContainer/Graph Settings/CanvasRes/CanvasX" to="ScrollContainer/Graph Settings/CanvasRes/CanvasX" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="ScrollContainer/Graph Settings/CanvasRes/CanvasX" to="ScrollContainer/Graph Settings/CanvasRes/CanvasX" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="ScrollContainer/Graph Settings/CanvasRes/CanvasX" to="ScrollContainer/Graph Settings/CanvasRes/CanvasX" method="_on_LineEdit_text_changed" flags=18]
+[connection signal="focus_entered" from="ScrollContainer/Graph Settings/CanvasRes/CanvasY" to="ScrollContainer/Graph Settings/CanvasRes/CanvasY" method="_on_FloatEdit_focus_entered" flags=18]
+[connection signal="focus_exited" from="ScrollContainer/Graph Settings/CanvasRes/CanvasY" to="ScrollContainer/Graph Settings/CanvasRes/CanvasY" method="_on_LineEdit_focus_exited" flags=18]
+[connection signal="text_changed" from="ScrollContainer/Graph Settings/CanvasRes/CanvasY" to="ScrollContainer/Graph Settings/CanvasRes/CanvasY" method="_on_LineEdit_text_changed" flags=18]

@@ -13,7 +13,6 @@ var need_update : bool = false
 
 @onready var layout = $VBoxContainer/Layout
 var library
-var tools
 var brushes
 
 const FPS_LIMIT_MIN = 20
@@ -66,6 +65,7 @@ const MENU = [
 	{ menu="View/-" },
 	{ menu="View/Touch Friendly Mode", command="touch_mode_switch", shortcut="Control+Space" },
 	{ menu="View/Panels", submenu="show_panels" },
+	{ menu="View/New window", command="new_window" },
 	{ menu="View/Fullscreen", command="fullscreen", shortcut="F11"},
 
 	{ menu="Help/User manual", command="show_doc", shortcut="F1" },
@@ -119,7 +119,6 @@ func _ready() -> void:
 
 	
 	layout.load_panels()
-	tools = get_panel("Tool Settings")
 #
 #	# Load recent projects
 	load_recents()
@@ -168,6 +167,7 @@ func create_menu_show_panels(menu : PopupMenu) -> void:
 		menu.set_item_checked(i, layout.is_panel_visible(panels[i]))
 	if !menu.is_connected("id_pressed", _on_ShowPanels_id_pressed):
 		menu.connect("id_pressed", _on_ShowPanels_id_pressed)
+
 
 func _on_ShowPanels_id_pressed(id) -> void:
 	var panel : String = layout.get_panel_list()[id]
@@ -568,7 +568,14 @@ func view_reset_zoom() -> void:
 
 func touch_mode_switch() -> void:
 	$VBoxContainer/Layout.toggle_side_panels()
+
+var window_packed_scene = preload("res://windows/undocked_window/undocked_window.tscn")
+func new_window():
+	get_viewport().gui_embed_subwindows = false
+	var window : Window = window_packed_scene.instantiate()
+	add_child(window)
 	
+
 func fullscreen():
 	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_FULLSCREEN:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
