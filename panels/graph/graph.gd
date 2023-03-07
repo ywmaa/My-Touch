@@ -75,21 +75,12 @@ var previous_mouse_position : Vector2
 var mouse_position_delta : Vector2
 var dragging : bool = false
 var drag_start : Vector2 = Vector2.ZERO
-var select_rect = RectangleShape2D.new()
-var select_draw_rectangle : bool = false
-var select_draw_circle : bool = false
 @export var smooth_mode : bool = false
 
 
 func _draw():
-	if select_draw_circle:
-		draw_circle(drag_start,(get_local_mouse_position()-drag_start).length(),Color(0.5,0.5,0.5))
-	if select_draw_rectangle:
-		draw_rect(Rect2(drag_start,get_local_mouse_position()-drag_start),Color(0.5,0.5,0.5),false)
-
 	if dragging:
-#		draw_polyline() # free select
-		draw_rect(Rect2(drag_start,get_local_mouse_position()-drag_start),Color(0.5,0.5,0.5),false)
+		draw_rect(Rect2(drag_start,get_local_mouse_position()-drag_start),Color(0.75,0.75,0.75),false)
 
 var context_menu : PopupMenu = PopupMenu.new()
 
@@ -121,7 +112,7 @@ func add_context_menu_item_pressed(id: int):
 			new_selection_layer.init(layers.get_unused_layer_name(),default_icon,base_layer.layer_type.mask,canvas)
 			layers.add_layer(new_selection_layer)
 		
-
+var mouse_rect : Rect2
 func _input(event):
 	if !visible or has_focus == false:
 		return
@@ -220,12 +211,13 @@ func _input(event):
 			var drag_end = get_local_mouse_position()
 			
 			for layer in layers.layers:
-				var mouse_rect : Rect2
-				if drag_end - drag_start < Vector2.ZERO:
+				
+				if drag_end.y - drag_start.y < 0.0:
 					mouse_rect = Rect2(drag_end,abs(drag_end-drag_start))
 				else:
 					mouse_rect = Rect2(drag_start,abs(drag_end-drag_start))
-					
+				mouse_rect.position.x = drag_start.x if drag_start.x < drag_end.x else drag_end.x
+				
 				if mouse_rect.intersects(layer.get_rect(),true):
 					layers.select_layer(layer)
 		
