@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://ch0j87kh07p73"]
 
 [ext_resource type="Texture2D" uid="uid://btagbsdvxesyh" path="res://graphics/tools/tool_background.png" id="1_1mply"]
-[ext_resource type="Texture2D" uid="uid://d20fb6au0vw8d" path="res://graphics/tools/rectselect.png" id="2_hxiv5"]
+[ext_resource type="Texture2D" uid="uid://snk0kn8v44dk" path="res://graphics/tools/select.png" id="2_a526j"]
 
 [node name="ToolButton" type="Button"]
 custom_minimum_size = Vector2(24, 24)
@@ -29,4 +29,5 @@ offset_right = -1.0
 offset_bottom = -1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_hxiv5")
+texture = ExtResource("2_a526j")
+expand_mode = 1
