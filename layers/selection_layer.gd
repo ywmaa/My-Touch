@@ -1,6 +1,32 @@
 extends base_layer
 class_name selection_layer
+var color : Color:
+	set(v):
+		image.color = v
+	get:
+		return image.color
 
+var shape : shape_generator.shape_type:
+	set(v):
+		image.shape = v
+	get:
+		return image.shape
+
+var shader : shape_generator.shader_type:
+	set(v):
+		image.shader = v
+	get:
+		return image.shader
+
+func get_layer_inspector_properties() -> Array:
+	var PropertiesView : Array = super.get_layer_inspector_properties()
+	PropertiesView[0].append("Shape Properties")
+	var PropertiesToShow : Dictionary
+	PropertiesToShow["color"] = "Shape Properties"
+	PropertiesToShow["shape,square,circle,polygon"] = "Shape Properties"
+	PropertiesToShow["shader,fill,border,image,mask,custom"] = "Shape Properties"
+	PropertiesView[1].merge(PropertiesToShow)
+	return PropertiesView
 
 func init(_name: String,_path: String,p_layer_type : layer_type,_parent : Node):
 	name = _name
@@ -18,6 +44,8 @@ func clear_image():
 
 func draw_image():
 	super.draw_image()
+#	if extents.dragged_anchor.is_empty():
+#		extents.size = main_object.get_rect().size*10
 
 func refresh():
 	super.refresh()

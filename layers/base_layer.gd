@@ -5,6 +5,64 @@ enum layer_type {brush, image, project, mask, text, light, postprocess}
 
 var main_object : Node = null
 @export var image : Sprite2D = Sprite2D.new()
+var position : Vector2:
+	set(v):
+		set_position(v)
+	get:
+		return get_position()
+func set_position(v):
+	if !image:
+		return
+	image.position = v
+	emit_changed()
+func get_position():
+	if !image:
+		return Vector2.ZERO
+	return image.position
+
+var rotation : float:
+	set(v):
+		set_rotation(v)
+	get:
+		return get_rotation()
+func set_rotation(v):
+	if !image:
+		return
+	image.rotation_degrees = v
+	emit_changed()
+func get_rotation():
+	if !image:
+		return 0.0
+	return image.rotation_degrees
+
+
+var size : Vector2:
+	set(v):
+		set_size(v)
+	get:
+		return get_size()
+func set_size(v):
+	return
+func get_size():
+	if !image:
+		return Vector2.ZERO
+	return image.get_rect().size
+
+var scale : Vector2:
+	set(v):
+		set_scale(v)
+	get:
+		return get_scale()
+func set_scale(v):
+	if !image:
+		return
+	image.scale = v
+	emit_changed()
+func get_scale():
+	if !image:
+		return Vector2.ZERO
+	return image.scale
+
 
 @export var icon : Sprite2D = Sprite2D.new()
 
@@ -14,10 +72,13 @@ var main_object : Node = null
 @export var hidden : bool :
 	set(new_hidden):
 		hidden = new_hidden
+		emit_changed()
 		if main_object:
 			main_object.visible = !hidden
 		
 @export_global_dir var image_path : String
+
+#@export var extents : RectExtents = RectExtents.new()
 
 var parent : Node
 
@@ -43,6 +104,26 @@ var parent : Node
 
 var texture = ImageTexture.new()
 
+func get_layer_inspector_properties() -> Array:
+	var PropertiesView : Array = []
+	var PropertiesGroups : Array[String] = []
+	PropertiesGroups.append("Transform")
+	PropertiesGroups.append("Visibility")
+	var PropertiesToShow : Dictionary = {}
+	PropertiesToShow["position"] = "Transform"
+	PropertiesToShow["rotation"] = "Transform"
+	PropertiesToShow["size"] = "Transform"
+	PropertiesToShow["scale"] = "Transform"
+	PropertiesToShow["lock_aspect"] = "Transform"
+	
+	PropertiesToShow["opacity"] = "Visibility"
+	PropertiesToShow["affect_children_opacity"] = "Visibility"
+	
+	
+	PropertiesView.append(PropertiesGroups)
+	PropertiesView.append(PropertiesToShow)
+	return PropertiesView
+
 func init(_name: String,path: String,p_layer_type : layer_type,_parent : Node):
 	name = _name
 	image_path = path
@@ -58,6 +139,7 @@ func clear_image():
 		image.get_parent().remove_child(image)
 	if parent != null:
 		parent = null
+#	extents.my_layer = null
 func draw_image():
 	if image == null:
 		return
@@ -65,6 +147,10 @@ func draw_image():
 		if image.get_parent() != null:
 			image.get_parent().remove_child(image)
 		parent.add_child(image)
+#		image.add_child(extents)
+#	if extents.dragged_anchor.is_empty():
+#		extents.size = main_object.get_rect().size
+#	extents.my_layer = self
 func refresh():
 	if !texture.get_image():
 		var load_image = Image.load_from_file(image_path)
@@ -80,7 +166,7 @@ func get_copy(_name: String = "copy"):
 	layer.init(_name,image_path,type,parent)
 	return layer
 
-
+#Used to get rect relative to the real viewport
 func get_rect() -> Rect2:
 	var graph : MTGraph = mt_globals.main_window.get_current_graph_edit()
 	var camera = graph.camera

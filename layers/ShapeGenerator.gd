@@ -11,12 +11,17 @@ enum shape_type {square,circle,polygon}
 		color = new_color
 		if material:
 			material.set_shader_parameter("Color",color)
+@export var polygon : Polygon2D = Polygon2D.new()
 var fill_shader = preload("res://layers/shaders/Fill.tres")
 
 
 func _ready():
 	material = ShaderMaterial.new()
 	material.set_shader_parameter("Color",color)
+	polygon.polygon.append(Vector2(0,0))
+	polygon.polygon.append(Vector2(50,100))
+	polygon.polygon.append(Vector2(300,400))
+	polygon.polygon.append(Vector2(900,500))
 	
 	
 func _process(_delta):
@@ -42,4 +47,11 @@ func _draw():
 			if shader == shader_type.border:
 				draw_arc(Vector2(0.0,0.0),10,0,PI*2,1000,color)
 		shape_type.polygon:
-			pass
+			if !polygon:
+				return
+			if polygon.get_parent() == null:
+				add_child(polygon)
+			
+
+
+

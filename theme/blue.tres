@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=117 format=3]
+[gd_resource type="Theme" load_steps=117 format=3 uid="uid://bpsx7mpam16mw"]
 
 [ext_resource type="Texture2D" uid="uid://c57fnu52dwq3d" path="res://theme/dark/textedit_space.png" id="1"]
 [ext_resource type="Texture2D" uid="uid://d18q2mvbtmehv" path="res://theme/dark/textedit_tab.png" id="2"]
@@ -55,7 +55,7 @@
 [ext_resource type="Texture2D" uid="uid://d3xc08jfpnkjk" path="res://theme/dark/tabcontainer_increment_highlight.png" id="53"]
 [ext_resource type="Texture2D" uid="uid://dvxoikj4ddpua" path="res://theme/dark/tabs_increment.png" id="54"]
 [ext_resource type="FontFile" path="res://theme/font.tres" id="55"]
-[ext_resource type="FontFile" path="res://theme/fonts/DroidSansFallback.ttf" id="56"]
+[ext_resource type="FontFile" uid="uid://5bgis1cvfybw" path="res://theme/fonts/DroidSansFallback.ttf" id="56"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
 content_margin_left = 6.0
@@ -276,7 +276,7 @@ border_width_bottom = 1
 border_color = Color(0.1, 0.115, 0.155, 1)
 
 [sub_resource type="FontFile" id="120"]
-fallbacks = [ExtResource("56")]
+fallbacks = Array[Font]([ExtResource("56")])
 face_index = null
 embolden = null
 transform = null

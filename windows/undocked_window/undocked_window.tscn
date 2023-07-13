@@ -15,8 +15,8 @@ func _ready():
 disable_3d = true
 physics_object_picking = true
 physics_object_picking_sort = true
-initial_position = 2
 title = "Undocked Window Manager"
+initial_position = 2
 size = Vector2i(500, 500)
 always_on_top = true
 script = SubResource("GDScript_xitsg")

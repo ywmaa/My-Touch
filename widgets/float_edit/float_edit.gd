@@ -1,5 +1,5 @@
 extends LineEdit
-
+class_name FloatEdit
 @export var value : float = 0.5 :
 	set(v):
 		if v is float:

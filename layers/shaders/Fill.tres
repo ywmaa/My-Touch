@@ -6,6 +6,8 @@ default_value_enabled = true
 
 [resource]
 code = "shader_type canvas_item;
+render_mode blend_mix;
+
 uniform vec4 Color : source_color = vec4(1.000000, 1.000000, 1.000000, 1.000000);
 
 

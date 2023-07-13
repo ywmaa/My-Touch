@@ -136,11 +136,11 @@ func _input(event):
 					for selected in layers.selected_layers:
 						match ToolManager.current_mode:
 							ToolManager.tool_mode.move_image:
-								undo_redo.add_do_property(selected.main_object, "position", selected.main_object.position)
+								undo_redo.add_do_property(selected, "position", selected.position)
 							ToolManager.tool_mode.rotate_image:
-								undo_redo.add_do_property(selected.main_object, "rotation", selected.main_object.rotation)
+								undo_redo.add_do_property(selected, "rotation", selected.rotation)
 							ToolManager.tool_mode.scale_image:
-								undo_redo.add_do_property(selected.main_object, "scale", selected.main_object.scale)
+								undo_redo.add_do_property(selected, "scale", selected.scale)
 					undo_redo.commit_action()
 					for selected in layers.selected_layers:
 						undo_redo.undo()
@@ -155,7 +155,7 @@ func _input(event):
 				if ToolManager.current_mode == ToolManager.tool_mode.move_image:
 					if layers.selected_layers:
 						for selected in layers.selected_layers:
-							undo_redo.add_do_property(selected.main_object, "position", selected.main_object.position)
+							undo_redo.add_do_property(selected, "position", selected.position)
 						get_node("/root/Editor/MessageLabel").show_step(undo_redo.get_history_count())
 						undo_redo.commit_action()
 					ToolManager.current_mode = ToolManager.tool_mode.none
@@ -166,7 +166,7 @@ func _input(event):
 				if ToolManager.current_mode == ToolManager.tool_mode.rotate_image:
 					if layers.selected_layers:
 						for selected in layers.selected_layers:
-							undo_redo.add_do_property(selected.main_object, "rotation", selected.main_object.rotation)
+							undo_redo.add_do_property(selected, "rotation", selected.rotation)
 						undo_redo.commit_action()
 						get_node("/root/Editor/MessageLabel").show_step(undo_redo.get_history_count())
 					ToolManager.current_mode = ToolManager.tool_mode.none
@@ -177,7 +177,7 @@ func _input(event):
 				if ToolManager.current_mode == ToolManager.tool_mode.scale_image:
 					if layers.selected_layers:
 						for selected in layers.selected_layers:
-							undo_redo.add_do_property(selected.main_object, "scale", selected.main_object.scale)
+							undo_redo.add_do_property(selected, "scale", selected.scale)
 						undo_redo.commit_action()
 						get_node("/root/Editor/MessageLabel").show_step(undo_redo.get_history_count())
 					ToolManager.current_mode = ToolManager.tool_mode.none
@@ -189,11 +189,11 @@ func _input(event):
 					for selected in layers.selected_layers:
 						match ToolManager.current_mode:
 							ToolManager.tool_mode.move_image:
-								undo_redo.add_do_property(selected.main_object, "position", selected.main_object.position)
+								undo_redo.add_do_property(selected, "position", selected.position)
 							ToolManager.tool_mode.rotate_image:
-								undo_redo.add_do_property(selected.main_object, "rotation", selected.main_object.rotation)
+								undo_redo.add_do_property(selected, "rotation", selected.rotation)
 							ToolManager.tool_mode.scale_image:
-								undo_redo.add_do_property(selected.main_object, "scale", selected.main_object.scale)
+								undo_redo.add_do_property(selected, "scale", selected.scale)
 				if ToolManager.current_mode == ToolManager.tool_mode.none:
 					layers.selected_layers = []
 				else:
@@ -236,19 +236,19 @@ func _process(delta):
 	if ToolManager.current_mode == ToolManager.tool_mode.move_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
-				ToolManager.move(selected.main_object,mouse_position_delta)
+				ToolManager.move(selected,mouse_position_delta)
 	if ToolManager.current_mode == ToolManager.tool_mode.rotate_image:
 		if layers.selected_layers:
 			var canvas_position : Vector2 = size/2-camera.offset*(camera.zoom)
 			
 			
 			for selected in layers.selected_layers:
-				var object_pos = canvas_position+(selected.main_object.position*camera.zoom)-(selected.main_object.get_rect().size*selected.main_object.scale*camera.zoom/4)
-				ToolManager.rotate(selected.main_object,object_pos.angle_to_point(get_local_mouse_position()) - object_pos.angle_to_point(previous_mouse_position))
+				var object_pos = canvas_position+(selected.position*camera.zoom)-(selected.get_rect().size*selected.scale*camera.zoom/4)
+				ToolManager.rotate(selected,object_pos.angle_to_point(get_local_mouse_position()) - object_pos.angle_to_point(previous_mouse_position))
 	if ToolManager.current_mode == ToolManager.tool_mode.scale_image:
 		if layers.selected_layers:
 			for selected in layers.selected_layers:
-				ToolManager.scale(selected.main_object,mouse_position_delta * delta,selected.lock_aspect) 
+				ToolManager.scale(selected,mouse_position_delta * delta,selected.lock_aspect) 
 
 	previous_mouse_position = get_local_mouse_position()
 
@@ -359,21 +359,21 @@ func tool_shortcut(index): # handle tools list
 		if layers.selected_layers:
 			undo_redo.create_action("Move Layers")
 			for selected in layers.selected_layers:
-				undo_redo.add_undo_property(selected.main_object,"position",selected.main_object.position)
+				undo_redo.add_undo_property(selected,"position",selected.position)
 			send_changed_signal()
 			ToolManager.current_mode = ToolManager.tool_mode.move_image
 	if index == ToolManager.tool_mode.rotate_image:
 		if layers.selected_layers:
 			undo_redo.create_action("Rotate Layers")
 			for selected in layers.selected_layers:
-				undo_redo.add_undo_property(selected.main_object,"rotation",selected.main_object.rotation)
+				undo_redo.add_undo_property(selected,"rotation",selected.rotation)
 			send_changed_signal()
 			ToolManager.current_mode = ToolManager.tool_mode.rotate_image
 	if index == ToolManager.tool_mode.scale_image:
 		if layers.selected_layers:
 			undo_redo.create_action("Scale Layers")
 			for selected in layers.selected_layers:
-				undo_redo.add_undo_property(selected.main_object,"scale",selected.main_object.scale)
+				undo_redo.add_undo_property(selected,"scale",selected.scale)
 			send_changed_signal()
 			ToolManager.current_mode = ToolManager.tool_mode.scale_image
 func new_project() -> void:
