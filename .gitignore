@@ -8,4 +8,5 @@ export.cfg
 # Imported translations (automatically generated from CSV files)
 *.translation
 
-AI/ImageGeneration/weights/model.ckpt
+*.mt.tres
+*.mt.res
