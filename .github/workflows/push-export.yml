@@ -4,7 +4,7 @@ on:
     branches:
       - master
 env:
-  GODOT_VERSION: 4.0
+  GODOT_VERSION: 4.1.1
   EXPORT_NAME: My Touch
   RELEASE_ANDROID: ${{ true }} #set to  true if you want to enable automatic android release export
 
@@ -33,8 +33,8 @@ jobs:
         id: export
         uses: firebelley/godot-export@master
         with:
-          godot_executable_download_url: https://downloads.tuxfamily.org/godotengine/4.0/Godot_v4.0-stable_linux.x86_64.zip
-          godot_export_templates_download_url: https://downloads.tuxfamily.org/godotengine/4.0/Godot_v4.0-stable_export_templates.tpz
+          godot_executable_download_url: https://downloads.tuxfamily.org/godotengine/${{ env.GODOT_VERSION }}/Godot_v${{ env.GODOT_VERSION }}-stable_linux.x86_64.zip
+          godot_export_templates_download_url: https://downloads.tuxfamily.org/godotengine/${{ env.GODOT_VERSION }}/Godot_v${{ env.GODOT_VERSION }}-stable_export_templates.tpz
           relative_project_path: ./ # build the standard project
           relative_export_path: ./build # move export output to this directory relative to git root
           archive_output: true
