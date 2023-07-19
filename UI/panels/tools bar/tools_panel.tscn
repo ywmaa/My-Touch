@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://bm0lg64mbtyim"]
+
+[ext_resource type="Script" path="res://UI/panels/tools bar/tools_panel.gd" id="1_xme5t"]
+
+[node name="Tools" type="ScrollContainer"]
+custom_minimum_size = Vector2(36, 36)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1250.0
+offset_bottom = -230.0
+grow_horizontal = 2
+grow_vertical = 2
+follow_focus = true
+script = ExtResource("1_xme5t")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ToolButtons" type="HFlowContainer" parent="PanelContainer"]
+layout_mode = 2
+size_flags_vertical = 3

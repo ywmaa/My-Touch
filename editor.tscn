@@ -1,12 +1,12 @@
 [gd_scene load_steps=11 format=3 uid="uid://8w67718v7rk"]
 
-[ext_resource type="Theme" uid="uid://dl7dg81sapu26" path="res://theme/dark.tres" id="1_gmhfm"]
 [ext_resource type="Script" path="res://editor.gd" id="1_ix08l"]
+[ext_resource type="Theme" uid="uid://dl7dg81sapu26" path="res://UI/theme/dark.tres" id="1_qcjp6"]
 [ext_resource type="Script" path="res://Layout.gd" id="2_o50ww"]
-[ext_resource type="PackedScene" uid="uid://cliund3ivs7rq" path="res://widgets/render_counter/render_counter.tscn" id="3_dljtu"]
+[ext_resource type="PackedScene" uid="uid://cliund3ivs7rq" path="res://UI/widgets/render_counter/render_counter.tscn" id="3_dljtu"]
 [ext_resource type="Script" path="res://tabs.gd" id="4_ejxk4"]
-[ext_resource type="PackedScene" uid="uid://bm0lg64mbtyim" path="res://panels/tools bar/tools_panel.tscn" id="4_t1qqc"]
-[ext_resource type="PackedScene" uid="uid://di4qw4bosuns4" path="res://windows/windows_manager/WindowsManager.tscn" id="7_8bflp"]
+[ext_resource type="PackedScene" uid="uid://bm0lg64mbtyim" path="res://UI/panels/tools bar/tools_panel.tscn" id="4_t1qqc"]
+[ext_resource type="PackedScene" uid="uid://di4qw4bosuns4" path="res://UI/windows/windows_manager/WindowsManager.tscn" id="7_8bflp"]
 
 [sub_resource type="GDScript" id="6"]
 script/source = "extends Label
@@ -61,7 +61,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_gmhfm")
+theme = ExtResource("1_qcjp6")
 script = ExtResource("1_ix08l")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]

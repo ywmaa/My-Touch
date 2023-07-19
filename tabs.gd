@@ -9,8 +9,9 @@ var current_tab = -1 :
 			node = get_child(current_tab)
 			if !(node is TabBar):
 				node.visible = false
-				node.layers.unload_layers()
-				node.layers.selected_layers.clear()
+				node.project.layers.selected_layers.clear()
+				node.project.layers.unload_layers()
+				
 		current_tab = t
 		node = get_child(current_tab)
 		node.visible = true
@@ -54,10 +55,10 @@ func check_save_tabs() -> bool:
 
 func check_save_tab(tab) -> bool:
 	var tab_control = get_child(tab)
-	if tab_control.need_save and mt_globals.get_config("confirm_close_project"):
-		var dialog = preload("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
-		var save_path = tab_control.save_path
-		if save_path == null:
+	if tab_control.project.need_save and mt_globals.get_config("confirm_close_project"):
+		var dialog = preload("res://UI/windows/accept_dialog/accept_dialog.tscn").instantiate()
+		var save_path = tab_control.project.save_path
+		if save_path == "":
 			save_path = "[unnamed]"
 		else:
 			save_path = save_path.get_file()

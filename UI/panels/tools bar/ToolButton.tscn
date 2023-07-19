@@ -1,0 +1,33 @@
+[gd_scene load_steps=3 format=3 uid="uid://ch0j87kh07p73"]
+
+[ext_resource type="Texture2D" uid="uid://btagbsdvxesyh" path="res://UI/graphics/tools/tool_background.png" id="1_e3peg"]
+[ext_resource type="Texture2D" uid="uid://snk0kn8v44dk" path="res://UI/graphics/tools/select.png" id="2_1ou6d"]
+
+[node name="ToolButton" type="Button"]
+custom_minimum_size = Vector2(24, 24)
+offset_right = 8.0
+offset_bottom = 8.0
+mouse_default_cursor_shape = 2
+
+[node name="Background" type="NinePatchRect" parent="."]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_e3peg")
+
+[node name="Icon" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = -1.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_1ou6d")
+expand_mode = 1

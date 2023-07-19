@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://bhh3s3lu1c547"]
+
+[sub_resource type="GDScript" id="GDScript_55rgs"]
+script/source = "extends PanelContainer
+
+func set_layer(l) -> void:
+	$VBoxContainer/LayerName.text = l.name
+	var thumbnail_scene = preload(\"res://UI/panels/layers/layer_tooltip_thumbnail.tscn\")
+	var t = thumbnail_scene.instantiate()
+	t.init(l)
+	$VBoxContainer/Thumbnails.add_child(t)
+"
+
+[node name="LayerTooltip" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource("GDScript_55rgs")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="LayerName" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Layer name"
+
+[node name="Thumbnails" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2

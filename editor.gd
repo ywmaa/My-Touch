@@ -78,9 +78,9 @@ const MENU = [
 
 func _input(event: InputEvent) -> void:
 	left_cursor.position = get_global_mouse_position() + Vector2(-32, 32)
-	for tool in ToolManager.TOOLS:
-		if tool.shortcut == event.as_text():
-			ToolManager.assign_tool(tool.tool,ToolManager.TOOLS.find(tool))
+	for tool in ToolsManager.TOOLS:
+		if tool.tool_button_shortcut == event.as_text():
+			ToolsManager.assign_tool(tool.tool_name,ToolsManager.TOOLS.find(tool))
 
 
 func _ready() -> void:
@@ -208,13 +208,13 @@ func new_project() -> void:
 	graph_edit.update_tab_title()
 
 func new_graph_panel():
-	var graph_edit = load("res://panels/graph/graph.tscn").instantiate()
+	var graph_edit = load("res://UI/panels/graph/graph.tscn").instantiate()
 	projects.add_child(graph_edit)
 	projects.current_tab = graph_edit.get_index()
 	return graph_edit
 
 func load_project() -> void:
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -257,7 +257,7 @@ func do_load_mt(filename : String) -> bool:
 			projects.get_child(tab).name_used = false
 			projects.get_child(tab).update_tab_title()
 		if projects.get_node("Tabs").get_tab_title(tab) == name_without_path:
-			if projects.get_child(tab).save_path == filename:
+			if projects.get_child(tab).project.save_path == filename:
 				projects.set_current_tab(tab)
 				return true
 			else:
@@ -350,7 +350,7 @@ func _on_export_id_pressed(id) -> void:
 			export_jpeg_image()
 func export_png_image():
 	# Prompt for a target PNG file
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -369,7 +369,7 @@ func export_png_image():
 	
 func export_jpeg_image():
 	# Prompt for a target PNG file
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -392,8 +392,8 @@ func refresh():
 func open_file_location():
 	var project = get_current_graph_edit()
 	if project != null:
-		if project.save_path != null:
-			var path = project.save_path
+		if project.project.save_path != "":
+			var path = project.project.save_path
 			var path_array = path.split("/")
 			path_array.remove_at(path_array.size()-1)
 			path = ""
@@ -408,7 +408,7 @@ func quit() -> void:
 	if quitting:
 		return
 	quitting = true
-	var dialog = preload("res://windows/accept_dialog/accept_dialog.tscn").instantiate()
+	var dialog = preload("res://UI/windows/accept_dialog/accept_dialog.tscn").instantiate()
 	dialog.dialog_text = "Quit My Touch?"
 	dialog.add_cancel_button("Cancel")
 	add_child(dialog)
@@ -497,7 +497,7 @@ func edit_select_invert() -> void:
 	if graph_edit != null:
 		graph_edit.select_invert()
 func edit_load_selection() -> void:
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -518,7 +518,7 @@ func edit_save_selection():
 		return await project.save_selection()
 
 func edit_load_project_as_image() -> void:
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -534,7 +534,7 @@ func edit_load_project_as_image() -> void:
 			graph_edit.load_project_layer(files)
 
 func set_app_theme(theme_name : String) -> void:
-	theme = load("res://theme/"+theme_name+".tres")
+	theme = load("res://UI/theme/"+theme_name+".tres")
 
 func _on_SetTheme_id_pressed(id) -> void:
 	var theme_name : String = THEMES[id].to_lower()
@@ -549,7 +549,7 @@ func create_menu_set_theme(menu) -> void:
 		menu.connect("id_pressed", _on_SetTheme_id_pressed)
 
 func edit_preferences() -> void:
-	var dialog = load("res://windows/preferences/preferences.tscn").instantiate()
+	var dialog = load("res://UI/windows/preferences/preferences.tscn").instantiate()
 	add_child(dialog)
 	dialog.connect("config_changed", on_config_changed)
 	dialog.edit_preferences(mt_globals.config)
@@ -569,7 +569,7 @@ func view_reset_zoom() -> void:
 func touch_mode_switch() -> void:
 	$VBoxContainer/Layout.toggle_side_panels()
 
-var window_packed_scene = preload("res://windows/undocked_window/undocked_window.tscn")
+var window_packed_scene = preload("res://UI/windows/undocked_window/undocked_window.tscn")
 func new_window():
 	get_viewport().gui_embed_subwindows = false
 	var window : Window = window_packed_scene.instantiate()
@@ -607,7 +607,7 @@ func bug_report() -> void:
 
 func about() -> void:
 	#replace with preload
-	var about_box = load("res://windows/about/about.tscn").instantiate()
+	var about_box = load("res://UI/windows/about/about.tscn").instantiate()
 	add_child(about_box)
 	about_box.connect("popup_hide", about_box.queue_free)
 	about_box.popup_centered()
@@ -620,7 +620,7 @@ func about() -> void:
 
 #image import
 func import_image() -> void:
-	var dialog = preload("res://windows/file_dialog/file_dialog.tscn").instantiate()
+	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM

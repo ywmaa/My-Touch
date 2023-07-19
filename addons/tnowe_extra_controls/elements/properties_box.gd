@@ -59,7 +59,7 @@ func add_int(key : StringName, value : int = 0, minvalue : int = -2147483648, ma
 ## Adds a [SpinBox]. Retrieve the value with [method get_float] or [method get_int].
 ## If both [code]minvalue[/code] and [code]maxvalue[/code] are specified, also creates an [HSlider].
 func add_float(key : StringName, value : float = 0.0, minvalue : float = -99999900000.0, maxvalue : float = 99999900000.0, step : float = 1.0):
-	var editor : FloatEdit = preload("res://widgets/float_edit/float_edit.tscn").instantiate()
+	var editor : FloatEdit = preload("res://UI/widgets/float_edit/float_edit.tscn").instantiate()
 	var is_slider = minvalue > -2147483648 && maxvalue < 2147483648
 	editor.value = value
 	editor.step = step

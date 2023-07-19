@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3 uid="uid://c1iy7mngb5v7t"]
+
+[ext_resource type="PackedScene" uid="uid://di4qw4bosuns4" path="res://UI/windows/windows_manager/WindowsManager.tscn" id="1_mf5vx"]
+
+[sub_resource type="GDScript" id="GDScript_xitsg"]
+script/source = "extends Window
+
+
+func _ready():
+	self.connect(\"close_requested\",func(): queue_free())
+
+"
+
+[node name="Window" type="Window"]
+disable_3d = true
+physics_object_picking = true
+physics_object_picking_sort = true
+title = "Undocked Window Manager"
+initial_position = 2
+size = Vector2i(500, 500)
+always_on_top = true
+script = SubResource("GDScript_xitsg")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control" parent="Panel" instance=ExtResource("1_mf5vx")]
+layout_mode = 1

@@ -1,0 +1,14 @@
+[remap]
+
+importer="image"
+type="Image"
+uid="uid://drwha340d0ubv"
+path="res://.godot/imported/circle_9x9.png-e3ff682282c797f24547d8bd48fa6466.image"
+
+[deps]
+
+source_file="res://UI/graphics/circle_9x9.png"
+dest_files=["res://.godot/imported/circle_9x9.png-e3ff682282c797f24547d8bd48fa6466.image"]
+
+[params]
+

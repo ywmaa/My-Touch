@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://csvl0avx42734"]
+
+[ext_resource type="Script" path="res://UI/panels/layer_inspector/LayerInspector.gd" id="1_ndj82"]
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/properties_box.gd" id="2_ipelq"]
+
+[node name="ScrollContainer" type="ScrollContainer" node_paths=PackedStringArray("properties_box")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ndj82")
+properties_box = NodePath("PropertiesBox")
+
+[node name="PropertiesBox" type="VBoxContainer" parent="."]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("2_ipelq")

@@ -22,8 +22,7 @@ config/actual_release="0.2"
 [autoload]
 
 mt_globals="*res://globals.tscn"
-Layers="*res://layers/layers_data_object.gd"
-ToolManager="*res://tool_manager.gd"
+ToolsManager="*res://src/tools/tools_manager.gd"
 
 [display]
 
@@ -33,7 +32,7 @@ window/actual_release="0.2"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/sprite_painter/plugin.cfg", "res://addons/tnowe_extra_controls/plugin.cfg")
+enabled=PackedStringArray("res://addons/editor_icon_previewer/plugin.cfg", "res://addons/sprite_painter/plugin.cfg", "res://addons/tnowe_extra_controls/plugin.cfg")
 
 [filesystem]
 
@@ -120,6 +119,11 @@ select_all={
 add_context_menu={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":true,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":65,"key_label":0,"unicode":65,"echo":false,"script":null)
+]
+}
+cancel={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194305,"key_label":0,"unicode":0,"echo":false,"script":null)
 ]
 }
 

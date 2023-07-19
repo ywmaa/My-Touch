@@ -9,7 +9,7 @@
 [ext_resource type="Script" path="res://addons/sprite_painter/src/image_transform_menu.gd" id="9_20sxo"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/workspace.gd" id="9_gvnc2"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/image_view/image_view.gd" id="10_etjnr"]
-[ext_resource type="PackedScene" path="res://addons/sprite_painter/src/image_view/resize_rect.tscn" id="11_jhyl6"]
+[ext_resource type="PackedScene" uid="uid://bsuqx8yiwhy5x" path="res://addons/sprite_painter/src/image_view/resize_rect.tscn" id="11_jhyl6"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/image_view/image_selection_view.gd" id="13_81c1e"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/floating/tool_switcher.gd" id="14_ig7f3"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/editing_tools/tool_select.gd" id="15_2n2l5"]
@@ -152,17 +152,17 @@ shadow_color = Color(0.8, 0.8, 0.8, 1)
 shadow_size = 4
 anti_aliasing = false
 
-[sub_resource type="Gradient" id="Gradient_jeov6"]
+[sub_resource type="Gradient" id="Gradient_w4oaf"]
 offsets = PackedFloat32Array(0, 1, 1)
-colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_bmka2"]
-gradient = SubResource("Gradient_jeov6")
+gradient = SubResource("Gradient_w4oaf")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_xuu2x"]
 shader = ExtResource("7_nc3ac")
-shader_parameter/from = Vector2(0.0820313, 0.132813)
-shader_parameter/delta = Vector2(0.0742188, 0.1875)
+shader_parameter/from = Vector2(0.255187, 0.34375)
+shader_parameter/delta = Vector2(0.356846, 0.363281)
 shader_parameter/type = 0
 shader_parameter/gradient = SubResource("GradientTexture1D_bmka2")
 
@@ -180,7 +180,7 @@ shader_parameter/enable_aa = false
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hi61m"]
 shader = ExtResource("22_sfnac")
 shader_parameter/color = null
-shader_parameter/origin = Vector2(104.5, 114.5)
+shader_parameter/origin = Vector2(314.5, 26.5)
 shader_parameter/delta = null
 shader_parameter/width = null
 shader_parameter/enable_aa = false

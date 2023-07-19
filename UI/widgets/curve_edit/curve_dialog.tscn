@@ -1,0 +1,62 @@
+[gd_scene load_steps=4 format=3 uid="uid://cmxy063yusa2s"]
+
+[ext_resource type="PackedScene" uid="uid://chwf84l74yjm5" path="res://UI/widgets/curve_edit/curve_editor.tscn" id="1"]
+[ext_resource type="Script" path="res://UI/widgets/curve_edit/curve_dialog.gd" id="2"]
+[ext_resource type="Script" path="res://UI/widgets/curve_edit/presets_selector.gd" id="3"]
+
+[node name="CurveDialog" type="Window"]
+size = Vector2i(244, 100)
+script = ExtResource("2")
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 236.0
+offset_bottom = 51.0
+
+[node name="EditorContainer" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CurveEditor" parent="VBoxContainer/EditorContainer" instance=ExtResource("1")]
+layout_mode = 2
+size_flags_vertical = 3
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 381.0
+margin_bottom = 349.0
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="PresetsSelector" type="MenuButton" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Presets"
+flat = false
+script = ExtResource("3")
+
+[node name="Invert" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Invert"
+
+[node name="Control" type="Control" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="OK" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "OK"
+
+[node name="Cancel" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Cancel"
