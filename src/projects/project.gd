@@ -18,7 +18,7 @@ var need_save : bool = false:
 		if new != need_save:
 			need_save = new
 			emit_signal("need_save_changed")
-
+var name_used : bool = false
 
 signal canvas_size_changed(prev_canvas_size,new_canvas_size)
 signal save_path_changed
@@ -39,5 +39,5 @@ static func project_exists(path:String) -> bool:
 
 static func load_project(path:String) -> Project:
 	if ResourceLoader.exists(path):
-		return ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE) as Project
+		return ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_REUSE) as Project
 	return null

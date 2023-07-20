@@ -65,8 +65,8 @@ func enable_tool(): # Save History and Enable Tool
 func cancel_tool(): # Redo Actions
 	tool_active = false
 func confirm_tool(): # Confirm Actions
-	ToolsManager.current_project.send_changed_signal()
-	ToolsManager.current_project.get_node("/root/Editor/MessageLabel").show_step(ToolsManager.current_project.project.undo_redo.get_history_count())
+	ProjectsManager.send_changed_signal()
+	ToolsManager.get_node("/root/Editor/MessageLabel").show_step(ToolsManager.current_project.undo_redo.get_history_count())
 	tool_active = false
 func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
 	printerr("Not implemented: draw_preview! (" + get_script().resource_path.get_file() + ")")

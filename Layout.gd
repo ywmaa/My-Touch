@@ -3,14 +3,16 @@ extends HSplitContainer
 const PANEL_POSITIONS = {
 	TopLeft="SplitLeft/Left/Top",
 	BottomLeft="SplitLeft/Left/Bottom",
+	Center="SplitRight/Center",
 	TopRight="SplitRight/Right/Top",
 	BottomRight="SplitRight/Right/Bottom"
 }
 var PANELS = [
 	{ index=0, name="Top Right", position="TopRight" },
 	{ index=1, name="Bottom Right", position="BottomRight" },
-	{ index=2, name="Top Left", position="TopLeft" },
-	{ index=3, name="Bottom Left", position="BottomLeft" },
+	{ index=2, name="Center", position="Center" },
+	{ index=3, name="Top Left", position="TopLeft" },
+	{ index=4, name="Bottom Left", position="BottomLeft" },
 ]
 const HIDE_PANELS = {
 	photo_editing=[],
@@ -28,7 +30,7 @@ func _ready() -> void:
 func toggle_side_panels() -> void:
 	# Toggle side docks' visibility to maximize the space available
 	# for the graph panel. This is useful on smaller displays.
-	$SplitLeft/Left.visible = not $SplitLeft/Left.visible
+	$SplitLeft.visible = not $SplitLeft.visible
 	$SplitRight/Right.visible = not $SplitRight/Right.visible
 
 func load_panels() -> void:

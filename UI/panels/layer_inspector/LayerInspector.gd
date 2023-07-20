@@ -1,6 +1,6 @@
 extends ScrollContainer
 
-var current_graph : MTGraph 
+var current_project : Project 
 var current_layer : base_layer
 
 signal current_layer_changed
@@ -12,23 +12,23 @@ func _ready():
 
 
 func _process(_delta):
-	if !mt_globals.main_window.get_current_graph_edit():
+	if !ProjectsManager.project:
 		visible = false
 		current_layer = null
 		current_layer_changed.emit()
 		return
-	if !current_graph or current_graph != mt_globals.main_window.get_current_graph_edit():
+	if !current_project or current_project != ProjectsManager.project:
 		visible = false
-		current_graph = mt_globals.main_window.get_current_graph_edit()
+		current_project = ProjectsManager.project
 		return
-	if current_graph.project.layers.selected_layers.is_empty():
+	if current_project.layers.selected_layers.is_empty():
 		current_layer = null
 		current_layer_changed.emit()
 		visible = false
 		return
 	
-	if current_layer != current_graph.project.layers.selected_layers.front():
-		current_layer = current_graph.project.layers.selected_layers.front()
+	if current_layer != current_project.layers.selected_layers.front():
+		current_layer = current_project.layers.selected_layers.front()
 		current_layer_changed.emit()
 	if current_layer.main_object == null:
 		return

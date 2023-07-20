@@ -16,10 +16,12 @@ var TOOLS : Array[ToolBase] = [
 	preload("res://src/tools/move_tool.gd").new(),
 	preload("res://src/tools/rotate_tool.gd").new(),
 	preload("res://src/tools/scale_tool.gd").new(),
+	preload("res://src/tools/context_menu_tool.gd").new(),
 ]
 var current_tool : ToolBase
 var shortcut_tool : ToolBase
-var current_project : MTGraph
+var current_project : Project
+var camera : Camera2D
 @export var smooth_mode : bool = false
 var current_mouse_position : Vector2
 var previous_mouse_position : Vector2
@@ -32,7 +34,8 @@ func handle_image_input(event) -> bool:
 	if !current_project:
 		return false
 	
-	if current_project.project.layers.selected_layers.is_empty():
+	
+	if current_project.layers.selected_layers.is_empty():
 		return false
 	
 	event.position = event.global_position
@@ -47,29 +50,31 @@ func handle_image_input(event) -> bool:
 	#		current_tool.selection = selection
 			current_tool.mouse_pressed(
 				event,
-				current_project.project.layers.selected_layers[0],
+				current_project.layers.selected_layers[0],
 				current_color1 if event.button_index == MOUSE_BUTTON_LEFT else current_color2,
 				current_color1 if event.button_index != MOUSE_BUTTON_LEFT else current_color2
 			)
 		if shortcut_tool:
 			shortcut_tool.mouse_pressed(
 				event,
-				current_project.project.layers.selected_layers[0],
+				current_project.layers.selected_layers[0],
 				current_color1 if event.button_index == MOUSE_BUTTON_LEFT else current_color2,
 				current_color1 if event.button_index != MOUSE_BUTTON_LEFT else current_color2
 			)
 		if current_tool:
 			if current_tool.image_hide_mode != 2:
-				for layer in current_project.project.layers.selected_layers:
+				for layer in current_project.layers.selected_layers:
 					layer.main_object.self_modulate.a = 1.0
 		if current_tool:
 			if event.pressed && current_tool.image_hide_mode == 1:
-				for layer in current_project.project.layers.selected_layers:
+				for layer in current_project.layers.selected_layers:
 					layer.main_object.self_modulate.a = 0.0
 
 	return true
 func _process(delta):
-	current_project = mt_globals.main_window.get_current_graph_edit()
+	current_project = ProjectsManager.project
+	if !current_project:
+		return
 	for tool in TOOLS:
 		tool.shortcut_pressed()
 	
@@ -80,10 +85,10 @@ func _input(_event):
 		effect_scaling_factor = 1.0
 
 
-func add_context():
-	mt_globals.main_window.get_current_graph_edit().create_add_context_menu()
-
 func assign_tool(_p_name: String, button: int) -> void:
+	if TOOLS[button].tool_name == "add_layer":
+		TOOLS[button].enable_tool()
+		return
 	current_tool = TOOLS[button]
 	emit_signal("tool_changed",current_tool)
 	update_tool_cursors()

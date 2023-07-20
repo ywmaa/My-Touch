@@ -28,10 +28,9 @@ func get_layer_inspector_properties() -> Array:
 	PropertiesView[1].merge(PropertiesToShow)
 	return PropertiesView
 
-func init(_name: String,_path: String,p_layer_type : layer_type,_parent : Node):
+func init(_name: String,_path: String,p_layer_type : layer_type):
 	name = _name
 	type = p_layer_type
-	parent = _parent
 	refresh()
 
 func _init():
@@ -39,16 +38,9 @@ func _init():
 	affect_children_opacity = true
 	image = shape_generator.new()
 
-func clear_image():
-	super.clear_image()
-
-func draw_image():
-	super.draw_image()
-#	if extents.dragged_anchor.is_empty():
-#		extents.size = main_object.get_rect().size*10
 
 func refresh():
-	super.refresh()
+	main_object = image
 
 func get_rect() -> Rect2:
 	var graph : MTGraph = mt_globals.main_window.get_current_graph_edit()

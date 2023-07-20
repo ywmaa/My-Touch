@@ -9,7 +9,7 @@ var current_tab = null
 var updating : bool = false
 var need_update : bool = false
 
-@onready var projects = $VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects
+#@onready var projects = $VBoxContainer/ProjectTabs
 
 @onready var layout = $VBoxContainer/Layout
 var library
@@ -26,6 +26,7 @@ const THEMES = [ "Dark", "Blue", "Light" ]
 const EXPORT_TYPES = [ "png", "jpeg"]
 
 const MENU = [
+	{ menu="File/New Layer", command="create_add_context_menu", shortcut="Shift+A" },
 	{ menu="File/New Canvas", command="new_project", shortcut="Control+N" },
 	{ menu="File/Load", command="load_project", shortcut="Control+O" },
 	{ menu="File/Load recent", submenu="load_recent", standalone_only=true },
@@ -51,7 +52,7 @@ const MENU = [
 	{ menu="Edit/Duplicate", command="edit_duplicate", shortcut="Control+D" },
 	{ menu="Edit/-" },
 	{ menu="Edit/Select All", command="edit_select_all", shortcut="A" },
-	{ menu="Edit/Select None", command="edit_select_none", shortcut="Shift+A" },
+	{ menu="Edit/Select None", command="edit_select_none", shortcut="Alt+A" },
 	{ menu="Edit/Invert Selection", command="edit_select_invert", shortcut="Control+I" },
 	{ menu="Edit/-" },
 	{ menu="Edit/Load Selection", command="edit_load_selection" },
@@ -84,14 +85,13 @@ func _input(event: InputEvent) -> void:
 
 
 func _ready() -> void:
-	
+	set_physics_process(false)
 	get_tree().set_auto_accept_quit(false)
 	
 	if mt_globals.get_config("locale") == "":
 		mt_globals.set_config("locale", TranslationServer.get_locale())
 
 	on_config_changed()
-	
 	get_screen_position()
 	
 	# Restore the window position/size if values are present in the configuration cache
@@ -131,8 +131,46 @@ func _ready() -> void:
 	do_load_projects(OS.get_cmdline_args())
 	
 	get_viewport().connect("files_dropped", on_files_dropped)
+	
+	add_child(context_menu)
 
+var context_menu : PopupMenu = PopupMenu.new()
 
+func create_add_context_menu(pos: Vector2 = get_global_mouse_position()):
+	context_menu.clear()
+	context_menu.add_item("Import Image")
+	context_menu.add_item("Load Project As Image")
+	context_menu.add_separator()
+	context_menu.add_item("Text Layer")
+	context_menu.add_item("Selection Layer")
+	
+	
+	context_menu.connect("id_pressed",add_context_menu_item_pressed)
+	context_menu.position = pos
+	context_menu.visible = true
+
+func add_context_menu_item_pressed(id: int):
+	match id:
+		0: #import image
+			if !ProjectsManager.project:
+				return
+			import_image()
+		1: #project layer
+			if !ProjectsManager.project:
+				return
+			edit_load_project_as_image()
+		3: #text layer
+			if !ProjectsManager.project:
+				return
+			var new_text_layer = text_layer.new()
+			new_text_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.default_icon,base_layer.layer_type.text)
+			ProjectsManager.project.layers.add_layer(new_text_layer)
+		4: #selection layer
+			if !ProjectsManager.project:
+				return
+			var new_selection_layer = selection_layer.new()
+			new_selection_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.default_icon,base_layer.layer_type.mask)
+			ProjectsManager.project.layers.add_layer(new_selection_layer)
 
 func _enter_tree() -> void:
 	mt_globals.main_window = self
@@ -176,14 +214,12 @@ func _on_ShowPanels_id_pressed(id) -> void:
 func get_panel(panel_name : String) -> Control:
 	return layout.get_panel(panel_name)
 
-func get_current_project():
-	return projects.get_current_tab_control()
 	
-func get_current_graph_edit() -> MTGraph:
-	var graph_edit = projects.get_current_tab_control()
-	if graph_edit != null and graph_edit.has_method("get_graph_edit"):
-		return graph_edit.get_graph_edit()
-	return null
+#func get_current_graph_edit() -> MTGraph:
+#	var graph_edit = projects.get_current_tab_control()
+#	if graph_edit != null and graph_edit.has_method("get_graph_edit"):
+#		return graph_edit.get_graph_edit()
+#	return null
 
 func _notification(what : int) -> void:
 	match what:
@@ -204,14 +240,8 @@ func _notification(what : int) -> void:
 # -----------------------------------------------------------------------
 
 func new_project() -> void:
-	var graph_edit = new_graph_panel()
-	graph_edit.update_tab_title()
+	ProjectsManager.new_project()
 
-func new_graph_panel():
-	var graph_edit = load("res://UI/panels/graph/graph.tscn").instantiate()
-	projects.add_child(graph_edit)
-	projects.current_tab = graph_edit.get_index()
-	return graph_edit
 
 func load_project() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
@@ -252,21 +282,14 @@ func do_load_project(file_name) -> bool:
 func do_load_mt(filename : String) -> bool:
 	var name_used = false
 	var name_without_path = filename.substr(filename.rfind("/")+1)
-	for tab in projects.get_node("Tabs").tab_count:
-		if projects.get_node("Tabs").get_tab_title(tab).contains("/"):
-			projects.get_child(tab).name_used = false
-			projects.get_child(tab).update_tab_title()
-		if projects.get_node("Tabs").get_tab_title(tab) == name_without_path:
-			if projects.get_child(tab).project.save_path == filename:
-				projects.set_current_tab(tab)
-				return true
-			else:
-				projects.get_child(tab).name_used = true
-				projects.get_child(tab).update_tab_title()
-				name_used = true
-	var graph_edit = new_graph_panel()
-	graph_edit.name_used = name_used
-	graph_edit.load_file(filename)
+	for project in ProjectsManager.projects:
+		if project.save_path == filename:
+			ProjectsManager.project = project
+			return true
+		if project.save_path.substr(filename.rfind("/")+1) == name_without_path:
+			project.name_used = true
+			name_used = true
+	ProjectsManager.load_file(filename, name_used)
 	return true
 
 func create_menu_load_recent(menu) -> void:
@@ -314,23 +337,15 @@ func remove_recent(path, save = true) -> void:
 	if save:
 		save_recents()
 
-func save_project(project : Control = null) -> bool:
-	if project == null:
-		project = get_current_project()
-	if project != null:
-		return await project.save()
-	return false
+func save_project() -> bool:
+	return await ProjectsManager.save()
 
-func save_project_as(project : Control = null) -> bool:
-	if project == null:
-		project = get_current_project()
-	if project != null:
-		return await project.save_as()
-	return false
+func save_project_as() -> bool:
+	return await ProjectsManager.save_as()
 
 func save_all_projects() -> void:
-	for i in range(projects.get_tab_count()):
-		await projects.get_tab(i).save()
+	for project in ProjectsManager.projects:
+		project.save_project()
 
 
 
@@ -349,6 +364,8 @@ func _on_export_id_pressed(id) -> void:
 		"jpeg":
 			export_jpeg_image()
 func export_png_image():
+	if !ProjectsManager.project:
+		return
 	# Prompt for a target PNG file
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
@@ -360,14 +377,21 @@ func export_png_image():
 	if files.size() != 1:
 		return
 	# Generate the image
-	var graph_edit : MTGraph = get_current_graph_edit()
+	get_viewport().gui_embed_subwindows = true
+	var window : Window = window_packed_scene.instantiate()
+	add_child(window)
+	var rendering_window : window_manager = window.find_child("Control")
+	rendering_window.change_window(2)
 	var image : Image = Image.new() #create(graph_edit.canvas_size.x,graph_edit.canvas_size.y,true,Image.FORMAT_BPTC_RGBA)
 	# Wait until the frame has finished before getting the texture.
 	await RenderingServer.frame_post_draw
-	image = graph_edit.viewport.get_texture().get_image()
+	image = rendering_window.find_child("SubViewport", true, false).get_texture().get_image()
 	image.save_png(files[0])
+	window.queue_free()
 	
 func export_jpeg_image():
+	if !ProjectsManager.project:
+		return
 	# Prompt for a target PNG file
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
@@ -379,21 +403,23 @@ func export_jpeg_image():
 	if files.size() != 1:
 		return
 	# Generate the image
-	var graph_edit : MTGraph = get_current_graph_edit()
+	get_viewport().gui_embed_subwindows = true
+	var window : Window = window_packed_scene.instantiate()
+	add_child(window)
+	var rendering_window : window_manager = window.find_child("Control")
+	rendering_window.change_window(2)
 	var image : Image = Image.new()
 	# Wait until the frame has finished before getting the texture.
 	await RenderingServer.frame_post_draw
-	image = graph_edit.viewport.get_texture().get_image()
+	image = rendering_window.find_child("SubViewport", true, false).get_texture().get_image()
 	image.save_jpg(files[0])
+	window.queue_free()
 func refresh():
-	var project = get_current_project()
-	if project != null:
-		project.refresh()
+	ProjectsManager.refresh()
 func open_file_location():
-	var project = get_current_graph_edit()
-	if project != null:
-		if project.project.save_path != "":
-			var path = project.project.save_path
+	if ProjectsManager.project != null:
+		if ProjectsManager.project.save_path != "":
+			var path = ProjectsManager.project.save_path
 			var path_array = path.split("/")
 			path_array.remove_at(path_array.size()-1)
 			path = ""
@@ -402,7 +428,7 @@ func open_file_location():
 			
 			OS.shell_open(path)
 func close_project() -> void:
-	projects.close_tab()
+	ProjectsManager.close_project(ProjectsManager.projects.find(ProjectsManager.project))
 
 func quit() -> void:
 	if quitting:
@@ -442,60 +468,36 @@ func dim_window() -> void:
 #                             Edit menu
 # -----------------------------------------------------------------------
 func edit_undo() -> void:
-	var project = get_current_project()
-	if project != null:
-		project.undo()
+	ProjectsManager.undo()
 
 func edit_undo_is_disabled() -> bool:
-	var project = get_current_project()
-	if project != null:
-		return !project.can_undo()
-	return true
+	return !ProjectsManager.can_undo()
 
 func edit_redo() -> void:
-	var project = get_current_project()
-	if project != null:
-		project.redo()
+	ProjectsManager.redo()
 
 func edit_redo_is_disabled() ->  bool:
-	var project = get_current_project()
-	if project != null:
-		return !project.can_redo()
-	return true
+	return !ProjectsManager.can_redo()
 
 func edit_cut() -> void:
-	var graph_edit : MTGraph = get_current_graph_edit()
-	if graph_edit != null:
-		graph_edit.cut()
+	ProjectsManager.cut()
 func edit_copy() -> void:
-	var graph_edit : MTGraph = get_current_graph_edit()
-	if graph_edit != null:
-		graph_edit.copy()
+	ProjectsManager.copy()
 
 func edit_paste() -> void:
-	var graph_edit : MTGraph = get_current_graph_edit()
-	if graph_edit != null:
-		graph_edit.paste()
+	ProjectsManager.paste()
 
 func edit_duplicate() -> void:
-	var graph_edit : MTGraph = get_current_graph_edit()
-	if graph_edit != null:
-		graph_edit.duplicate_selected()
+	ProjectsManager.duplicate_selected()
 
 func edit_select_all() -> void:
-	var graph_edit : MTGraph = get_current_graph_edit()
-	if graph_edit != null:
-		graph_edit.select_all()
+	ProjectsManager.select_all()
 
 func edit_select_none() -> void:
-	var graph_edit : MTGraph = get_current_graph_edit()
-	if graph_edit != null:
-		graph_edit.select_none()
+	ProjectsManager.select_none()
 
 func edit_select_invert() -> void:
-	var graph_edit : MTGraph = get_current_graph_edit()
-	if graph_edit != null:
-		graph_edit.select_invert()
+	ProjectsManager.select_invert()
 func edit_load_selection() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
@@ -508,14 +510,10 @@ func edit_load_selection() -> void:
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
 	if files.size() > 0:
-		var graph_edit : MTGraph = get_current_graph_edit()
-		if graph_edit != null:
-			graph_edit.load_selection(files)
+		ProjectsManager.load_selection(files)
 
 func edit_save_selection():
-	var project = get_current_project()
-	if project != null:
-		return await project.save_selection()
+	return await ProjectsManager.save_selection()
 
 func edit_load_project_as_image() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
@@ -529,9 +527,7 @@ func edit_load_project_as_image() -> void:
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
 	if files.size() > 0:
-		var graph_edit : MTGraph = get_current_graph_edit()
-		if graph_edit != null:
-			graph_edit.load_project_layer(files)
+		ProjectsManager.load_project_layer(files)
 
 func set_app_theme(theme_name : String) -> void:
 	theme = load("res://UI/theme/"+theme_name+".tres")
@@ -559,12 +555,14 @@ func edit_preferences() -> void:
 #                             View menu
 # -----------------------------------------------------------------------
 func view_center() -> void:
-	var graph_edit : MTGraph = get_current_graph_edit()
-	graph_edit.center_view()
+	printerr("Not implemented: view_center! (" + get_script().resource_path.get_file() + ")")
+#	var graph_edit : MTGraph = get_current_graph_edit()
+#	graph_edit.center_view()
 
 func view_reset_zoom() -> void:
-	var graph_edit : MTGraph = get_current_graph_edit()
-	graph_edit.camera.zoom_100()
+	printerr("Not implemented: view_reset_zoom! (" + get_script().resource_path.get_file() + ")")
+#	var graph_edit : MTGraph = get_current_graph_edit()
+#	graph_edit.camera.zoom_100()
 
 func touch_mode_switch() -> void:
 	$VBoxContainer/Layout.toggle_side_panels()
@@ -645,8 +643,7 @@ func on_files_dropped(files : PackedStringArray) -> void:
 			"tres":
 				do_load_project(f)
 			"jpg", "jpeg", "png", "svg", "webp":
-				if get_current_graph_edit():
-					get_current_graph_edit().on_import_image_file(f)
+				ProjectsManager.on_import_image_file(f)
 
 
 

@@ -6,17 +6,6 @@ var selected_layers : Array[base_layer] = []
 var canvas: Node 
 
 signal layers_changed
-func unload_layers():
-	for layer in layers:
-		if layer:
-			layer.clear_image()
-func load_layers():
-	for layer in layers:
-		if layer:
-			layer.parent = canvas
-			layer.refresh()
-			if layer.main_object:
-				layer.main_object.z_index = layers.find(layer)
 func add_layer(new_layer:base_layer):
 	layers.append(new_layer)
 	_on_layers_changed()
@@ -24,7 +13,7 @@ func add_layer(new_layer:base_layer):
 func remove_layer(layer : base_layer) -> void:
 	var layers_array = find_parent_array(layer)
 	layers_array.erase(layer)
-	layer.clear_image()
+#	layer.clear_image()
 	_on_layers_changed()
 
 func select_layer_name(layer_name):

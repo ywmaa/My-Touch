@@ -1,5 +1,6 @@
 extends ColorRect
 
+@export var graph : MTGraph
 func _enter_tree():
 	update_rect()
 
@@ -8,12 +9,11 @@ func _ready() -> void:
 
 
 func update_rect() -> void:
-	if !mt_globals.main_window.get_current_graph_edit():
-		visible = false
+	if !ProjectsManager.project:
 		return
 	visible = true
-	size = mt_globals.main_window.get_current_graph_edit().project.canvas_size
-	fit_rect(mt_globals.main_window.get_current_graph_edit().tiles.get_bounding_rect())
+	size = ProjectsManager.project.canvas_size
+	fit_rect(graph.tiles.get_bounding_rect())
 	material.set_shader_parameter("size", mt_globals.checker_size)
 	material.set_shader_parameter("color1", mt_globals.checker_color_1)
 	material.set_shader_parameter("color2", mt_globals.checker_color_2)

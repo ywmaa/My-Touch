@@ -57,17 +57,17 @@ func get_affected_rect() -> Rect2i:
 func mouse_moved(event : InputEventMouseMotion):
 	if !tool_active:
 		return
-	if !ToolsManager.current_project.project.layers.selected_layers:
+	if !ToolsManager.current_project.layers.selected_layers:
 		tool_active = false
-	for layer in ToolsManager.current_project.project.layers.selected_layers:
+	for layer in ToolsManager.current_project.layers.selected_layers:
 		move(layer,ToolsManager.mouse_position_delta)
 
 func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
 	if !tool_active:
 		return
-	if ToolsManager.current_project.project.layers.selected_layers.is_empty():
+	if ToolsManager.current_project.layers.selected_layers.is_empty():
 		return
-	axis_position = ToolsManager.current_project.project.layers.selected_layers[0].main_object.position
+	axis_position = ToolsManager.current_project.layers.selected_layers[0].main_object.position
 	# Draw Axis
 	if direction == coordinates.x or direction == coordinates.xy:
 		image_view.draw_line(ToolsManager.axis_position * Vector2(-100000,1), ToolsManager.axis_position * Vector2(100000,1), Color(1,0,0), -1, true)
@@ -78,24 +78,24 @@ func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
 	
 
 func enable_tool(): # Save History and Enable Tool
-	ToolsManager.current_project.project.undo_redo.create_action("Move Layers")
-	for selected in ToolsManager.current_project.project.layers.selected_layers:
-		ToolsManager.current_project.project.undo_redo.add_undo_property(selected,"position",selected.position)
+	ToolsManager.current_project.undo_redo.create_action("Move Layers")
+	for selected in ToolsManager.current_project.layers.selected_layers:
+		ToolsManager.current_project.undo_redo.add_undo_property(selected,"position",selected.position)
 	direction = coordinates.xy
 	super.enable_tool()
 func cancel_tool(): # Redo Actions
-	if ToolsManager.current_project.project.layers.selected_layers:
-		for selected in ToolsManager.current_project.project.layers.selected_layers:
-			ToolsManager.current_project.project.undo_redo.add_do_property(selected, "position", selected.position)
-		ToolsManager.current_project.project.undo_redo.commit_action()
-		for selected in ToolsManager.current_project.project.layers.selected_layers:
-			ToolsManager.current_project.project.undo_redo.undo()
+	if ToolsManager.current_project.layers.selected_layers:
+		for selected in ToolsManager.current_project.layers.selected_layers:
+			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
+		ToolsManager.current_project.undo_redo.commit_action()
+		for selected in ToolsManager.current_project.layers.selected_layers:
+			ToolsManager.current_project.undo_redo.undo()
 	super.cancel_tool()
 func confirm_tool(): # Confirm Actions
-	if ToolsManager.current_project.project.layers.selected_layers:
-		for selected in ToolsManager.current_project.project.layers.selected_layers:
-			ToolsManager.current_project.project.undo_redo.add_do_property(selected, "position", selected.position)
-		ToolsManager.current_project.project.undo_redo.commit_action()
+	if ToolsManager.current_project.layers.selected_layers:
+		for selected in ToolsManager.current_project.layers.selected_layers:
+			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
+		ToolsManager.current_project.undo_redo.commit_action()
 	super.confirm_tool()
 
 

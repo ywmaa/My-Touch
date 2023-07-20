@@ -78,7 +78,7 @@ func get_scale():
 
 #@export var extents : RectExtents = RectExtents.new()
 
-var parent : Node
+#var parent : Node
 
 
 @export var opacity : float:
@@ -122,33 +122,19 @@ func get_layer_inspector_properties() -> Array:
 	PropertiesView.append(PropertiesToShow)
 	return PropertiesView
 
-func init(_name: String,path: String,p_layer_type : layer_type,_parent : Node):
+func init(_name: String, path: String, p_layer_type : layer_type):
 	name = _name
 	image_path = path
 	type = p_layer_type
-	parent = _parent
 	main_object = image
 	refresh()
 
-func clear_image():
-	if image == null:
-		return
-	if image.get_parent() != null:
-		image.get_parent().remove_child(image)
-	if parent != null:
-		parent = null
-#	extents.my_layer = null
-func draw_image():
-	if image == null:
-		return
-	if image.get_parent() != parent:
-		if image.get_parent() != null:
-			image.get_parent().remove_child(image)
-		parent.add_child(image)
-#		image.add_child(extents)
-#	if extents.dragged_anchor.is_empty():
-#		extents.size = main_object.get_rect().size
-#	extents.my_layer = self
+
+func get_image() -> Node:
+	refresh()
+	if main_object == null:
+		return null
+	return main_object
 func refresh():
 	if !texture.get_image():
 		var load_image = Image.load_from_file(image_path)
@@ -160,12 +146,12 @@ func refresh():
 
 func get_copy(_name: String = "copy"):
 	var layer = base_layer.new()
-	layer.init(_name,image_path,type,parent)
+	layer.init(_name,image_path,type)
 	return layer
 
 #Used to get rect relative to the real viewport
-func get_rect() -> Rect2:
-	var graph : MTGraph = mt_globals.main_window.get_current_graph_edit()
-	var camera = graph.camera
-	var canvas_position : Vector2 = graph.size/2-camera.offset*(camera.zoom)
-	return Rect2(canvas_position+(main_object.position*camera.zoom)-(main_object.get_rect().size*main_object.scale*camera.zoom/2),main_object.get_rect().size*main_object.scale*camera.zoom)
+#func get_rect() -> Rect2:
+#	var graph : MTGraph = mt_globals.main_window.get_current_graph_edit()
+#	var camera = graph.camera
+#	var canvas_position : Vector2 = graph.size/2-camera.offset*(camera.zoom)
+#	return Rect2(canvas_position+(main_object.position*camera.zoom)-(main_object.get_rect().size*main_object.scale*camera.zoom/2),main_object.get_rect().size*main_object.scale*camera.zoom)

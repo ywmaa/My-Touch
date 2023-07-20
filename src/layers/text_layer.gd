@@ -58,10 +58,9 @@ func get_layer_inspector_properties() -> Array:
 
 # we don't need an image or texture so we will override everything 
 # and reset all images and textures to free memory
-func init(_name: String,_path: String,p_layer_type : layer_type,_parent : Node):
+func init(_name: String,_path: String,p_layer_type : layer_type):
 	name = _name
 	type = p_layer_type
-	parent = _parent
 	main_object = text_label
 	text_label.text = "Hello World" #Default Text
 	text_label.fit_content = true
@@ -77,28 +76,29 @@ func _init():
 	texture = null
 	
 
-func clear_image():
-	if text_label.get_parent() != null:
-		text_label.get_parent().remove_child(text_label)
-	parent = null
-#	extents.my_layer = null
-
-func draw_image():
-	if text_label.get_parent() != parent:
-		if text_label.get_parent() != null:
-			text_label.get_parent().remove_child(image)
-		parent.add_child(text_label)
-#		text_label.add_child(extents)
-#	extents.offset = Vector2(text_label.get_content_width()/2,text_label.get_content_height()/2)
-#	if extents.dragged_anchor.is_empty():
-#		extents.size = Vector2(text_label.get_content_width(),text_label.get_content_height())
-#	extents.my_layer = self
+#func clear_image(parent:Node):
+#	if text_label == null:
+#		return
+#	for instance in instances:
+#		if instance in parent.get_children():
+#			parent.get_child(parent.get_children().find(instance)).queue_free()
+#			instances.remove_at(instances.find(instance))
+#
+#func draw_image(parent:Node):
+#	if text_label == null:
+#		return
+#	for instance in instances:
+#		if instance in parent.get_children():
+#			return
+#	var instance = text_label.duplicate(8)
+#	parent.add_child(instance)
+#	instances.append(instance)
 func refresh():
 	main_object = text_label
 
 func get_copy(_name: String = "copy"):
 	var layer = text_layer.new()
-	layer.init(_name,image_path,type,parent)
+	layer.init(_name,image_path,type)
 	return layer
 
 func get_rect() -> Rect2:

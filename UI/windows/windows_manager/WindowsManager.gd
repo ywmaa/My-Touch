@@ -3,6 +3,7 @@ class_name window_manager
 var windows = [
 	{scene=preload("res://UI/panels/layers/layers.tscn"),name="Layers Panel"},
 	{scene=preload("res://UI/panels/layer_inspector/LayerInspector.tscn"),name="Layer Inspector"},
+	{scene=preload("res://UI/panels/graph/graph.tscn"),name="Graph"},
 	{scene=preload("res://UI/panels/tools bar/tool_settings.tscn"),name="Tool Settings"},
 	{scene=preload("res://UI/panels/graph/GraphSettings.tscn"),name="Project Settings"},
 ]

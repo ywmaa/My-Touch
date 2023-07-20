@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://dg35jlqxnf8qy"]
+[gd_scene load_steps=11 format=3 uid="uid://dg35jlqxnf8qy"]
 
 [ext_resource type="Script" path="res://UI/panels/graph/graph.gd" id="1_a3h74"]
+[ext_resource type="PackedScene" uid="uid://bm0lg64mbtyim" path="res://UI/panels/tools bar/tools_panel.tscn" id="1_ys8hk"]
 [ext_resource type="Shader" path="res://UI/panels/graph/TransparentChecker.gdshader" id="2_ygg0t"]
 [ext_resource type="Script" path="res://UI/panels/graph/TransparentChecker.gd" id="3_khcqe"]
 [ext_resource type="Script" path="res://UI/panels/graph/Canvas.gd" id="4_h0v7x"]
@@ -23,15 +24,24 @@ shader_parameter/follow_movement = false
 shader_parameter/follow_scale = false
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_7uark"]
-viewport_path = NodePath("Viewport/TransparentChecker/SubViewport")
+viewport_path = NodePath("SubViewportContainer/Viewport/TransparentChecker/SubViewport")
 
-[node name="SubViewportContainer" type="SubViewportContainer"]
-material = SubResource("CanvasItemMaterial_nodqv")
+[node name="HBoxContainer" type="HBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Tools" parent="." instance=ExtResource("1_ys8hk")]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+material = SubResource("CanvasItemMaterial_nodqv")
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 tooltip_text = "canvas"
@@ -41,7 +51,7 @@ mouse_default_cursor_shape = 3
 stretch = true
 script = ExtResource("1_a3h74")
 
-[node name="Viewport" type="SubViewport" parent="."]
+[node name="Viewport" type="SubViewport" parent="SubViewportContainer"]
 disable_3d = true
 handle_input_locally = false
 snap_2d_transforms_to_pixel = true
@@ -49,18 +59,19 @@ snap_2d_vertices_to_pixel = true
 physics_object_picking = true
 sdf_oversize = 0
 sdf_scale = 0
-size = Vector2i(1280, 720)
+size = Vector2i(1240, 720)
 render_target_update_mode = 4
 
-[node name="TransparentChecker" type="ColorRect" parent="Viewport"]
+[node name="TransparentChecker" type="ColorRect" parent="SubViewportContainer/Viewport" node_paths=PackedStringArray("graph")]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_bhahg")
 custom_minimum_size = Vector2(40, 40)
 mouse_filter = 2
 script = ExtResource("3_khcqe")
+graph = NodePath("../..")
 metadata/_edit_use_anchors_ = true
 
-[node name="Preview" type="TextureRect" parent="Viewport/TransparentChecker"]
+[node name="Preview" type="TextureRect" parent="SubViewportContainer/Viewport/TransparentChecker"]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -68,7 +79,7 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("ViewportTexture_7uark")
 
-[node name="SubViewport" type="SubViewport" parent="Viewport/TransparentChecker"]
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer/Viewport/TransparentChecker"]
 disable_3d = true
 transparent_bg = true
 snap_2d_transforms_to_pixel = true
@@ -76,21 +87,23 @@ snap_2d_vertices_to_pixel = true
 physics_object_picking = true
 render_target_update_mode = 4
 
-[node name="Canvas" type="Node2D" parent="Viewport/TransparentChecker/SubViewport"]
+[node name="Canvas" type="Node2D" parent="SubViewportContainer/Viewport/TransparentChecker/SubViewport" node_paths=PackedStringArray("graph")]
 script = ExtResource("4_h0v7x")
+graph = NodePath("../../../..")
 
-[node name="PixelGrid" type="Node2D" parent="Viewport/TransparentChecker/SubViewport/Canvas"]
+[node name="PixelGrid" type="Node2D" parent="SubViewportContainer/Viewport/TransparentChecker/SubViewport/Canvas" node_paths=PackedStringArray("graph")]
 script = ExtResource("5_p4b4e")
+graph = NodePath("../../../../..")
 
-[node name="Camera2D" type="Camera2D" parent="Viewport"]
+[node name="Camera2D" type="Camera2D" parent="SubViewportContainer/Viewport"]
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 script = ExtResource("6_ge858")
 
-[node name="TopBar" type="HBoxContainer" parent="."]
+[node name="TopBar" type="HBoxContainer" parent="SubViewportContainer"]
 custom_minimum_size = Vector2(0, 25)
 layout_mode = 2
 
-[node name="Menu" type="HBoxContainer" parent="TopBar"]
+[node name="Menu" type="HBoxContainer" parent="SubViewportContainer/TopBar"]
 layout_mode = 2
 size_flags_horizontal = 3

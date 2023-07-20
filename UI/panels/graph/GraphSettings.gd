@@ -10,29 +10,32 @@ func _ready():
 	self.connect("mouse_entered",_on_mouse_entered)
 	self.connect("mouse_exited",_on_mouse_exited)
 func _process(_delta):
-	if !mt_globals.main_window.get_current_graph_edit():
+	if !ProjectsManager.project:
 		return
-	if !project or project != mt_globals.main_window.get_current_graph_edit():
-		project = mt_globals.main_window.get_current_graph_edit()
-		
+	if !project or project != ProjectsManager.project:
+		project = ProjectsManager.project
+		if project:
+			var canvas_size : Vector2 = project.canvas_size
+			%CanvasX.value = canvas_size.x
+			%CanvasY.value = canvas_size.y
 		return
-	if project.project.canvas_size.x != %CanvasX.value:
-		%CanvasX.value = project.project.canvas_size.x
-	if project.project.canvas_size.y != %CanvasY.value:
-		%CanvasY.value = project.project.canvas_size.y
+	if project.canvas_size.x != %CanvasX.value:
+		%CanvasX.value = project.canvas_size.x
+	if project.canvas_size.y != %CanvasY.value:
+		%CanvasY.value = project.canvas_size.y
 		
-	if project.viewport.msaa_2d != %AntiAliasing.selected:
-		%AntiAliasing.selected = project.viewport.msaa_2d
+	if get_viewport().msaa_2d != %AntiAliasing.selected:
+		%AntiAliasing.selected = get_viewport().msaa_2d
 
 
 func value_changed(value):
-	if project.project.canvas_size.x != %CanvasX.value:
-		project.project.canvas_size.x = %CanvasX.value
-	if project.project.canvas_size.y != %CanvasY.value:
-		project.project.canvas_size.y = %CanvasY.value
+	if project.canvas_size.x != %CanvasX.value:
+		project.canvas_size.x = %CanvasX.value
+	if project.canvas_size.y != %CanvasY.value:
+		project.canvas_size.y = %CanvasY.value
 
-	if project.viewport.msaa_2d != %AntiAliasing.selected:
-		project.viewport.msaa_2d = %AntiAliasing.selected
+	if get_viewport().msaa_2d != %AntiAliasing.selected:
+		get_viewport().msaa_2d = %AntiAliasing.selected
 
 func _on_mouse_entered():
 	has_focus = true

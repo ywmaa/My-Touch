@@ -9,28 +9,28 @@ func _ready():
 	self.connect("mouse_entered",_on_mouse_entered)
 	self.connect("mouse_exited",_on_mouse_exited)
 func _process(_delta):
-	if !mt_globals.main_window.get_current_graph_edit():
+	if !ProjectsManager.project:
 		visible = false
 		return
 	visible = true
-	if mt_globals.main_window.get_current_graph_edit():
-		set_layers(mt_globals.main_window.get_current_graph_edit().project.layers)
+	if ProjectsManager.project:
+		set_layers(ProjectsManager.project.layers)
 	else:
 		set_layers([])
 func set_layers(_layers) -> void:
 	layers = _layers
 	tree.layers = layers
 	if layers:
-		layers.load_layers()
+#		layers.load_layers()
 		tree.update_from_layers(layers.layers, layers.selected_layers)
 	else:
 		tree.update_from_layers([], [])
 
 func _on_Tree_selection_changed(new_selected) -> void:
 	var empty_layers_array : Array[base_layer] = []
-	mt_globals.main_window.get_current_graph_edit().project.layers.selected_layers = empty_layers_array
+	ProjectsManager.project.layers.selected_layers = empty_layers_array
 	for item in new_selected:
-		mt_globals.main_window.get_current_graph_edit().project.layers.select_layer(item.get_meta("layer"))
+		ProjectsManager.project.layers.select_layer(item.get_meta("layer"))
 
 func _on_Add_pressed():
 	pass

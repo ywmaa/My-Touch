@@ -1,15 +1,15 @@
 extends Node2D
 
-
+@export var graph : MTGraph
 func _draw() -> void:
 	if not mt_globals.draw_pixel_grid:
 		return
 
-	var zoom_percentage = 100.0 / mt_globals.main_window.get_current_graph_edit().camera.zoom.x
+	var zoom_percentage = 100.0 / graph.camera.zoom.x
 	if zoom_percentage < mt_globals.pixel_grid_show_at_zoom:
 		return
 
-	var target_rect: Rect2 = mt_globals.main_window.get_current_graph_edit().tiles.get_bounding_rect()
+	var target_rect: Rect2 = graph.tiles.get_bounding_rect()
 	if !target_rect.has_area():
 		return
 
