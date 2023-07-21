@@ -44,6 +44,7 @@ func get_scale():
 var text : String:
 	set(v):
 		text_label.text = v
+		emit_changed()
 	get:
 		return text_label.text
 

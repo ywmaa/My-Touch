@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://8w67718v7rk"]
+[gd_scene load_steps=11 format=3 uid="uid://8w67718v7rk"]
 
 [ext_resource type="Script" path="res://editor.gd" id="1_ix08l"]
 [ext_resource type="Theme" uid="uid://dl7dg81sapu26" path="res://UI/theme/dark.tres" id="1_qcjp6"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cliund3ivs7rq" path="res://UI/widgets/render_counter/render_counter.tscn" id="3_dljtu"]
 [ext_resource type="Script" path="res://tabs.gd" id="4_ejxk4"]
 [ext_resource type="PackedScene" uid="uid://di4qw4bosuns4" path="res://UI/windows/windows_manager/WindowsManager.tscn" id="7_8bflp"]
+[ext_resource type="Script" path="res://UI/panels/graph/Canvas.gd" id="7_kirsr"]
 
 [sub_resource type="GDScript" id="6"]
 script/source = "extends Label
@@ -173,6 +174,17 @@ libraries = {
 
 [node name="LeftCursor" type="Sprite2D" parent="."]
 visible = false
+
+[node name="AppRender" type="SubViewport" parent="."]
+disable_3d = true
+transparent_bg = true
+snap_2d_transforms_to_pixel = true
+snap_2d_vertices_to_pixel = true
+physics_object_picking = true
+render_target_update_mode = 4
+
+[node name="Canvas" type="Node2D" parent="AppRender"]
+script = ExtResource("7_kirsr")
 
 [connection signal="active_tab_rearranged" from="VBoxContainer/ProjectTabs/Tabs" to="VBoxContainer/ProjectTabs" method="move_active_tab_to"]
 [connection signal="tab_changed" from="VBoxContainer/ProjectTabs/Tabs" to="VBoxContainer/ProjectTabs" method="set_current_tab"]

@@ -12,7 +12,6 @@ var project : Project:
 var clipboard_file_path = "user://my_touch_clipboard.res"
 var default_icon = "res://icon.png"
 
-
 func new_project() -> void:
 #	center_view()
 	project = Project.new()

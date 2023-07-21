@@ -20,23 +20,16 @@ func on_canvas_size_changed(value):
 	tiles.reset_mask()
 	transparent_checker.update_rect()
 
-@onready var viewport : SubViewport = $Viewport/TransparentChecker/SubViewport
-@onready var canvas : Node2D = $Viewport/TransparentChecker/SubViewport/Canvas
 @onready var transparent_checker = $Viewport/TransparentChecker
 @onready var camera: Camera2D = get_node("Viewport/Camera2D")
 
 
 
-	# Called when the node enters the scene tree for the first time.
-func _init():
-	tiles = Tiles.new(ProjectsManager.project.canvas_size)
 
 func _ready() -> void:
 	self.connect("mouse_entered",_on_mouse_entered)
 	self.connect("mouse_exited",_on_mouse_exited)
 	OS.low_processor_usage_mode = true
-	
-	center_view()
 
 var dragging : bool = false
 var drag_start : Vector2 = Vector2.ZERO
@@ -87,10 +80,12 @@ func _process(delta):
 		visible = false
 		return
 	visible = true
+	if !tiles:
+		tiles = Tiles.new(Vector2.ONE)
+		center_view()
 	if ProjectsManager.project.canvas_size != tiles.tile_size:
 		on_canvas_size_changed(ProjectsManager.project.canvas_size)
-	if viewport.msaa_2d != get_viewport().msaa_2d:
-		viewport.msaa_2d = get_viewport().msaa_2d
+	if $Viewport.msaa_2d != get_viewport().msaa_2d:
 		$Viewport.msaa_2d = get_viewport().msaa_2d
 	if has_focus == false:
 		return
@@ -111,12 +106,11 @@ func save_config():
 	pass
 
 
-func get_graph_edit():
-	return self
-
 # Center view
 
 func center_view() -> void:
+	if !ProjectsManager.project:
+		return
 	camera.fit_to_frame(ProjectsManager.project.canvas_size)
 
 

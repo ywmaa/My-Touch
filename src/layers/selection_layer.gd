@@ -3,18 +3,21 @@ class_name selection_layer
 var color : Color:
 	set(v):
 		image.color = v
+		emit_changed()
 	get:
 		return image.color
 
 var shape : shape_generator.shape_type:
 	set(v):
 		image.shape = v
+		emit_changed()
 	get:
 		return image.shape
 
 var shader : shape_generator.shader_type:
 	set(v):
 		image.shader = v
+		emit_changed()
 	get:
 		return image.shader
 

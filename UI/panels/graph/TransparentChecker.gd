@@ -13,7 +13,8 @@ func update_rect() -> void:
 		return
 	visible = true
 	size = ProjectsManager.project.canvas_size
-	fit_rect(graph.tiles.get_bounding_rect())
+	if graph.tiles:
+		fit_rect(graph.tiles.get_bounding_rect())
 	material.set_shader_parameter("size", mt_globals.checker_size)
 	material.set_shader_parameter("color1", mt_globals.checker_color_1)
 	material.set_shader_parameter("color2", mt_globals.checker_color_2)

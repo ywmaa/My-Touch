@@ -152,23 +152,23 @@ shadow_color = Color(0.8, 0.8, 0.8, 1)
 shadow_size = 4
 anti_aliasing = false
 
-[sub_resource type="Gradient" id="Gradient_w4oaf"]
+[sub_resource type="Gradient" id="Gradient_q3yr3"]
 offsets = PackedFloat32Array(0, 1, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_bmka2"]
-gradient = SubResource("Gradient_w4oaf")
+gradient = SubResource("Gradient_q3yr3")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_xuu2x"]
 shader = ExtResource("7_nc3ac")
-shader_parameter/from = Vector2(0.255187, 0.34375)
-shader_parameter/delta = Vector2(0.356846, 0.363281)
+shader_parameter/from = Vector2(0.121094, 0.0820312)
+shader_parameter/delta = Vector2(0.666016, 0.736328)
 shader_parameter/type = 0
 shader_parameter/gradient = SubResource("GradientTexture1D_bmka2")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qmoem"]
 shader = ExtResource("20_0y2y6")
-shader_parameter/shape_index = 0
+shader_parameter/shape_index = 4
 shader_parameter/color_border = null
 shader_parameter/color_fill = null
 shader_parameter/origin = null

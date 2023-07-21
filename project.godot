@@ -128,10 +128,6 @@ cancel={
 ]
 }
 
-[physics]
-
-common/physics_ticks_per_second=1
-
 [rendering]
 
 renderer/rendering_method="mobile"
