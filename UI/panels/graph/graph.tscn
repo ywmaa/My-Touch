@@ -23,7 +23,7 @@ shader_parameter/rect_size = Vector2(0, 0)
 shader_parameter/follow_movement = false
 shader_parameter/follow_scale = false
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_7uark"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_gruml"]
 
 [node name="HBoxContainer" type="HBoxContainer"]
 anchors_preset = 15
@@ -58,7 +58,7 @@ snap_2d_vertices_to_pixel = true
 physics_object_picking = true
 sdf_oversize = 0
 sdf_scale = 0
-size = Vector2i(1240, 720)
+size = Vector2i(2, 2)
 render_target_update_mode = 4
 
 [node name="TransparentChecker" type="ColorRect" parent="SubViewportContainer/Viewport" node_paths=PackedStringArray("graph")]
@@ -76,7 +76,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = SubResource("ViewportTexture_7uark")
+texture = SubResource("ViewportTexture_gruml")
 script = ExtResource("5_n10pt")
 
 [node name="PixelGrid" type="Node2D" parent="SubViewportContainer/Viewport" node_paths=PackedStringArray("graph")]

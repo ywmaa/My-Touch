@@ -29,7 +29,7 @@ jobs:
       - name: Setup Android SDK
         if: env.RELEASE_ANDROID == 'true'
         uses: android-actions/setup-android@v2
-      - name: export game
+      - name: export app
         id: export
         uses: firebelley/godot-export@master
         with:
@@ -39,7 +39,6 @@ jobs:
           relative_export_path: ./build # move export output to this directory relative to git root
           archive_output: true
           wine_path: ${{ steps.wine_install.outputs.WINE_PATH }}
-          use_godot_4: true
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
         with:

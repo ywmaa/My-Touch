@@ -13,9 +13,9 @@ var presets = [
 ] 
 
 func _enter_tree() -> void:
-	get_popup().connect("id_pressed", self, "_menu_item_selected")
-	var current_theme : Theme = mm_globals.main_window.theme
-	var path = "res://material_maker/theme/"
+	get_popup().connect("id_pressed", _menu_item_selected)
+	var current_theme : Theme = mt_globals.main_window.theme
+	var path = "res://UI/theme/"
 	if "light" in current_theme.resource_path:
 		path += "light/"
 	else:
@@ -30,7 +30,7 @@ func _enter_tree() -> void:
 	get_popup().set_item_icon(6, load(path + "curve_preset_bevel.tres"))
 
 func _exit_tree() -> void:
-	get_popup().disconnect("id_pressed", self, "_menu_item_selected")
+	get_popup().disconnect("id_pressed", _menu_item_selected)
 
 func _menu_item_selected(index : int) -> void:
 	var curve = MMCurve.new()

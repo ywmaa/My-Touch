@@ -24,7 +24,7 @@ func do_set_image_path(path) -> void:
 		return
 	image_path = path
 	update_image()
-	hint_tooltip = path
+	tooltip_text = path
 	filetime = get_filetime(image_path)
 
 func set_image_path(path) -> void:
@@ -32,9 +32,8 @@ func set_image_path(path) -> void:
 	emit_signal("on_file_selected", path)
 
 func get_filetime(file_path : String) -> int:
-	var f : File = File.new()
-	if f.file_exists(file_path):
-		return f.get_modified_time(file_path)
+	if FileAccess.file_exists(file_path):
+		return FileAccess.get_modified_time(file_path)
 	return 0
 
 func _on_Timer_timeout():
@@ -44,11 +43,11 @@ func _on_Timer_timeout():
 		filetime = new_filetime
 
 func _on_ImagePicker_pressed():
-	var dialog = preload("res://material_maker/windows/file_dialog/file_dialog.tscn").instance()
+	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instance()
 	add_child(dialog)
 	dialog.rect_min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
-	dialog.mode = FileDialog.MODE_OPEN_FILE
+	dialog.mode = FileDialog.FILE_MODE_OPEN_FILE
 	dialog.add_filter("*.bmp;BMP Image")
 	dialog.add_filter("*.exr;EXR Image")
 	dialog.add_filter("*.hdr;Radiance HDR Image")

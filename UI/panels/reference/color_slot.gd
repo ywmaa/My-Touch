@@ -5,7 +5,7 @@ signal clicked
 func _ready() -> void:
 	pass # Replace with function body.
 
-func set_color(c) -> void:
+func set_rect_color(c) -> void:
 	$ColorRect.color = c
 
 func select(b : bool) -> void:

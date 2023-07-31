@@ -71,7 +71,7 @@ func handle_image_input(event) -> bool:
 					layer.main_object.self_modulate.a = 0.0
 
 	return true
-func _process(delta):
+func _process(_delta):
 	current_project = ProjectsManager.project
 	if !current_project:
 		return

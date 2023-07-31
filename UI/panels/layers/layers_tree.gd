@@ -33,7 +33,7 @@ func update_from_layers(layers_array : Array, selected_layers:Array[base_layer])
 		clear()
 		do_update_from_layers(layers_array, create_item(), selected_layers)
 
-func do_update_from_layers(layers_array : Array, item : TreeItem, selected_layers:Array[base_layer]) -> void:
+func do_update_from_layers(layers_array : Array, _item : TreeItem, selected_layers:Array[base_layer]) -> void:
 	for l in layers_array:
 		var new_item = create_item()
 		new_item.set_text(0, l.name)

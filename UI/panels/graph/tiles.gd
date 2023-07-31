@@ -12,7 +12,6 @@ var has_mask := false
 
 
 func _init(size: Vector2):
-	print("test")
 	x_basis = Vector2(size.x, 0)
 	y_basis = Vector2(0, size.y)
 	tile_size = size

@@ -41,9 +41,9 @@ func shortcut_pressed():
 
 func mouse_pressed(
 	event : InputEventMouseButton,
-	image : base_layer,
-	color1 : Color = Color.BLACK,
-	color2 : Color = Color.WHITE,
+	_image : base_layer,
+	_color1 : Color = Color.BLACK,
+	_color2 : Color = Color.WHITE,
 ):
 	if event.button_index == MOUSE_BUTTON_RIGHT and tool_active:
 		cancel_tool()
@@ -54,7 +54,7 @@ func get_affected_rect() -> Rect2i:
 	return Rect2i()
 
 
-func mouse_moved(event : InputEventMouseMotion):
+func mouse_moved(_event : InputEventMouseMotion):
 	if !tool_active:
 		return
 	if !ToolsManager.current_project.layers.selected_layers:
@@ -62,7 +62,7 @@ func mouse_moved(event : InputEventMouseMotion):
 	for selected in ToolsManager.current_project.layers.selected_layers:
 		scale(selected,ToolsManager.mouse_position_delta*ToolsManager.get_process_delta_time(),selected.lock_aspect) 
 
-func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
+func draw_preview(image_view : CanvasItem, _mouse_position : Vector2i):
 	if !tool_active:
 		return
 	if ToolsManager.current_project.layers.selected_layers.is_empty():

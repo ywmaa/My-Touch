@@ -41,7 +41,7 @@ var size : Vector2:
 		set_size(v)
 	get:
 		return get_size()
-func set_size(v):
+func set_size(_v):
 	return
 func get_size():
 	if !image:
@@ -148,6 +148,8 @@ func get_copy(_name: String = "copy"):
 	var layer = base_layer.new()
 	layer.init(_name,image_path,type)
 	return layer
+
+
 
 #Used to get rect relative to the real viewport
 #func get_rect() -> Rect2:

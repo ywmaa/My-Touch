@@ -28,7 +28,7 @@ var tilemode_opacity := 1.0
 # View menu options
 var greyscale_view := false
 var mirror_view := false
-var draw_pixel_grid := true
+var draw_pixel_grid := false
 var show_rulers := true
 var show_guides := true
 

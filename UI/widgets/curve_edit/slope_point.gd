@@ -1,6 +1,6 @@
 extends Control
 
-export var distance : float
+@export var distance : float
 
 var moving = false
 
@@ -10,13 +10,13 @@ func _ready():
 	pass # Replace with function body.
 
 func _draw():
-	var current_theme : Theme = mm_globals.main_window.theme
+	var current_theme : Theme = mt_globals.main_window.theme
 	var color : Color = current_theme.get_color("font_color", "Label")
 	draw_circle(Vector2(3.0, 3.0), 3.0, color)
 
 func _on_ControlPoint_gui_input(event):
 	if event is InputEventMouseButton:
-		if event.button_index == BUTTON_LEFT:
+		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				if event.doubleclick:
 					var parent = get_parent()
@@ -26,7 +26,7 @@ func _on_ControlPoint_gui_input(event):
 					else:
 						vector = parent.get_parent().get_child(parent.get_index()+1).rect_position-parent.rect_position
 					vector = distance*vector.normalized()
-					rect_position = vector-OFFSET
+					position = vector-OFFSET
 					if event.control:
 						get_parent().get_child(1-get_index()).rect_position = -vector-OFFSET
 					get_parent().update_tangents()
@@ -38,7 +38,7 @@ func _on_ControlPoint_gui_input(event):
 		var vector = get_global_mouse_position()-get_parent().get_global_rect().position+OFFSET
 		vector *= sign(vector.x)
 		vector = distance*vector.normalized()
-		rect_position = vector-OFFSET
+		position = vector-OFFSET
 		if event.control:
 			get_parent().get_child(1-get_index()).rect_position = -vector-OFFSET
 		get_parent().update_tangents()

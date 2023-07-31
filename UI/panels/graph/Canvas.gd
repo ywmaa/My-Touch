@@ -1,7 +1,7 @@
 class_name Canvas
 extends Node2D
 
-@onready var pixel_grid = $PixelGrid
+#@onready var pixel_grid = $PixelGrid
 #@export var graph : MTGraph
 var sprites : Array[Node]
 var current_project : Project
@@ -21,12 +21,15 @@ func _draw() -> void:
 	draw_set_transform(position_tmp, rotation, scale_tmp)
 	
 	# Draw current frame layers
-
-
 		
 	draw_set_transform(position, rotation, scale)
 
 func _process(_delta):
+	if Input.is_action_just_pressed("mouse_left"):
+		for image in get_children():
+			if image.get_rect().has_point(image.to_local(get_global_mouse_position())):
+				pass
+#				print("A click!")
 	if current_project != ProjectsManager.project:
 		current_project = ProjectsManager.project
 		for child in get_children():
@@ -74,4 +77,9 @@ func render(p:Node, project:Project):
 #	graph.transparent_checker.update_rect()
 
 
+
+#func _input(event):
+#
+#	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+#		print("mouse")
 

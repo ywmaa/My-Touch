@@ -33,9 +33,9 @@ func shortcut_pressed():
 
 func mouse_pressed(
 	event : InputEventMouseButton,
-	image : base_layer,
-	color1 : Color = Color.BLACK,
-	color2 : Color = Color.WHITE,
+	_image : base_layer,
+	_color1 : Color = Color.BLACK,
+	_color2 : Color = Color.WHITE,
 ):
 	if event.button_index == MOUSE_BUTTON_RIGHT and tool_active:
 		cancel_tool()
@@ -56,7 +56,7 @@ func mouse_moved(event : InputEventMouseMotion):
 		var object_pos = canvas_position+(selected.position*ToolsManager.camera.zoom)-(selected.main_object.get_rect().size*selected.scale*ToolsManager.camera.zoom/4)
 		rotate(selected,75*(object_pos.angle_to_point(ToolsManager.current_mouse_position) - object_pos.angle_to_point(ToolsManager.current_mouse_position-event.relative)))
 	prev = event.global_position
-func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
+func draw_preview(_image_view : CanvasItem, _mouse_position : Vector2i):
 	pass
 	
 

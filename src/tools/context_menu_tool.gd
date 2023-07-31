@@ -16,10 +16,10 @@ func shortcut_pressed():
 	pass
 
 func mouse_pressed(
-	event : InputEventMouseButton,
-	image : base_layer,
-	color1 : Color = Color.BLACK,
-	color2 : Color = Color.WHITE,
+	_event : InputEventMouseButton,
+	_image : base_layer,
+	_color1 : Color = Color.BLACK,
+	_color2 : Color = Color.WHITE,
 ):
 	pass
 
@@ -29,9 +29,9 @@ func get_affected_rect() -> Rect2i:
 	return Rect2i()
 
 
-func mouse_moved(event : InputEventMouseMotion):
+func mouse_moved(_event : InputEventMouseMotion):
 	pass
-func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
+func draw_preview(_image_view : CanvasItem, _mouse_position : Vector2i):
 	pass
 	
 

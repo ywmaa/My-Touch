@@ -17,7 +17,6 @@ func create_menu(menu_def : Array, object, menu:HFlowContainer):
 		var menu_item_name = menu_def[i].tool_name
 		var menu_item_tip = menu_def[i].tool_desc
 		var icon = menu_def[i].tool_icon
-		var cursor_icon = menu_def[i].tool_icon
 		var shortcut = 0
 		if menu_def[i].tool_button_shortcut != "":
 			for s in menu_def[i].tool_button_shortcut.split("+"):
@@ -46,7 +45,7 @@ func on_menu_item_pressed(menu_def, object, id) -> void:
 	object.assign_tool(menu_def[id].tool_name, id)
 	
 
-func selected_tool_changed(tool):
+func selected_tool_changed(_tool):
 	update_tool_buttons()
 
 func update_tool_buttons() -> void:

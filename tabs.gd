@@ -11,7 +11,7 @@ var current_tab = -1 :
 signal tab_changed
 signal no_more_tabs
 
-func _process(delta):
+func _process(_delta):
 	for index in ProjectsManager.projects.size(): 
 		var project = ProjectsManager.projects[index]
 		var title : String = ("[unnamed]" if project.save_path == "" else project.save_path) + (" *" if project.need_save else "")
@@ -93,6 +93,8 @@ func move_active_tab_to(idx_to) -> void:
 
 
 func set_tab_title(index, title) -> void:
+	if $Tabs.tab_count < index+1:
+		return 
 	$Tabs.set_tab_title(index, title)
 	
 

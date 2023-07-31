@@ -41,10 +41,10 @@ func shortcut_pressed():
 	printerr("Not implemented: shortcut_pressed! (" + get_script().resource_path.get_file() + ")")
 
 func mouse_pressed(
-	event : InputEventMouseButton,
-	image : base_layer,
-	color1 : Color = Color.BLACK,
-	color2 : Color = Color.WHITE,
+	_event : InputEventMouseButton,
+	_image : base_layer,
+	_color1 : Color = Color.BLACK,
+	_color2 : Color = Color.WHITE,
 ):
 	printerr("Not implemented: mouse_pressed! (" + get_script().resource_path.get_file() + ")")
 
@@ -54,10 +54,10 @@ func get_affected_rect() -> Rect2i:
 	return Rect2i()
 
 
-func mouse_moved(event : InputEventMouseMotion):
+func mouse_moved(_event : InputEventMouseMotion):
 	printerr("Not implemented: mouse_moved! (" + get_script().resource_path.get_file() + ")")
 
-func key_pressed(event : InputEventKey):
+func key_pressed(_event : InputEventKey):
 	printerr("Not implemented: key_pressed! (" + get_script().resource_path.get_file() + ")")
 
 func enable_tool(): # Save History and Enable Tool
@@ -68,9 +68,9 @@ func confirm_tool(): # Confirm Actions
 	ProjectsManager.send_changed_signal()
 	ToolsManager.get_node("/root/Editor/MessageLabel").show_step(ToolsManager.current_project.undo_redo.get_history_count())
 	tool_active = false
-func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
+func draw_preview(_image_view : CanvasItem, _mouse_position : Vector2i):
 	printerr("Not implemented: draw_preview! (" + get_script().resource_path.get_file() + ")")
 
 
-func draw_shader_preview(image_view : CanvasItem, mouse_position : Vector2i):
+func draw_shader_preview(_image_view : CanvasItem, _mouse_position : Vector2i):
 	pass

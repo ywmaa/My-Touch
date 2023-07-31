@@ -6,12 +6,13 @@ var windows = [
 	{scene=preload("res://UI/panels/graph/graph.tscn"),name="Graph"},
 	{scene=preload("res://UI/panels/tools bar/tool_settings.tscn"),name="Tool Settings"},
 	{scene=preload("res://UI/panels/graph/GraphSettings.tscn"),name="Project Settings"},
+	{scene=preload("res://UI/panels/reference/reference_panel.tscn"),name="Reference Panel"},
 ]
 
 @onready var window_button : OptionButton = $VBoxContainer/WindowOptions
 @onready var panel : PanelContainer = $VBoxContainer/PanelContainer
 
-func _process(delta):
+func _process(_delta):
 	if $VBoxContainer/PanelContainer.get_child_count() == 0:
 		change_window(window_button.get_selected_id())
 		

@@ -24,7 +24,7 @@ var shader : shape_generator.shader_type:
 func get_layer_inspector_properties() -> Array:
 	var PropertiesView : Array = super.get_layer_inspector_properties()
 	PropertiesView[0].append("Shape Properties")
-	var PropertiesToShow : Dictionary
+	var PropertiesToShow : Dictionary = {}
 	PropertiesToShow["color"] = "Shape Properties"
 	PropertiesToShow["shape,square,circle,polygon"] = "Shape Properties"
 	PropertiesToShow["shader,fill,border,image,mask,custom"] = "Shape Properties"

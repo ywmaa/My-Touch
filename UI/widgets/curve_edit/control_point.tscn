@@ -7,24 +7,15 @@
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("2")
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="LeftSlope" type="Control" parent="."]
 anchors_preset = 0
 script = ExtResource("1")
-__meta__ = {
-"_edit_use_anchors_": false
-}
 distance = -30.0
 
 [node name="RightSlope" type="Control" parent="."]
 anchors_preset = 0
 script = ExtResource("1")
-__meta__ = {
-"_edit_use_anchors_": false
-}
 distance = 30.0
 
 [connection signal="gui_input" from="." to="." method="_on_ControlPoint_gui_input"]

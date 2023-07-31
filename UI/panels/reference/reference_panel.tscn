@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://dhi5uspfra24x"]
 
 [ext_resource type="Script" path="res://UI/panels/reference/reference_panel.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://cir533sf8niyf" path="res://UI/panels/reference/color_slot.tscn" id="2"]
-[ext_resource type="PackedScene" path="res://UI/panels/reference/gradient_slot.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://b5uu7lqa3dwkc" path="res://UI/panels/reference/color_slot.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://ca1vy1mqeuhrl" path="res://UI/panels/reference/gradient_slot.tscn" id="3"]
 
 [sub_resource type="Shader" id="1"]
 code = "shader_type canvas_item;
@@ -21,81 +21,72 @@ void fragment() {
 
 [sub_resource type="ShaderMaterial" id="3"]
 shader = SubResource("1")
-canvas_size = null
-center = null
-image_size = null
-scale = null
+shader_parameter/canvas_size = null
+shader_parameter/image_size = null
+shader_parameter/scale = null
+shader_parameter/center = Vector2(0.5, 0.5)
 
 [node name="ReferencePanel" type="Panel"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="Image" type="ColorRect" parent="VBoxContainer"]
 material = SubResource("3")
-offset_right = 1280.0
-offset_bottom = 712.0
+layout_mode = 2
 size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Image"]
+layout_mode = 0
 anchor_right = 1.0
 mouse_filter = 2
 
 [node name="Prev" type="Button" parent="VBoxContainer/Image/HBoxContainer"]
-offset_right = 18.0
-offset_bottom = 31.0
+layout_mode = 2
 text = "<"
 
 [node name="Control" type="Control" parent="VBoxContainer/Image/HBoxContainer"]
-offset_left = 22.0
-offset_right = 1258.0
-offset_bottom = 31.0
+layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
 [node name="Next" type="Button" parent="VBoxContainer/Image/HBoxContainer"]
-offset_left = 1262.0
-offset_right = 1280.0
-offset_bottom = 31.0
+layout_mode = 2
 text = ">"
 
 [node name="Colors" type="HBoxContainer" parent="VBoxContainer"]
-offset_top = 716.0
-offset_right = 1280.0
-offset_bottom = 716.0
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
 
 [node name="ColorSlot1" parent="VBoxContainer/Colors" instance=ExtResource("2")]
-offset_right = 252.0
+layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="ColorSlot2" parent="VBoxContainer/Colors" instance=ExtResource("2")]
-offset_left = 256.0
-offset_right = 509.0
+layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="ColorSlot3" parent="VBoxContainer/Colors" instance=ExtResource("2")]
-offset_left = 513.0
-offset_right = 766.0
+layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="ColorSlot4" parent="VBoxContainer/Colors" instance=ExtResource("2")]
-offset_left = 770.0
-offset_right = 1023.0
+layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="ColorSlot5" parent="VBoxContainer/Colors" instance=ExtResource("2")]
-offset_left = 1027.0
-offset_right = 1280.0
+layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="GradientSlot" parent="VBoxContainer" instance=ExtResource("3")]
-offset_top = 720.0
-offset_right = 1280.0
-offset_bottom = 720.0
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
 
 [node name="ContextMenu" type="PopupMenu" parent="."]
 size = Vector2i(173, 100)
@@ -109,4 +100,10 @@ item_1/id = 1
 [connection signal="resized" from="VBoxContainer/Image" to="." method="_on_Image_resized"]
 [connection signal="pressed" from="VBoxContainer/Image/HBoxContainer/Prev" to="." method="change_image" binds= [-1]]
 [connection signal="pressed" from="VBoxContainer/Image/HBoxContainer/Next" to="." method="change_image" binds= [1]]
+[connection signal="clicked" from="VBoxContainer/Colors/ColorSlot1" to="." method="select_slot"]
+[connection signal="clicked" from="VBoxContainer/Colors/ColorSlot2" to="." method="select_slot"]
+[connection signal="clicked" from="VBoxContainer/Colors/ColorSlot3" to="." method="select_slot"]
+[connection signal="clicked" from="VBoxContainer/Colors/ColorSlot4" to="." method="select_slot"]
+[connection signal="clicked" from="VBoxContainer/Colors/ColorSlot5" to="." method="select_slot"]
+[connection signal="clicked" from="VBoxContainer/GradientSlot" to="." method="select_slot"]
 [connection signal="index_pressed" from="ContextMenu" to="." method="_on_ContextMenu_index_pressed"]

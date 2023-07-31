@@ -445,7 +445,7 @@ func quit() -> void:
 			quitting = false
 			return
 	if mt_globals.get_config("confirm_close_project"):
-		var result = await $VBoxContainer/Layout/SplitRight/ProjectsPanel/Projects.check_save_tabs()
+		var result = await $VBoxContainer/ProjectTabs.check_save_tabs()
 		if !result:
 			quitting = false
 			return

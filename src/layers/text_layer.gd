@@ -25,7 +25,7 @@ func get_rotation():
 		return 0.0
 	return text_label.rotation_degrees
 
-func set_size(v):
+func set_size(_v):
 	return
 func get_size():
 	if !text_label:
@@ -52,7 +52,7 @@ var text : String:
 func get_layer_inspector_properties() -> Array:
 	var PropertiesView : Array = super.get_layer_inspector_properties()
 	PropertiesView[0].append("Text Properties")
-	var PropertiesToShow : Dictionary
+	var PropertiesToShow : Dictionary = {}
 	PropertiesToShow["text"] = "Text Properties"
 	PropertiesView[1].merge(PropertiesToShow)
 	return PropertiesView

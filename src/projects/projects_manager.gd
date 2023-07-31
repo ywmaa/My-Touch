@@ -3,8 +3,8 @@ extends Node
 var projects : Array[Project]
 
 var project : Project:
-	set(new_project):
-		project = new_project
+	set(value):
+		project = value
 		if !project:
 			return
 		if !project.undo_redo:

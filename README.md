@@ -7,11 +7,11 @@
  
  also thanks to pixelorama for their open source code, I learned methods for canvas and tool handling.
 
+ finally thanks to sprite_painter addon, I was able to have an idea of better tooling system.
+
 # Notes for contributers
 
-The current version of Godot for the project is : Godot 4.0 Stable
-
-the project has a lot of files from material maker/pixelorama and it is not organised, yet.
+The current version of Godot for the project is : Godot 4.1 Stable
 
 # goals
 
@@ -45,7 +45,7 @@ the project has a lot of files from material maker/pixelorama and it is not orga
 # Roadmap
  https://trello.com/b/ATaLIaII/my-touch
  
-# Current Version 0.2
+# Current Version 0.4
 
 
 # Supported Platforms :
