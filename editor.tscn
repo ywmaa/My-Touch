@@ -1,10 +1,11 @@
-[gd_scene load_steps=11 format=3 uid="uid://8w67718v7rk"]
+[gd_scene load_steps=12 format=3 uid="uid://8w67718v7rk"]
 
 [ext_resource type="Script" path="res://editor.gd" id="1_ix08l"]
 [ext_resource type="Theme" uid="uid://dl7dg81sapu26" path="res://UI/theme/dark.tres" id="1_qcjp6"]
-[ext_resource type="Script" path="res://Layout.gd" id="2_o50ww"]
 [ext_resource type="PackedScene" uid="uid://cliund3ivs7rq" path="res://UI/widgets/render_counter/render_counter.tscn" id="3_dljtu"]
 [ext_resource type="Script" path="res://tabs.gd" id="4_ejxk4"]
+[ext_resource type="Script" path="res://addons/dockable_container/dockable_container.gd" id="6_jlrni"]
+[ext_resource type="Resource" uid="uid://busuw7nyk34mk" path="res://touch_editor_layout.tres" id="6_yg31v"]
 [ext_resource type="PackedScene" uid="uid://di4qw4bosuns4" path="res://UI/windows/windows_manager/WindowsManager.tscn" id="7_8bflp"]
 [ext_resource type="Script" path="res://UI/panels/graph/Canvas.gd" id="7_kirsr"]
 
@@ -74,6 +75,10 @@ offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="AutoSaveTimer" type="Timer" parent="VBoxContainer"]
+wait_time = 15.0
+autostart = true
+
 [node name="TopBar" type="HBoxContainer" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 25)
 layout_mode = 2
@@ -106,52 +111,31 @@ grow_vertical = 2
 tab_close_display_policy = 1
 drag_to_rearrange_enabled = true
 
-[node name="Layout" type="HSplitContainer" parent="VBoxContainer"]
+[node name="Layout" type="Container" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-split_offset = -1118
-script = ExtResource("2_o50ww")
+script = ExtResource("6_jlrni")
+layout = ExtResource("6_yg31v")
 
-[node name="SplitLeft" type="HSplitContainer" parent="VBoxContainer/Layout"]
+[node name="Tool Settings" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
+layout_mode = 2
+init_window = 3
+
+[node name="Project Settings" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
+visible = false
+layout_mode = 2
+init_window = 4
+
+[node name="Graph" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
+layout_mode = 2
+init_window = 2
+
+[node name="Layers Panel" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
 layout_mode = 2
 
-[node name="Left" type="VSplitContainer" parent="VBoxContainer/Layout/SplitLeft"]
-custom_minimum_size = Vector2(124, 679)
+[node name="Layer Inspector" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
 layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Top" parent="VBoxContainer/Layout/SplitLeft/Left" instance=ExtResource("7_8bflp")]
-layout_mode = 2
-size_flags_horizontal = 1
-
-[node name="Bottom" parent="VBoxContainer/Layout/SplitLeft/Left" instance=ExtResource("7_8bflp")]
-layout_mode = 2
-size_flags_horizontal = 1
-
-[node name="SplitRight" type="HSplitContainer" parent="VBoxContainer/Layout"]
-clip_contents = true
-custom_minimum_size = Vector2(1100, 679)
-layout_mode = 2
-
-[node name="Center" parent="VBoxContainer/Layout/SplitRight" instance=ExtResource("7_8bflp")]
-layout_mode = 2
-size_flags_vertical = 1
-
-[node name="AutoSaveTimer" type="Timer" parent="VBoxContainer/Layout/SplitRight"]
-wait_time = 15.0
-autostart = true
-
-[node name="Right" type="VSplitContainer" parent="VBoxContainer/Layout/SplitRight"]
-custom_minimum_size = Vector2(147, 349)
-layout_mode = 2
-
-[node name="Top" parent="VBoxContainer/Layout/SplitRight/Right" instance=ExtResource("7_8bflp")]
-layout_mode = 2
-size_flags_horizontal = 1
-
-[node name="Bottom" parent="VBoxContainer/Layout/SplitRight/Right" instance=ExtResource("7_8bflp")]
-layout_mode = 2
-size_flags_horizontal = 1
+init_window = 1
 
 [node name="MessageLabel" type="Label" parent="."]
 visible = false
@@ -186,7 +170,7 @@ render_target_update_mode = 4
 [node name="Canvas" type="Node2D" parent="AppRender"]
 script = ExtResource("7_kirsr")
 
+[connection signal="timeout" from="VBoxContainer/AutoSaveTimer" to="VBoxContainer/ProjectTabs" method="_on_auto_save_timer_timeout"]
 [connection signal="active_tab_rearranged" from="VBoxContainer/ProjectTabs/Tabs" to="VBoxContainer/ProjectTabs" method="move_active_tab_to"]
 [connection signal="tab_changed" from="VBoxContainer/ProjectTabs/Tabs" to="VBoxContainer/ProjectTabs" method="set_current_tab"]
 [connection signal="tab_close_pressed" from="VBoxContainer/ProjectTabs/Tabs" to="VBoxContainer/ProjectTabs" method="close_tab"]
-[connection signal="timeout" from="VBoxContainer/Layout/SplitRight/AutoSaveTimer" to="VBoxContainer/ProjectTabs" method="_on_auto_save_timer_timeout"]

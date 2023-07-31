@@ -70,7 +70,8 @@ class GradientCursor:
 
 var value = null: 
 	set(v):
-		set_value(v)
+		value = v
+		set_value()
 @export var embedded : bool = true
 
 var continuous_change = true
@@ -81,7 +82,7 @@ signal updated(value, cc)
 
 func _ready() -> void:
 	$Gradient.material = $Gradient.material.duplicate(true)
-	set_value(MMGradient.new())
+	value = MMGradient.new()
 
 func get_gradient_from_data(data):
 	if typeof(data) == TYPE_ARRAY:
@@ -109,8 +110,7 @@ func can_drop_data(_position : Vector2, data) -> bool:
 #	if gradient != null:
 #		set_value_and_update(MMType.deserialize_value(gradient), false)
 
-func set_value(v, from_popup : bool = false) -> void:
-	value = v
+func set_value(from_popup : bool = false) -> void:
 	for c in get_children():
 		if c is GradientCursor:
 			remove_child(c)
@@ -131,16 +131,16 @@ func update_from_value() -> void:
 	emit_signal("updated", value, continuous_change)
 	continuous_change = true
 
-func set_value_and_update(v, cc : bool = true) -> void:
+func set_value_and_update(cc : bool = true) -> void:
 	if ! cc:
 		continuous_change = false
-	set_value(v, true)
+	set_value(true)
 	update_from_value()
 
 func add_cursor(x, color) -> void:
 	var cursor = GradientCursor.new()
 	add_child(cursor)
-	cursor.rect_position.x = x
+	cursor.position.x = x
 	cursor.color = color
 
 func _gui_input(ev) -> void:

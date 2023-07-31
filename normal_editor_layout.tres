@@ -1,0 +1,73 @@
+[gd_resource type="Resource" script_class="DockableLayout" load_steps=13 format=3 uid="uid://w3y2pnff5xnk"]
+
+[ext_resource type="Script" path="res://addons/dockable_container/layout_panel.gd" id="1_dbddf"]
+[ext_resource type="Script" path="res://addons/dockable_container/layout_split.gd" id="2_8i02r"]
+[ext_resource type="Script" path="res://addons/dockable_container/layout.gd" id="3_8rp8x"]
+
+[sub_resource type="Resource" id="Resource_hkcbp"]
+resource_name = "Tabs"
+script = ExtResource("1_dbddf")
+names = PackedStringArray("Tool Settings")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_7gslx"]
+resource_name = "Tabs"
+script = ExtResource("1_dbddf")
+names = PackedStringArray("Project Settings")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_m10rm"]
+resource_name = "Split"
+script = ExtResource("2_8i02r")
+direction = 1
+percent = 0.5
+first = SubResource("Resource_hkcbp")
+second = SubResource("Resource_7gslx")
+
+[sub_resource type="Resource" id="Resource_gt0nj"]
+resource_name = "Tabs"
+script = ExtResource("1_dbddf")
+names = PackedStringArray("Graph")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_1v1i3"]
+resource_name = "Tabs"
+script = ExtResource("1_dbddf")
+names = PackedStringArray("Layers Panel")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_7jwmo"]
+resource_name = "Tabs"
+script = ExtResource("1_dbddf")
+names = PackedStringArray("Layer Inspector")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_xlcfl"]
+resource_name = "Split"
+script = ExtResource("2_8i02r")
+direction = 1
+percent = 0.5
+first = SubResource("Resource_1v1i3")
+second = SubResource("Resource_7jwmo")
+
+[sub_resource type="Resource" id="Resource_26d7r"]
+resource_name = "Split"
+script = ExtResource("2_8i02r")
+direction = 0
+percent = 0.75
+first = SubResource("Resource_gt0nj")
+second = SubResource("Resource_xlcfl")
+
+[sub_resource type="Resource" id="Resource_siokk"]
+resource_name = "Split"
+script = ExtResource("2_8i02r")
+direction = 0
+percent = 0.2
+first = SubResource("Resource_m10rm")
+second = SubResource("Resource_26d7r")
+
+[resource]
+resource_name = "default_layout"
+script = ExtResource("3_8rp8x")
+root = SubResource("Resource_siokk")
+hidden_tabs = {}

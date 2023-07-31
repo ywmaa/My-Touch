@@ -11,7 +11,8 @@ var need_update : bool = false
 
 #@onready var projects = $VBoxContainer/ProjectTabs
 
-@onready var layout = $VBoxContainer/Layout
+@onready var layout : DockableContainer = $VBoxContainer/Layout
+const SAVED_LAYOUT_PATH := "user://layout.tres"
 var library
 var brushes
 
@@ -64,9 +65,12 @@ const MENU = [
 	{ menu="View/Center view", command="view_center", shortcut="C" },
 	{ menu="View/Reset zoom", command="view_reset_zoom", shortcut="Control+0" },
 	{ menu="View/-" },
-	{ menu="View/Touch Friendly Mode", command="touch_mode_switch", shortcut="Control+Space" },
-	{ menu="View/Panels", submenu="show_panels" },
-	{ menu="View/New window", command="new_window" },
+	{ menu="View/Touch Friendly Layout", command="touch_mode_switch", shortcut="Control+Space" },
+	{ menu="View/Default Layout", command="default_mode_switch", shortcut="" },
+	{ menu="View/User Layout", command="user_mode_switch", shortcut="" },
+	{ menu="View/-" },
+	{ menu="View/New floating window", command="new_window" },
+	{ menu="View/New dockable window", command="new_dock_window" },
 	{ menu="View/Fullscreen", command="fullscreen", shortcut="F11"},
 
 	{ menu="Help/User manual", command="show_doc", shortcut="F1" },
@@ -83,7 +87,12 @@ func _input(event: InputEvent) -> void:
 		if tool.tool_button_shortcut == event.as_text():
 			ToolsManager.assign_tool(tool.tool_name,ToolsManager.TOOLS.find(tool))
 
+func _enter_tree():
+	mt_globals.main_window = self
 
+#func _process(_delta):
+#	layout._update_layout_with_children()
+#	print(layout.get_tab_count())
 func _ready() -> void:
 	set_physics_process(false)
 	get_tree().set_auto_accept_quit(false)
@@ -94,6 +103,8 @@ func _ready() -> void:
 	on_config_changed()
 	get_screen_position()
 	
+	
+
 	# Restore the window position/size if values are present in the configuration cache
 	if mt_globals.config.has_section_key("window", "screen"):
 		DisplayServer.window_set_current_screen(mt_globals.config.get_value("window", "screen"))
@@ -117,9 +128,7 @@ func _ready() -> void:
 	# Set window title
 	DisplayServer.window_set_title(str(ProjectSettings.get_setting("application/config/name")+" v"+ProjectSettings.get_setting("application/config/actual_release")))
 
-	
-	layout.load_panels()
-#
+
 #	# Load recent projects
 	load_recents()
 #
@@ -133,6 +142,12 @@ func _ready() -> void:
 	get_viewport().connect("files_dropped", on_files_dropped)
 	
 	add_child(context_menu)
+	
+	var saved_layout : DockableLayout = ResourceLoader.load(SAVED_LAYOUT_PATH)
+	if saved_layout:
+		layout.set_layout(saved_layout.clone())
+	else:
+		print("Error: Can't Load Layout")
 
 var context_menu : PopupMenu = PopupMenu.new()
 
@@ -172,8 +187,6 @@ func add_context_menu_item_pressed(id: int):
 			new_selection_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.default_icon,base_layer.layer_type.mask)
 			ProjectsManager.project.layers.add_layer(new_selection_layer)
 
-func _enter_tree() -> void:
-	mt_globals.main_window = self
 	
 func on_config_changed() -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if mt_globals.get_config("vsync") else DisplayServer.VSYNC_DISABLED)
@@ -197,22 +210,6 @@ func on_config_changed() -> void:
 	get_tree().root.content_scale_size = Vector2i()
 	get_tree().root.content_scale_factor = ui_scale
 	
-func create_menu_show_panels(menu : PopupMenu) -> void:
-	menu.clear()
-	var panels = layout.get_panel_list()
-	for i in range(panels.size()):
-		menu.add_check_item(panels[i], i)
-		menu.set_item_checked(i, layout.is_panel_visible(panels[i]))
-	if !menu.is_connected("id_pressed", _on_ShowPanels_id_pressed):
-		menu.connect("id_pressed", _on_ShowPanels_id_pressed)
-
-
-func _on_ShowPanels_id_pressed(id) -> void:
-	var panel : String = layout.get_panel_list()[id]
-	layout.set_panel_visible(panel, !layout.is_panel_visible(panel))
-
-func get_panel(panel_name : String) -> Control:
-	return layout.get_panel(panel_name)
 
 	
 #func get_current_graph_edit() -> MTGraph:
@@ -455,7 +452,9 @@ func quit() -> void:
 	mt_globals.config.set_value("window", "maximized", DisplayServer.window_get_mode())
 	mt_globals.config.set_value("window", "position", DisplayServer.window_get_position())
 	mt_globals.config.set_value("window", "size", DisplayServer.window_get_size())
-	layout.save_config()
+	#Save Layout
+	if layout.layout.resource_name != "default_layout" and layout.layout.resource_name != "touch_layout":
+		await ResourceSaver.save(layout.layout, SAVED_LAYOUT_PATH)
 	get_tree().quit()
 	quitting = false
 
@@ -565,14 +564,38 @@ func view_reset_zoom() -> void:
 #	graph_edit.camera.zoom_100()
 
 func touch_mode_switch() -> void:
-	$VBoxContainer/Layout.toggle_side_panels()
+	var saved_layout : DockableLayout = load("res://touch_editor_layout.tres")
+	if saved_layout:
+		var clone = saved_layout.clone()
+		clone.resource_name = "touch_layout"
+		layout.set_layout(clone)
+	else:
+		print("Error: Can't Load Layout")
+func default_mode_switch() -> void:
+	var saved_layout : DockableLayout = load("res://normal_editor_layout.tres")
+	if saved_layout:
+		var clone = saved_layout.clone()
+		clone.resource_name = "default_layout"
+		layout.set_layout(clone)
+	else:
+		print("Error: Can't Load Layout")
+func user_mode_switch() -> void:
+	var saved_layout : DockableLayout = ResourceLoader.load(SAVED_LAYOUT_PATH)
+	if saved_layout:
+		layout.set_layout(saved_layout.clone())
+	else:
+		print("Error: Can't Load Layout")
 
 var window_packed_scene = preload("res://UI/windows/undocked_window/undocked_window.tscn")
 func new_window():
 	get_viewport().gui_embed_subwindows = false
 	var window : Window = window_packed_scene.instantiate()
 	add_child(window)
-	
+func new_dock_window():
+	var control := preload("res://UI/windows/windows_manager/WindowsManager.tscn").instantiate()
+	layout.add_child(control, true)
+	await layout.sort_children
+	layout.set_control_as_current_tab(control)
 
 func fullscreen():
 	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_FULLSCREEN:

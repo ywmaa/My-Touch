@@ -1,0 +1,60 @@
+[gd_resource type="Resource" script_class="DockableLayout" load_steps=11 format=3 uid="uid://busuw7nyk34mk"]
+
+[ext_resource type="Script" path="res://addons/dockable_container/layout_panel.gd" id="1_8tcst"]
+[ext_resource type="Script" path="res://addons/dockable_container/layout_split.gd" id="2_ns8yw"]
+[ext_resource type="Script" path="res://addons/dockable_container/layout.gd" id="3_42blb"]
+
+[sub_resource type="Resource" id="Resource_48pqg"]
+resource_name = "Tabs"
+script = ExtResource("1_8tcst")
+names = PackedStringArray("Project Settings", "Layer Inspector")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_wpxgq"]
+resource_name = "Tabs"
+script = ExtResource("1_8tcst")
+names = PackedStringArray("Tool Settings")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_2ms2b"]
+resource_name = "Split"
+script = ExtResource("2_ns8yw")
+direction = 0
+percent = 0.5
+first = SubResource("Resource_48pqg")
+second = SubResource("Resource_wpxgq")
+
+[sub_resource type="Resource" id="Resource_daj1h"]
+resource_name = "Tabs"
+script = ExtResource("1_8tcst")
+names = PackedStringArray("Layers Panel")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_8bq14"]
+resource_name = "Split"
+script = ExtResource("2_ns8yw")
+direction = 1
+percent = 0.5
+first = SubResource("Resource_2ms2b")
+second = SubResource("Resource_daj1h")
+
+[sub_resource type="Resource" id="Resource_x26ns"]
+resource_name = "Tabs"
+script = ExtResource("1_8tcst")
+names = PackedStringArray("Graph")
+current_tab = 0
+
+[sub_resource type="Resource" id="Resource_h1uxb"]
+resource_name = "Split"
+script = ExtResource("2_ns8yw")
+direction = 0
+percent = 0.2
+first = SubResource("Resource_8bq14")
+second = SubResource("Resource_x26ns")
+
+[resource]
+script = ExtResource("3_42blb")
+root = SubResource("Resource_h1uxb")
+hidden_tabs = {
+"Project Settings": true
+}
