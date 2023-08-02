@@ -41,6 +41,7 @@ func deselect_layer(layer : base_layer) -> void:
 
 func _on_layers_changed() -> void:
 	emit_signal("layers_changed")
+	ProjectsManager.refresh()
 	
 
 func duplicate_layer(source_layer) -> void:

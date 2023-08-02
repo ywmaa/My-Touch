@@ -918,6 +918,7 @@ layout_mode = 2
 script = ExtResource("17_pf4en")
 clone_preview_color = Color(1, 0.4, 0.937255, 0.752941)
 brush_type = 2
+crosshair_color = Color(0.501961, 0.501961, 0.501961, 0.74902)
 tool_name = "Clone Brush"
 
 [node name="ShadingBrush" type="VBoxContainer" parent="Box/Workspace/Floating/Control/ToolSettings/ToolSwitcher"]

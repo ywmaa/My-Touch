@@ -59,15 +59,17 @@ func get_layer_inspector_properties() -> Array:
 
 # we don't need an image or texture so we will override everything 
 # and reset all images and textures to free memory
-func init(_name: String,_path: String,p_layer_type : layer_type):
+func init(_name: String,_path: String,project:Project, p_layer_type : layer_type):
 	name = _name
 	type = p_layer_type
 	main_object = text_label
+	parent_project = project
 	text_label.text = "Hello World" #Default Text
 	text_label.fit_content = true
 	text_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	text_label.bbcode_enabled = true
 	refresh()
+	parent_project.layers.add_layer(self)
 
 func _init():
 	type = layer_type.text
@@ -99,7 +101,7 @@ func refresh():
 
 func get_copy(_name: String = "copy"):
 	var layer = text_layer.new()
-	layer.init(_name,image_path,type)
+	layer.init(_name, image_path, parent_project, type)
 	return layer
 
 func get_rect() -> Rect2:

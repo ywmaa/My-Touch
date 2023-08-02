@@ -6,11 +6,13 @@ var paint_image_path : String
 func update_path(path:String = "./"):
 	paint_image_path = path.path_join(name.c_unescape() + ".png")
 
-func init(_name: String,_path: String,p_layer_type : layer_type):
+func init(_name: String,_path: String, project:Project ,p_layer_type : layer_type):
 	name = _name
 	type = p_layer_type
 	main_object = image
+	parent_project = project
 	refresh()
+	parent_project.layers.add_layer(self)
 
 func _init():
 	type = layer_type.brush
@@ -27,10 +29,7 @@ func save_paint_image():
 	if paint_image_path:
 		image.texture.get_image().save_png(paint_image_path)
 func refresh():
-	if ProjectsManager.project.save_path.is_empty():
-		update_path("user://")
-	else:
-		update_path(ProjectsManager.project.save_path.get_base_dir() + "/")
+	update_path(parent_project.project_folder_abs_path + "/")
 	var load_test : Error = Image.new().load(paint_image_path)
 	if load_test == OK:
 		var load_image = Image.load_from_file(paint_image_path)

@@ -18,10 +18,24 @@ func new_project() -> void:
 	project.canvas_size = Vector2(mt_globals.default_width,mt_globals.default_height)
 	project.layers = layers_manager.new()
 	projects.append(project)
+	project.save_path = project_get_unused_save_path()
 	#default layer
 	var new_layer : base_layer = base_layer.new()
-	new_layer.init(project.layers.get_unused_layer_name(),default_icon,base_layer.layer_type.image)
-	project.layers.add_layer(new_layer)
+	var new_image_path : String = project.project_folder_abs_path + "/" + default_icon.get_file()
+	DirAccess.copy_absolute(default_icon, new_image_path)
+	new_layer.init(project.layers.get_unused_layer_name(), default_icon.get_file(), project ,base_layer.layer_type.image)
+	
+func project_get_unused_save_path() -> String:
+	var naming = "unnamed"
+	var return_name : String
+	var count = 0
+	return_name = naming
+	for p in projects:
+		if p.save_path.get_file().get_basename().get_basename() == return_name:
+			count += 1
+		if count > 0:
+			return_name = naming + " " + str(count)
+	return "user://" + return_name + ".mt.tres"
 
 func close_project(index:int):
 	if projects.size() > 1:
@@ -38,12 +52,13 @@ func close_project(index:int):
 
 
 
-func on_import_image_file(path):
+func on_import_image_file(path:String):
 	if !project:
 		return
 	var new_layer : base_layer = base_layer.new()
-	new_layer.init(project.layers.get_unused_layer_name(),path,base_layer.layer_type.image)
-	project.layers.add_layer(new_layer)
+	var new_image_path : String = project.project_folder_abs_path + "/" + path.get_file()
+	DirAccess.copy_absolute(path, new_image_path) # Move Image to Project Folder
+	new_layer.init(project.layers.get_unused_layer_name(), new_image_path.get_file(), project, base_layer.layer_type.image)
 
 # Cut / copy / paste / duplicate
 
@@ -152,8 +167,7 @@ func load_project_layer(filenames) -> void:
 		var data = ResourceLoader.load(file_name,"",ResourceLoader.CACHE_MODE_IGNORE) as Project
 		if data != null:
 			var new_project_layer = project_layer.new()
-			new_project_layer.init(file_name,default_icon,base_layer.layer_type.project)
-			project.layers.add_layer(new_project_layer)
+			new_project_layer.init(file_name, default_icon, project, base_layer.layer_type.project)
 		else:
 			var dialog : AcceptDialog = AcceptDialog.new()
 			add_child(dialog)
@@ -164,8 +178,7 @@ func load_project_layer(filenames) -> void:
 func refresh():
 	if !project:
 		return
-	for layer in project.layers.layers:
-		layer.refresh()
+	mt_globals.main_window.get_node("AppRender/Canvas").rerender()
 
 
 func load_file(filename, name_used:bool) -> bool:
@@ -212,8 +225,12 @@ func save_as() -> bool:
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
 	if files.size() == 1:
+		var old_file = ProjectSettings.globalize_path(project.save_path)
 		project.save_path = files[0]
 		if project.save_project():
+			var dir = DirAccess.open(old_file.get_base_dir())
+			if dir.file_exists(old_file.get_file()): # Remove Old MT File
+				dir.remove(old_file.get_file())
 #			main_window.add_recent(save_path)
 			mt_globals.config.set_value("path", "project", project.save_path.get_base_dir())
 			return true

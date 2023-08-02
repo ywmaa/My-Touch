@@ -3,6 +3,7 @@ class_name base_layer
 
 enum layer_type {brush, image, project, mask, text, light, postprocess}
 
+var parent_project : Project
 var main_object : Node = null
 @export var image : Sprite2D = Sprite2D.new()
 var position : Vector2:
@@ -74,7 +75,7 @@ func get_scale():
 		if main_object:
 			main_object.visible = !hidden
 		
-@export_global_dir var image_path : String
+@export var image_path : String
 
 #@export var extents : RectExtents = RectExtents.new()
 
@@ -122,12 +123,14 @@ func get_layer_inspector_properties() -> Array:
 	PropertiesView.append(PropertiesToShow)
 	return PropertiesView
 
-func init(_name: String, path: String, p_layer_type : layer_type):
+func init(_name: String, path: String, project:Project, p_layer_type : layer_type):
 	name = _name
+	parent_project = project
 	image_path = path
 	type = p_layer_type
 	main_object = image
 	refresh()
+	parent_project.layers.add_layer(self)
 
 
 func get_image() -> Node:
@@ -137,7 +140,7 @@ func get_image() -> Node:
 	return main_object
 func refresh():
 	if !texture.get_image():
-		var load_image = Image.load_from_file(image_path)
+		var load_image = Image.load_from_file(parent_project.project_folder_abs_path + "/" + image_path)
 		texture.set_image(load_image)
 		if image:
 			image.texture = texture
@@ -146,7 +149,7 @@ func refresh():
 
 func get_copy(_name: String = "copy"):
 	var layer = base_layer.new()
-	layer.init(_name,image_path,type)
+	layer.init(_name,image_path,parent_project,type)
 	return layer
 
 

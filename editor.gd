@@ -182,20 +182,17 @@ func add_context_menu_item_pressed(id: int):
 			if !ProjectsManager.project:
 				return
 			var new_paint_layer = paint_layer.new()
-			new_paint_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.project.save_path.get_base_dir(),base_layer.layer_type.brush)
-			ProjectsManager.project.layers.add_layer(new_paint_layer)
+			new_paint_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),"", ProjectsManager.project,base_layer.layer_type.brush)
 		5: #text layer
 			if !ProjectsManager.project:
 				return
 			var new_text_layer = text_layer.new()
-			new_text_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.default_icon,base_layer.layer_type.text)
-			ProjectsManager.project.layers.add_layer(new_text_layer)
+			new_text_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.project, base_layer.layer_type.text)
 		6: #selection layer
 			if !ProjectsManager.project:
 				return
 			var new_selection_layer = selection_layer.new()
-			new_selection_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.default_icon,base_layer.layer_type.mask)
-			ProjectsManager.project.layers.add_layer(new_selection_layer)
+			new_selection_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.project, base_layer.layer_type.mask)
 
 	
 func on_config_changed() -> void:

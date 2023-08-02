@@ -22,5 +22,5 @@ func refresh():
 
 func get_copy(_name: String = "copy"):
 	var layer = project_layer.new()
-	layer.init(name,image_path,type)
+	layer.init(name, image_path, project, type)
 	return layer

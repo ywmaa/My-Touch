@@ -14,7 +14,7 @@ signal no_more_tabs
 func _process(_delta):
 	for index in ProjectsManager.projects.size(): 
 		var project = ProjectsManager.projects[index]
-		var title : String = ("[unnamed]" if project.save_path == "" else project.save_path) + (" *" if project.need_save else "")
+		var title : String = (project.save_path) + (" *" if project.need_save else "")
 		set_tab_title(index, title)
 	if current_tab != ProjectsManager.projects.find(ProjectsManager.project):
 		create_tabs()
@@ -52,10 +52,6 @@ func check_save_tab(tab) -> bool:
 	if project.need_save and mt_globals.get_config("confirm_close_project"):
 		var dialog = preload("res://UI/windows/accept_dialog/accept_dialog.tscn").instantiate()
 		var save_path = project.save_path
-		if save_path == "":
-			save_path = "[unnamed]"
-		else:
-			save_path = save_path.get_file()
 		dialog.dialog_text = "Save "+save_path+" before closing?"
 		#dialog.dialog_autowrap = true
 		dialog.get_ok_button().text = "Save and close"
@@ -70,6 +66,11 @@ func check_save_tab(tab) -> bool:
 					return false
 			"cancel":
 				return false
+	if project.save_path.contains("user://"):
+		for file in DirAccess.get_files_at(project.project_folder_abs_path):
+			DirAccess.remove_absolute(project.project_folder_abs_path+"/"+file)
+		DirAccess.remove_absolute(project.project_folder_abs_path)
+		DirAccess.remove_absolute(project.save_path)
 	return true
 
 #func do_close_custom_action(_action : String, _tab : int, dialog : AcceptDialog) -> void:

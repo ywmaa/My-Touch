@@ -31,10 +31,12 @@ func get_layer_inspector_properties() -> Array:
 	PropertiesView[1].merge(PropertiesToShow)
 	return PropertiesView
 
-func init(_name: String,_path: String,p_layer_type : layer_type):
+func init(_name: String,_path: String, project:Project ,p_layer_type : layer_type):
 	name = _name
 	type = p_layer_type
+	parent_project = project
 	refresh()
+	parent_project.layers.add_layer(self)
 
 func _init():
 	type = layer_type.mask
