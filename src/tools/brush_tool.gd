@@ -42,19 +42,23 @@ func _init():
 	tool_name = "Brush Tool"
 	tool_button_shortcut = "Shift+B"
 	tool_desc = ""
-	tool_icon = get_icon_from_project_folder("shading")
+	tool_icon = get_icon_from_project_folder("brush")
 func get_tool_inspector_properties():
 	var PropertiesView : Array = []
 	var PropertiesGroups : Array[String] = []
 	PropertiesGroups.append("Settings")
-	PropertiesGroups.append("Color")
+	if brush_type == 0 or brush_type == 1:
+		PropertiesGroups.append("Color")
 	var PropertiesToShow : Dictionary = {}
+	if brush_type == 0 or brush_type == 1:
+		PropertiesToShow["brush_type,Draw,Erase"] = "Settings"
 	PropertiesToShow["brushsize:minvalue:1.0:maxvalue:1024.0:step:1.0"] = "Settings"
 	PropertiesToShow["hardness:minvalue:0.0:maxvalue:1.0:step:0.01"] = "Settings"
 	PropertiesToShow["opacity:minvalue:0.0:maxvalue:1.0:step:0.01"] = "Settings"
 	PropertiesToShow["pen_pressure_usage,size,opacity,tint"] = "Settings"
-	PropertiesToShow["drawing_color1"] = "Color"
-	PropertiesToShow["drawing_color2"] = "Color"
+	if brush_type == 0 or brush_type == 1:
+		PropertiesToShow["drawing_color1"] = "Color"
+		PropertiesToShow["drawing_color2"] = "Color"
 	PropertiesView.append(PropertiesGroups)
 	PropertiesView.append(PropertiesToShow)
 	return PropertiesView

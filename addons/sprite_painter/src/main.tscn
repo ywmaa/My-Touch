@@ -169,20 +169,20 @@ shader_parameter/gradient = SubResource("GradientTexture1D_bmka2")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qmoem"]
 shader = ExtResource("20_0y2y6")
 shader_parameter/shape_index = 0
-shader_parameter/color_border = Color(1, 1, 1, 0)
-shader_parameter/color_fill = Color(1, 1, 1, 0)
-shader_parameter/origin = Vector2i(-23, -38)
-shader_parameter/shape_size = Vector2i(32, 4)
-shader_parameter/border_width = 1
-shader_parameter/drag_delta = Vector2i(31, -3)
+shader_parameter/color_border = null
+shader_parameter/color_fill = null
+shader_parameter/origin = null
+shader_parameter/shape_size = null
+shader_parameter/border_width = null
+shader_parameter/drag_delta = null
 shader_parameter/enable_aa = false
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hi61m"]
 shader = ExtResource("22_sfnac")
-shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/color = null
 shader_parameter/origin = Vector2(104.5, 114.5)
-shader_parameter/delta = Vector2i(33, -33)
-shader_parameter/width = 1
+shader_parameter/delta = null
+shader_parameter/width = null
 shader_parameter/enable_aa = false
 
 [node name="Painter" type="MarginContainer"]
