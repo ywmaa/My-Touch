@@ -1,6 +1,6 @@
 extends ScrollContainer
 
-var current_graph : MTGraph 
+var current_project : Project 
 var current_tool : ToolBase
 
 signal current_tool_changed
@@ -12,26 +12,23 @@ func _ready():
 
 
 func _process(_delta):
-	return
-	if !mt_globals.main_window.get_current_graph_edit():
+#	return
+	if !ProjectsManager.project:
 		visible = false
 		current_tool = null
 		current_tool_changed.emit()
 		return
-	if !current_graph or current_graph != mt_globals.main_window.get_current_graph_edit():
+	if !current_project or current_project != ProjectsManager.project:
 		visible = false
-		current_graph = mt_globals.main_window.get_current_graph_edit()
-		return
-	if current_graph.layers.selected_layers.is_empty():
-		current_tool = null
-		current_tool_changed.emit()
-		visible = false
+		current_project = ProjectsManager.project
 		return
 	
 	## Assign Current Tool
-#	if current_layer != current_graph.layers.selected_layers.front():
-#		current_layer = current_graph.layers.selected_layers.front()
-#		current_tool_changed.emit()
+	if current_tool != ToolsManager.current_tool:
+		current_tool = ToolsManager.current_tool
+		current_tool_changed.emit()
+	if current_tool == null: return
+	
 	visible = true
 	if !current_tool.changed.is_connected(create_ui):
 		current_tool.connect("changed",create_ui)
@@ -40,6 +37,8 @@ func create_ui():
 	properties_box.clear()
 	
 	if !current_tool:
+		return
+	if !current_tool.get_tool_inspector_properties():
 		return
 	var PropertiesView : Array = current_tool.get_tool_inspector_properties()
 	var PropertiesGroups : Array[String] = PropertiesView[0]
@@ -58,12 +57,43 @@ func create_ui():
 					continue
 					
 				
-				var property_value = current_tool.get(property)
+				var property_value = current_tool.get(property.split(":")[0] if property.contains(":") else property)
 				if property_value is int:
-					properties_box.add_int(property, property_value)
+					if property.contains(":"): # hardness_property:min:1.0:max:100.0
+						var property_info : PackedStringArray = property.split(":")
+						var property_key = property_info[0]
+						property_info.remove_at(0)
+						var minvalue : float = -99999900000.0
+						var maxvalue : float = 99999900000.0
+						for i in property_info.size()-1:
+							if property_info[i] == "minvalue":
+								minvalue = float(property_info[i+1])
+							if property_info[i] == "maxvalue":
+								maxvalue = float(property_info[i+1])
+						
+						properties_box.add_int(property_key, property_value, minvalue, maxvalue)
+					else:
+						properties_box.add_int(property, property_value)
 					continue
 				if property_value is float:
-					properties_box.add_float(property, property_value)
+					if property.contains(":"): # hardness_property:min:1.0:max:100.0
+						var property_info : PackedStringArray = property.split(":")
+						var property_key = property_info[0]
+						property_info.remove_at(0)
+						var minvalue : float = -99999900000.0
+						var maxvalue : float = 99999900000.0
+						var step : float = 1.0
+						for i in property_info.size()-1:
+							if property_info[i] == "minvalue":
+								minvalue = float(property_info[i+1])
+							if property_info[i] == "maxvalue":
+								maxvalue = float(property_info[i+1])
+							if property_info[i] == "step":
+								step = float(property_info[i+1])
+						
+						properties_box.add_float(property_key, property_value, minvalue, maxvalue, step)
+					else:
+						properties_box.add_float(property, property_value)
 					continue
 				if property_value is String:
 					properties_box.add_string(property, property_value)

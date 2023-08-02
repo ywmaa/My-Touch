@@ -24,19 +24,23 @@ func _draw() -> void:
 		
 	draw_set_transform(position, rotation, scale)
 
+func rerender():
+	for child in get_children():
+		remove_child(child)
+	if current_project == null:
+		return
+	render(self, current_project)
 func _process(_delta):
-	if Input.is_action_just_pressed("mouse_left"):
-		for image in get_children():
-			if image.get_rect().has_point(image.to_local(get_global_mouse_position())):
-				pass
+#	if Input.is_action_just_pressed("mouse_left"):
+#		for image in get_children():
+#			if image.get_rect().has_point(image.to_local(get_global_mouse_position())):
+#				pass
 #				print("A click!")
 	if current_project != ProjectsManager.project:
 		current_project = ProjectsManager.project
-		for child in get_children():
-			remove_child(child)
-		if current_project == null:
-			return
-		render(self, current_project)
+		rerender()
+	if current_project and current_project.layers.layers.size() != get_child_count():
+		rerender()
 		
 	queue_redraw()
 	

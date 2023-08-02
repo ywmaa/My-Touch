@@ -9,7 +9,7 @@
 [ext_resource type="Script" path="res://addons/sprite_painter/src/image_transform_menu.gd" id="9_20sxo"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/workspace.gd" id="9_gvnc2"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/image_view/image_view.gd" id="10_etjnr"]
-[ext_resource type="PackedScene" uid="uid://bsuqx8yiwhy5x" path="res://addons/sprite_painter/src/image_view/resize_rect.tscn" id="11_jhyl6"]
+[ext_resource type="PackedScene" path="res://addons/sprite_painter/src/image_view/resize_rect.tscn" id="11_jhyl6"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/image_view/image_selection_view.gd" id="13_81c1e"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/floating/tool_switcher.gd" id="14_ig7f3"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/editing_tools/tool_select.gd" id="15_2n2l5"]
@@ -152,37 +152,37 @@ shadow_color = Color(0.8, 0.8, 0.8, 1)
 shadow_size = 4
 anti_aliasing = false
 
-[sub_resource type="Gradient" id="Gradient_q3yr3"]
+[sub_resource type="Gradient" id="Gradient_jeov6"]
 offsets = PackedFloat32Array(0, 1, 1)
 colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_bmka2"]
-gradient = SubResource("Gradient_q3yr3")
+gradient = SubResource("Gradient_jeov6")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_xuu2x"]
 shader = ExtResource("7_nc3ac")
-shader_parameter/from = Vector2(0.121094, 0.0820312)
-shader_parameter/delta = Vector2(0.666016, 0.736328)
+shader_parameter/from = Vector2(0.0820313, 0.132813)
+shader_parameter/delta = Vector2(0.0742188, 0.1875)
 shader_parameter/type = 0
 shader_parameter/gradient = SubResource("GradientTexture1D_bmka2")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qmoem"]
 shader = ExtResource("20_0y2y6")
-shader_parameter/shape_index = 4
-shader_parameter/color_border = null
-shader_parameter/color_fill = null
-shader_parameter/origin = null
-shader_parameter/shape_size = null
-shader_parameter/border_width = null
-shader_parameter/drag_delta = null
+shader_parameter/shape_index = 0
+shader_parameter/color_border = Color(1, 1, 1, 0)
+shader_parameter/color_fill = Color(1, 1, 1, 0)
+shader_parameter/origin = Vector2i(-23, -38)
+shader_parameter/shape_size = Vector2i(32, 4)
+shader_parameter/border_width = 1
+shader_parameter/drag_delta = Vector2i(31, -3)
 shader_parameter/enable_aa = false
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hi61m"]
 shader = ExtResource("22_sfnac")
-shader_parameter/color = null
-shader_parameter/origin = Vector2(314.5, 26.5)
-shader_parameter/delta = null
-shader_parameter/width = null
+shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/origin = Vector2(104.5, 114.5)
+shader_parameter/delta = Vector2i(33, -33)
+shader_parameter/width = 1
 shader_parameter/enable_aa = false
 
 [node name="Painter" type="MarginContainer"]
@@ -979,6 +979,11 @@ layout_mode = 2
 script = ExtResource("23_h1454")
 workspace = NodePath("../../../../..")
 tool_name = "Image Script"
+tool_desc = "Choose a script in the dropdown.
+To preview the result, hover over the image!
+
+Edit or create scripts in the folder:
+res://addons/sprite_painter/image_scripts/"
 image_hide_mode = 2
 metadata/_edit_lock_ = true
 

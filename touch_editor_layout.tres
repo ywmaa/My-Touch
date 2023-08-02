@@ -53,6 +53,7 @@ first = SubResource("Resource_8bq14")
 second = SubResource("Resource_x26ns")
 
 [resource]
+resource_name = "Layout"
 script = ExtResource("3_42blb")
 root = SubResource("Resource_h1uxb")
 hidden_tabs = {

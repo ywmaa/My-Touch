@@ -2,6 +2,7 @@ extends Node2D
 
 @export var graph : MTGraph
 func _draw() -> void:
+	
 	if not mt_globals.draw_pixel_grid:
 		return
 

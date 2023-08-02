@@ -147,7 +147,9 @@ func _ready() -> void:
 	if saved_layout:
 		layout.set_layout(saved_layout.clone())
 	else:
-		print("Error: Can't Load Layout")
+		print("Warning: Can't User Load Layout")
+		default_mode_switch()
+		
 
 var context_menu : PopupMenu = PopupMenu.new()
 
@@ -155,6 +157,8 @@ func create_add_context_menu(pos: Vector2 = get_global_mouse_position()):
 	context_menu.clear()
 	context_menu.add_item("Import Image")
 	context_menu.add_item("Load Project As Image")
+	context_menu.add_separator()
+	context_menu.add_item("Brush Layer")
 	context_menu.add_separator()
 	context_menu.add_item("Text Layer")
 	context_menu.add_item("Selection Layer")
@@ -174,13 +178,19 @@ func add_context_menu_item_pressed(id: int):
 			if !ProjectsManager.project:
 				return
 			edit_load_project_as_image()
-		3: #text layer
+		3: #project layer
+			if !ProjectsManager.project:
+				return
+			var new_paint_layer = paint_layer.new()
+			new_paint_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.project.save_path.get_base_dir(),base_layer.layer_type.brush)
+			ProjectsManager.project.layers.add_layer(new_paint_layer)
+		5: #text layer
 			if !ProjectsManager.project:
 				return
 			var new_text_layer = text_layer.new()
 			new_text_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.default_icon,base_layer.layer_type.text)
 			ProjectsManager.project.layers.add_layer(new_text_layer)
-		4: #selection layer
+		6: #selection layer
 			if !ProjectsManager.project:
 				return
 			var new_selection_layer = selection_layer.new()
@@ -374,17 +384,12 @@ func export_png_image():
 	if files.size() != 1:
 		return
 	# Generate the image
-	get_viewport().gui_embed_subwindows = true
-	var window : Window = window_packed_scene.instantiate()
-	add_child(window)
-	var rendering_window : window_manager = window.find_child("Control")
-	rendering_window.change_window(2)
+	var rendering_window : Viewport = $AppRender
 	var image : Image = Image.new() #create(graph_edit.canvas_size.x,graph_edit.canvas_size.y,true,Image.FORMAT_BPTC_RGBA)
 	# Wait until the frame has finished before getting the texture.
 	await RenderingServer.frame_post_draw
-	image = rendering_window.find_child("SubViewport", true, false).get_texture().get_image()
+	image = rendering_window.get_texture().get_image()
 	image.save_png(files[0])
-	window.queue_free()
 	
 func export_jpeg_image():
 	if !ProjectsManager.project:
@@ -400,17 +405,12 @@ func export_jpeg_image():
 	if files.size() != 1:
 		return
 	# Generate the image
-	get_viewport().gui_embed_subwindows = true
-	var window : Window = window_packed_scene.instantiate()
-	add_child(window)
-	var rendering_window : window_manager = window.find_child("Control")
-	rendering_window.change_window(2)
+	var rendering_window : Viewport = $AppRender
 	var image : Image = Image.new()
 	# Wait until the frame has finished before getting the texture.
 	await RenderingServer.frame_post_draw
-	image = rendering_window.find_child("SubViewport", true, false).get_texture().get_image()
+	image = rendering_window.get_texture().get_image()
 	image.save_jpg(files[0])
-	window.queue_free()
 func refresh():
 	ProjectsManager.refresh()
 func open_file_location():
@@ -454,7 +454,7 @@ func quit() -> void:
 	mt_globals.config.set_value("window", "size", DisplayServer.window_get_size())
 	#Save Layout
 	if layout.layout.resource_name != "default_layout" and layout.layout.resource_name != "touch_layout":
-		await ResourceSaver.save(layout.layout, SAVED_LAYOUT_PATH)
+		ResourceSaver.save(layout.layout, SAVED_LAYOUT_PATH)
 	get_tree().quit()
 	quitting = false
 

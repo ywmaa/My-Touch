@@ -11,7 +11,7 @@ enum {
 
 @export_enum("Draw", "Erase", "Clone", "Shading", "Normal Map") var brush_type := 0
 @export var chunk_size := Vector2i(256, 256)
-@export var max_brush_size := 150
+@export var max_brush_size := 512
 @export var crosshair_color := Color(0.5, 0.5, 0.5, 0.75)
 
 var brushsize := 5

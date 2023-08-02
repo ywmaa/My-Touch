@@ -65,7 +65,7 @@ func check_save_tab(tab) -> bool:
 		var result = await dialog.ask()
 		match result:
 			"ok":
-				var status = await project.save_project()
+				var status = project.save_project()
 				if !status:
 					return false
 			"cancel":

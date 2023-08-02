@@ -58,35 +58,35 @@ func add_int(key : StringName, value : int = 0, minvalue : int = -2147483648, ma
 
 ## Adds a [SpinBox]. Retrieve the value with [method get_float] or [method get_int].
 ## If both [code]minvalue[/code] and [code]maxvalue[/code] are specified, also creates an [HSlider].
-func add_float(key : StringName, value : float = 0.0, minvalue : float = -99999900000.0, maxvalue : float = 99999900000.0, step : float = 1.0):
+func add_float(key : StringName, value : float = 0.0, minvalue : float = -2147483648.0, maxvalue : float = 2147483648.0, step : float = 1.0):
 	var editor : FloatEdit = preload("res://UI/widgets/float_edit/float_edit.tscn").instantiate()
 	var is_slider = minvalue > -2147483648 && maxvalue < 2147483648
 	editor.value = value
 	editor.step = step
-	editor.min_value = 10000#minvalue
-	editor.max_value = -10000#maxvalue
+	editor.min_value = -10000 if not is_slider else minvalue#minvalue
+	editor.max_value = 10000 if not is_slider else maxvalue#maxvalue
 	_add_property_editor(key, editor, editor.value_changed, _on_number_changed)
-	if is_slider:
-		var box = HBoxContainer.new()
-		var slider = HSlider.new()
-		editor.get_parent().add_child(box)
-		editor.get_parent().remove_child(editor)
-		box.add_child(editor)
-		box.add_child(slider)
-
-		box.size_flags_horizontal = SIZE_EXPAND_FILL
-		slider.size_flags_horizontal = SIZE_EXPAND_FILL
-		slider.size_flags_vertical = SIZE_FILL
-		editor.size_flags_horizontal = SIZE_FILL
-
-		slider.value = value
-		slider.step = step
-		slider.min_value = minvalue
-		slider.max_value = maxvalue
-
-		slider.value_changed.connect(editor.set_value)
-		editor.value_changed.connect(slider.set_value)
-		slider.value_changed.connect(_on_number_changed.bind(key))
+#	if is_slider:
+#		var box = HBoxContainer.new()
+#		var slider = HSlider.new()
+#		editor.get_parent().add_child(box)
+#		editor.get_parent().remove_child(editor)
+#		box.add_child(editor)
+#		box.add_child(slider)
+#
+#		box.size_flags_horizontal = SIZE_EXPAND_FILL
+#		slider.size_flags_horizontal = SIZE_EXPAND_FILL
+#		slider.size_flags_vertical = SIZE_FILL
+#		editor.size_flags_horizontal = SIZE_FILL
+#
+#		slider.value = value
+#		slider.step = step
+#		slider.min_value = minvalue
+#		slider.max_value = maxvalue
+#
+#		slider.value_changed.connect(editor.set_value)
+#		editor.value_changed.connect(slider.set_value)
+#		slider.value_changed.connect(_on_number_changed.bind(key))
 
 ## Adds a [LineEdit]. Retrieve the value with [method get_string].
 func add_string(key : StringName, value : String = ""):

@@ -17,18 +17,18 @@ func create_menu(menu_def : Array, object, menu:HFlowContainer):
 		var menu_item_name = menu_def[i].tool_name
 		var menu_item_tip = menu_def[i].tool_desc
 		var icon = menu_def[i].tool_icon
-		var shortcut = 0
+		var _shortcut = 0
 		if menu_def[i].tool_button_shortcut != "":
 			for s in menu_def[i].tool_button_shortcut.split("+"):
 				if s == "Alt":
-					shortcut |= KEY_MASK_ALT
+					_shortcut |= KEY_MASK_ALT
 				elif s == "Control":
 					#replace with KEY_MASK_CMD_OR_CTRL
-					shortcut |= KEY_MASK_CTRL
+					_shortcut |= KEY_MASK_CTRL
 				elif s == "Shift":
-					shortcut |= KEY_MASK_SHIFT
+					_shortcut |= KEY_MASK_SHIFT
 				else:
-					shortcut |= OS.find_keycode_from_string(s)
+					_shortcut |= OS.find_keycode_from_string(s)
 
 		var tool_button : BaseButton = _tool_button_scene.instantiate()
 		tool_button.name = menu_item_name

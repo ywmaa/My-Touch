@@ -43,39 +43,40 @@ var mouse_rect : Rect2
 func pass_event_to_tool(event) -> bool:
 	return ToolsManager.handle_image_input(event)
 
-func _input(event):
-	if !visible or has_focus == false:
-		return
-	pass_event_to_tool(event)
-	if event is InputEventMouseMotion and dragging:
-		queue_redraw()
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed:
-			pass
-#					layers.selected_layers = []
-			dragging = true
-			drag_start = get_local_mouse_position()
-				
-				
-		elif dragging:
-			dragging = false
-			queue_redraw()
-			var drag_end = get_local_mouse_position()
-			
-			for layer in ProjectsManager.project.layers.layers:
-				
-				if drag_end.y - drag_start.y < 0.0:
-					mouse_rect = Rect2(drag_end,abs(drag_end-drag_start))
-				else:
-					mouse_rect = Rect2(drag_start,abs(drag_end-drag_start))
-				mouse_rect.position.x = drag_start.x if drag_start.x < drag_end.x else drag_end.x
+#func _input(event):
+#	if !visible or has_focus == false:
+#		return
+#
+##	pass_event_to_tool(event)
+#	if event is InputEventMouseMotion and dragging:
+#		queue_redraw()
+#	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+#		if event.pressed:
+#			pass
+##					layers.selected_layers = []
+#			dragging = true
+#			drag_start = get_local_mouse_position()
+#
+#
+#		elif dragging:
+#			dragging = false
+#			queue_redraw()
+#			var drag_end = get_local_mouse_position()
+#
+#			for layer in ProjectsManager.project.layers.layers:
+#
+#				if drag_end.y - drag_start.y < 0.0:
+#					mouse_rect = Rect2(drag_end,abs(drag_end-drag_start))
+#				else:
+#					mouse_rect = Rect2(drag_start,abs(drag_end-drag_start))
+#				mouse_rect.position.x = drag_start.x if drag_start.x < drag_end.x else drag_end.x
 				
 #				if mouse_rect.intersects(layer.get_rect(),true):
 #					ProjectsManager.project.layers.select_layer(layer)
 
 
 	
-func _process(delta):
+func _process(_delta):
 	if !ProjectsManager.project:
 		visible = false
 		return
@@ -89,9 +90,6 @@ func _process(delta):
 		$Viewport.msaa_2d = get_viewport().msaa_2d
 	if has_focus == false:
 		return
-	ToolsManager.current_mouse_position = get_local_mouse_position()
-	ToolsManager.mouse_position_delta = ToolsManager.current_mouse_position - ToolsManager.previous_mouse_position if ToolsManager.smooth_mode == false else Input.get_last_mouse_velocity() * delta
-	ToolsManager.previous_mouse_position = get_local_mouse_position()
 	ToolsManager.camera = camera
 
 

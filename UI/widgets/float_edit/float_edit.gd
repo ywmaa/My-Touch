@@ -3,7 +3,7 @@ class_name FloatEdit
 @export var value : float = 0.5 :
 	set(v):
 		if v is float:
-			value = v
+			value = clampf(v, min_value, max_value)
 			text = str(v)
 			do_update()
 			$Slider.visible = true

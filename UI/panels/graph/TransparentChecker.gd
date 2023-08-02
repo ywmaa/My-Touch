@@ -49,6 +49,6 @@ func update_transparency(value: float) -> void:
 
 func _on_resized():
 	material.set_shader_parameter("rect_size", size)
-func _input(event):
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		print(event.position)
+#func _input(event):
+#	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+#		print(event.position)

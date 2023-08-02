@@ -70,11 +70,9 @@ func draw_preview(image_view : CanvasItem, _mouse_position : Vector2i):
 	axis_position = ToolsManager.current_project.layers.selected_layers[0].main_object.position
 	# Draw Axis
 	if direction == coordinates.x or direction == coordinates.xy:
-		image_view.draw_line(ToolsManager.axis_position * Vector2(-100000,1), ToolsManager.axis_position * Vector2(100000,1), Color(1,0,0), -1, true)
-		image_view.queue_redraw()
+		image_view.draw_line(axis_position * Vector2(-100000,1), axis_position * Vector2(100000,1), Color(1,0,0), -1, true)
 	if direction == coordinates.y or direction == coordinates.xy:
-		image_view.draw_line(ToolsManager.axis_position * Vector2(1,-100000), ToolsManager.axis_position * Vector2(1,100000), Color(0,1,0), -1, true)
-		image_view.queue_redraw()
+		image_view.draw_line(axis_position * Vector2(1,-100000), axis_position * Vector2(1,100000), Color(0,1,0), -1, true)
 	
 
 func enable_tool(): # Save History and Enable Tool

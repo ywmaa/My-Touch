@@ -43,8 +43,6 @@ func shortcut_pressed():
 func mouse_pressed(
 	_event : InputEventMouseButton,
 	_image : base_layer,
-	_color1 : Color = Color.BLACK,
-	_color2 : Color = Color.WHITE,
 ):
 	printerr("Not implemented: mouse_pressed! (" + get_script().resource_path.get_file() + ")")
 

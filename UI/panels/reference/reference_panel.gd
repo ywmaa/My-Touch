@@ -36,10 +36,10 @@ func _on_Image_gui_input(event) -> void:
 	var m : ShaderMaterial = $VBoxContainer/Image.material
 	var canvas_size : Vector2 = $VBoxContainer/Image.get_size()
 	var image_size : Vector2 = m.get_shader_parameter("image_size")
-	var scale : float = m.get_shader_parameter("scale")
+	var image_scale : float = m.get_shader_parameter("scale")
 	var center : Vector2 = m.get_shader_parameter("center")
 	var new_center : Vector2 = center
-	var new_scale : float = scale
+	var new_scale : float = image_scale
 	var ratio : Vector2 = canvas_size/image_size
 	var multiplier : Vector2 = image_size*min(ratio.x, ratio.y)
 	var image_rect : Rect2 = $VBoxContainer/Image.get_global_rect()
@@ -78,7 +78,7 @@ func _on_Image_gui_input(event) -> void:
 			zooming = false
 	elif event is InputEventMouseMotion:
 		if dragging:
-			new_center = m.get_shader_parameter("center")-event.relative*scale/multiplier
+			new_center = m.get_shader_parameter("center")-event.relative*image_scale/multiplier
 		elif zooming:
 			new_scale = clamp(new_scale*(1.0+0.01*event.relative.y), 0.005, 5.0)
 		elif color_count > 0 and event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0 and selected_slot.get_parent() == $VBoxContainer/Colors:
@@ -93,9 +93,9 @@ func _on_Image_gui_input(event) -> void:
 			gradient.add_point(1.0, get_color_under_cursor())
 			selected_slot.set_gradient(gradient)
 			gradient_length = new_gradient_length
-	if new_scale != scale:
+	if new_scale != image_scale:
 		m.set_shader_parameter("scale", new_scale)
-		new_center = center+offset_from_center*(scale-new_scale)/multiplier
+		new_center = center+offset_from_center*(image_scale-new_scale)/multiplier
 		if current_image >= 0:
 			images[current_image].scale = new_scale
 	if new_center != center:

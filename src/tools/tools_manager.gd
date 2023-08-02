@@ -16,6 +16,7 @@ var TOOLS : Array[ToolBase] = [
 	preload("res://src/tools/move_tool.gd").new(),
 	preload("res://src/tools/rotate_tool.gd").new(),
 	preload("res://src/tools/scale_tool.gd").new(),
+	preload("res://src/tools/brush_tool.gd").new(),
 	preload("res://src/tools/context_menu_tool.gd").new(),
 ]
 var current_tool : ToolBase
@@ -26,6 +27,11 @@ var camera : Camera2D
 var current_mouse_position : Vector2
 var previous_mouse_position : Vector2
 var mouse_position_delta : Vector2
+func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
+	if shortcut_tool != null: shortcut_tool.draw_preview(image_view, mouse_position)
+	if current_tool != null: current_tool.draw_preview(image_view, mouse_position)
+	
+	
 
 func handle_image_input(event) -> bool:
 	
@@ -38,7 +44,7 @@ func handle_image_input(event) -> bool:
 	if current_project.layers.selected_layers.is_empty():
 		return false
 	
-	event.position = event.global_position
+	
 	if event is InputEventMouseMotion:
 #		current_tool.selection = selection  # Needed because Image Script tool does not normally use clicks
 		# I better just fetch it from the Workspace but also ehhhh incapsulation
@@ -51,15 +57,11 @@ func handle_image_input(event) -> bool:
 			current_tool.mouse_pressed(
 				event,
 				current_project.layers.selected_layers[0],
-				current_color1 if event.button_index == MOUSE_BUTTON_LEFT else current_color2,
-				current_color1 if event.button_index != MOUSE_BUTTON_LEFT else current_color2
 			)
 		if shortcut_tool:
 			shortcut_tool.mouse_pressed(
 				event,
 				current_project.layers.selected_layers[0],
-				current_color1 if event.button_index == MOUSE_BUTTON_LEFT else current_color2,
-				current_color1 if event.button_index != MOUSE_BUTTON_LEFT else current_color2
 			)
 		if current_tool:
 			if current_tool.image_hide_mode != 2:

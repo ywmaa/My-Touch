@@ -3,12 +3,11 @@
 [ext_resource type="Script" path="res://UI/windows/accept_dialog/accept_dialog.gd" id="1"]
 
 [node name="AcceptDialog" type="AcceptDialog"]
-size = Vector2i(95, 78)
+size = Vector2i(95, 80)
 visible = true
 always_on_top = true
 popup_window = true
 script = ExtResource("1")
 
-[connection signal="cancelled" from="." to="." method="_on_AcceptDialog_popup_hide"]
 [connection signal="confirmed" from="." to="." method="_on_AcceptDialog_confirmed"]
 [connection signal="custom_action" from="." to="." method="_on_AcceptDialog_custom_action"]
