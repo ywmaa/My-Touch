@@ -73,9 +73,6 @@ func check_save_tab(tab) -> bool:
 		DirAccess.remove_absolute(project.save_path)
 	return true
 
-#func do_close_custom_action(_action : String, _tab : int, dialog : AcceptDialog) -> void:
-#	dialog.queue_free()
-
 
 func do_close_tab(tab = 0) -> void:
 	$Tabs.remove_tab(tab)
@@ -134,14 +131,5 @@ func _on_auto_save_timer_timeout():
 		if ProjectsManager.has_method("auto_save"):
 			ProjectsManager.auto_save()
 
-
-#func _on_mouse_entered():
-#	print("entered")
-#	mt_globals.main_window.left_cursor.visible = mt_globals.show_left_tool_icon
-#
-#
-#func _on_mouse_exited():
-#	print("exited")
-#	mt_globals.main_window.left_cursor.visible = false
 
 

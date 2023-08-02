@@ -34,7 +34,7 @@ func get_tool_inspector_properties():
 	return PropertiesView
 
 func shortcut_pressed():
-	if Input.is_action_just_pressed("pencil") and not Input.is_key_pressed(KEY_SHIFT):
+	if Input.is_action_just_pressed("pencil") and not Input.is_key_pressed(KEY_SHIFT) and not Input.is_key_pressed(KEY_CTRL) and not Input.is_key_pressed(KEY_ALT):
 		ToolsManager.shortcut_tool = self
 		if !tool_active:
 			enable_tool()

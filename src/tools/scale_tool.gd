@@ -12,12 +12,12 @@ func _init():
 
 
 func get_tool_inspector_properties():
-	printerr("Not implemented: get_tool_inspector_properties! (" + get_script().resource_path.get_file() + ")")
+	pass
 
 
 
 func shortcut_pressed():
-	if Input.is_action_just_pressed("scale") and not Input.is_key_pressed(KEY_SHIFT):
+	if Input.is_action_just_pressed("scale") and not Input.is_key_pressed(KEY_SHIFT) and not Input.is_key_pressed(KEY_CTRL) and not Input.is_key_pressed(KEY_ALT):
 		ToolsManager.shortcut_tool = self
 		if !tool_active:
 			enable_tool()

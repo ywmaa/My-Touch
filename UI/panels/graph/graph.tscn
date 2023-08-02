@@ -46,7 +46,6 @@ size_flags_vertical = 3
 tooltip_text = "canvas"
 focus_mode = 2
 mouse_filter = 0
-mouse_default_cursor_shape = 3
 stretch = true
 script = ExtResource("1_a3h74")
 tool_bar = NodePath("../Tools")

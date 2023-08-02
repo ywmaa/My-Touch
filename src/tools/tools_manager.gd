@@ -80,12 +80,14 @@ func _process(_delta):
 	current_project = ProjectsManager.project
 	if !current_project:
 		return
+	var left_mouse_cursor_visible : bool = false
 	for c in active_canvas.values():
 		if c == true:
+			left_mouse_cursor_visible = mt_globals.show_left_tool_icon
 			for tool in TOOLS:
 				tool.shortcut_pressed()
 			break
-	
+	mt_globals.main_window.left_cursor.visible = left_mouse_cursor_visible
 func _input(_event):
 	if Input.is_key_pressed(KEY_SHIFT):
 		effect_scaling_factor = 0.25
