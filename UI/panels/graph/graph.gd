@@ -22,12 +22,13 @@ func on_canvas_size_changed(value):
 
 @onready var transparent_checker = $Viewport/TransparentChecker
 @onready var camera: Camera2D = get_node("Viewport/Camera2D")
-
-
-
+@export var tool_bar : Node 
 
 func _ready() -> void:
 	self.connect("mouse_entered",_on_mouse_entered)
+	self.connect("mouse_exited",_on_mouse_exited)
+	mt_globals.main_window.connect("signal_view_center",center_view)
+	mt_globals.main_window.connect("signal_view_reset_zoom",camera.zoom_100)
 	self.connect("mouse_exited",_on_mouse_exited)
 	OS.low_processor_usage_mode = true
 
@@ -90,6 +91,8 @@ func _process(_delta):
 		$Viewport.msaa_2d = get_viewport().msaa_2d
 	if has_focus == false:
 		return
+	if Input.is_action_just_pressed("show_tool_bar"):
+		tool_bar.visible = !tool_bar.visible
 	ToolsManager.camera = camera
 
 

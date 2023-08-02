@@ -196,7 +196,7 @@ func _on_tween_step(_idx: int) -> void:
 
 func zoom_100() -> void:
 	zoom = Vector2.ONE
-	offset = mt_globals.main_window.get_current_graph_edit().project.canvas_size / 2
+	offset = ProjectsManager.project.canvas_size / 2
 	zoom_changed()
 
 

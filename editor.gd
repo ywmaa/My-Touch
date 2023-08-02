@@ -550,15 +550,15 @@ func edit_preferences() -> void:
 # -----------------------------------------------------------------------
 #                             View menu
 # -----------------------------------------------------------------------
+signal signal_view_center
+signal signal_view_reset_zoom
+
 func view_center() -> void:
-	printerr("Not implemented: view_center! (" + get_script().resource_path.get_file() + ")")
-#	var graph_edit : MTGraph = get_current_graph_edit()
-#	graph_edit.center_view()
+	signal_view_center.emit()
 
 func view_reset_zoom() -> void:
-	printerr("Not implemented: view_reset_zoom! (" + get_script().resource_path.get_file() + ")")
-#	var graph_edit : MTGraph = get_current_graph_edit()
-#	graph_edit.camera.zoom_100()
+	signal_view_reset_zoom.emit()
+
 
 func touch_mode_switch() -> void:
 	var saved_layout : DockableLayout = load("res://touch_editor_layout.tres")

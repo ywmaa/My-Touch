@@ -38,7 +38,7 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." node_paths=PackedStringArray("tool_bar")]
 material = SubResource("CanvasItemMaterial_nodqv")
 layout_mode = 2
 size_flags_horizontal = 3
@@ -49,6 +49,7 @@ mouse_filter = 0
 mouse_default_cursor_shape = 3
 stretch = true
 script = ExtResource("1_a3h74")
+tool_bar = NodePath("../Tools")
 
 [node name="Viewport" type="SubViewport" parent="SubViewportContainer"]
 disable_3d = true
