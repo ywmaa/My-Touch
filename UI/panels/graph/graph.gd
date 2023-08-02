@@ -94,9 +94,6 @@ func _process(_delta):
 
 
 
-func _exit_tree():
-	save_config()
-
 func load_config():
 	pass
 
@@ -115,8 +112,14 @@ func center_view() -> void:
 func _on_mouse_entered():
 	has_focus = true
 	mt_globals.main_window.left_cursor.visible = mt_globals.show_left_tool_icon
+	ToolsManager.active_canvas[self] = has_focus
 
 
 func _on_mouse_exited():
 	has_focus = false
 	mt_globals.main_window.left_cursor.visible = false
+	ToolsManager.active_canvas[self] = has_focus
+
+func _exit_tree():
+	ToolsManager.active_canvas.erase(self)
+	save_config()

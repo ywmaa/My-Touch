@@ -15,6 +15,16 @@ func _init():
 	tool_icon = get_icon_from_project_folder("colorselect")
 	brush_type = 2
 
+func shortcut_pressed():
+	if Input.is_action_just_pressed("mouse_left"):
+		if !tool_active and ToolsManager.current_tool == self:
+			enable_tool()
+			return
+		if tool_active:
+			confirm_tool()
+			return
+	if Input.is_action_just_pressed("cancel"):
+		cancel_tool()
 
 func mouse_pressed(
 	event : InputEventMouseButton,

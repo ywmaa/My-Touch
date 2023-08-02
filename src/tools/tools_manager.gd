@@ -4,6 +4,7 @@ extends Node
 signal color_changed(color, button)
 signal tool_changed(assigned_tool)
 
+var active_canvas : Dictionary
 var pen_pressure := 1.0
 var horizontal_mirror := false
 var vertical_mirror := false
@@ -16,6 +17,7 @@ var TOOLS : Array[ToolBase] = [
 	preload("res://src/tools/move_tool.gd").new(),
 	preload("res://src/tools/rotate_tool.gd").new(),
 	preload("res://src/tools/scale_tool.gd").new(),
+	preload("res://src/tools/pencil_tool.gd").new(),
 	preload("res://src/tools/brush_tool.gd").new(),
 	preload("res://src/tools/brush_clone_tool.gd").new(),
 	preload("res://src/tools/context_menu_tool.gd").new(),
@@ -78,8 +80,11 @@ func _process(_delta):
 	current_project = ProjectsManager.project
 	if !current_project:
 		return
-	for tool in TOOLS:
-		tool.shortcut_pressed()
+	for c in active_canvas.values():
+		if c == true:
+			for tool in TOOLS:
+				tool.shortcut_pressed()
+			break
 	
 func _input(_event):
 	if Input.is_key_pressed(KEY_SHIFT):

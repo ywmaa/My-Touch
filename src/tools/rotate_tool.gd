@@ -13,7 +13,7 @@ func get_tool_inspector_properties():
 
 
 func shortcut_pressed():
-	if Input.is_action_just_pressed("rotate"):
+	if Input.is_action_just_pressed("rotate") and not Input.is_key_pressed(KEY_SHIFT):
 		ToolsManager.shortcut_tool = self
 		if !tool_active:
 			enable_tool()
@@ -25,7 +25,7 @@ func shortcut_pressed():
 		if !tool_active and ToolsManager.current_tool == self:
 			enable_tool()
 			return
-		if tool_active and ToolsManager.shortcut_tool == self:
+		if tool_active:
 			confirm_tool()
 			return
 	if Input.is_action_just_pressed("cancel"):

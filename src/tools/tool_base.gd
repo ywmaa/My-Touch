@@ -25,13 +25,13 @@ func is_selection_empty():
 
 func set_image_pixel(image : Image, x : int, y : int, color : Color):
 	if !is_out_of_bounds(Vector2i(x, y), image.get_size()):
-		if selection.get_bit(x, y):
+#		if selection.get_bit(x, y):
 			image.set_pixel(x, y, color)
 
 
 func set_image_pixelv(image : Image, pos : Vector2i, color : Color):
 	if !is_out_of_bounds(pos, image.get_size()):
-		if selection.get_bitv(pos):
+#		if selection.get_bitv(pos):
 			image.set_pixelv(pos, color)
 
 func get_tool_inspector_properties():
@@ -66,6 +66,14 @@ func confirm_tool(): # Confirm Actions
 	ProjectsManager.send_changed_signal()
 	ToolsManager.get_node("/root/Editor/MessageLabel").show_step(ToolsManager.current_project.undo_redo.get_history_count())
 	tool_active = false
+
+func draw_crosshair(image_view : CanvasItem, mouse_position : Vector2i, line_length : int, color : Color):
+	image_view.draw_rect(Rect2i(mouse_position + Vector2i(0, 4), Vector2(1, +line_length)).abs(), color)
+	image_view.draw_rect(Rect2i(mouse_position - Vector2i(0, 3), Vector2(1, -line_length)).abs(), color)
+	image_view.draw_rect(Rect2i(mouse_position + Vector2i(4, 0), Vector2(+line_length, 1)).abs(), color)
+	image_view.draw_rect(Rect2i(mouse_position - Vector2i(3, 0), Vector2(-line_length, 1)).abs(), color)
+
+
 func draw_preview(_image_view : CanvasItem, _mouse_position : Vector2i):
 	printerr("Not implemented: draw_preview! (" + get_script().resource_path.get_file() + ")")
 
