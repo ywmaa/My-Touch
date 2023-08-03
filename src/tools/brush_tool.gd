@@ -9,13 +9,32 @@ enum {
 }
 
 @export_enum("Draw", "Erase", "Clone", "Shading", "Normal Map") var brush_type := 0
-@export var chunk_size := Vector2i(256, 256)
+@export var chunk_size := Vector2i(2048, 2048)
 @export var crosshair_color := Color(1.0, 1.0, 1.0, 1.0)
 
 var brushsize := 50.0:
 	set(x):
 		brushsize = x
 		brush_offset = Vector2(0.5, 0.5) * float(int(x) % 2)
+		cached_pixels.clear()
+		#use Bresenham's algorithm
+		var radius = (brushsize * 0.5)
+		var r = radius
+		var current_point = Vector2(0,r)
+		var d : float = 5.0/4.0 - r
+		for y in current_point.y:
+			cached_pixels.append_array(GetCircleSym(0,0,current_point.x,y))
+		while current_point.y >= current_point.x:
+			current_point.x += 1
+
+			if (d < 0):
+				d = d + (2 * current_point.x + 1)
+			else:
+				current_point.y -= 1
+				d = d + (2 * (current_point.x-current_point.y) + 1)
+			#Fill the circle
+			for y in current_point.y:
+				cached_pixels.append_array(GetCircleSym(0,0,current_point.x,y))
 
 var brush_offset := Vector2(0.5, 0.5)
 var hardness := 1.0
@@ -33,7 +52,6 @@ var drawing_color1 := Color()
 var drawing_color2 := Color()
 var last_edits_chunks := {}
 var last_edits_textures := {}
-var last_affected_rect := Rect2i()
 
 var edited_object
 var EditedImage : Image
@@ -140,7 +158,7 @@ func confirm_tool(): # Confirm Actions
 #		ToolsManager.current_project.undo_redo.commit_action()
 	super.confirm_tool()
 
-func start_drawing(image, start_pos):
+func start_drawing(image, _start_pos):
 	# Break the image up into tiles - small images are faster to edit.
 	for i in ceil(float(image.get_width()) / chunk_size.x):
 		for j in ceil(float(image.get_height()) / chunk_size.y):
@@ -153,8 +171,6 @@ func start_drawing(image, start_pos):
 		# Copy the image to the tiles. Worse opacity handling,
 		# but with more work can make eraser editing more performant and previewable.
 		# last_edits_chunks[k].blit_rect(image, Rect2i(k, chunk_size), Vector2i.ZERO)
-
-	last_affected_rect = Rect2i(start_pos, Vector2i.ZERO)
 
 
 func apply_brush(image):
@@ -169,15 +185,12 @@ func apply_brush(image):
 func apply_eraser(image):
 	# Cutting off a smaller image does not increase performance.
 	# Must find another way - erasing is very slow.
-#	var new_image = Image.create(last_affected_rect.size.x + 1, last_affected_rect.size.y + 1, false, image.get_format())
-#	new_image.blit_rect(new_image, last_affected_rect, Vector2i.ZERO)
 	var pos
 	for k in last_edits_chunks:
 		var chunk = last_edits_chunks[k]
 		var height = mini(image.get_height() - k.y, chunk.get_height())
 		for i in mini(image.get_width() - k.x, chunk.get_width()):
 			for j in height:
-#				pos = k - last_affected_rect.position + Vector2i(i, j)
 				pos = Vector2i(i + k.x, j + k.y)
 				chunk.set_pixel(
 					i, j,
@@ -186,46 +199,32 @@ func apply_eraser(image):
 		image.blit_rect(last_edits_chunks[k], Rect2i(Vector2i.ZERO, chunk_size), k)
 
 
-func get_affected_rect():
-	return last_affected_rect.grow_individual(0, 0, 1, 1)
-
 
 func mouse_moved(event : InputEventMouseMotion):
 	if !tool_active:
 		return
 	if !edited_object:
 		return
-#	if ToolsManager.mouse_position_delta.length() > 0.0:
-	var object_correction = edited_object.main_object.position-edited_object.size/2
-	if event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0.0:
-		stroke(ToolsManager.previous_mouse_position-object_correction, ToolsManager.current_mouse_position-object_correction, event.pressure)
+	if ToolsManager.mouse_position_delta.length() > 0.0:
+		var object_correction = edited_object.main_object.position-edited_object.size/2
+		if event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0.0:
+			stroke(ToolsManager.previous_mouse_position-object_correction, ToolsManager.current_mouse_position-object_correction, event.pressure)
 
-	else:
-		stroke(ToolsManager.previous_mouse_position-object_correction, ToolsManager.current_mouse_position-object_correction, 1.0)
+		else:
+			stroke(ToolsManager.previous_mouse_position-object_correction, ToolsManager.current_mouse_position-object_correction, 1.0)
 
 var cached_pixels : PackedVector2Array = []
+var last_stroke_pos
 func stroke(stroke_start, stroke_end, pressure):
-	cached_pixels.clear()
+	if last_stroke_pos == null:
+		last_stroke_pos = stroke_end
+	if stroke_end.distance_to(last_stroke_pos) < (brushsize * 0.25):
+		return
+	last_stroke_pos = stroke_end
 	var unsolid_radius = (brushsize * 0.5) * (1.0 - hardness)
 	var radius = (brushsize * 0.5) * (pressure if pen_pressure_usage == pen_flag.size else 1.0)
 	var solid_radius = radius - unsolid_radius
-	#use Bresenham's algorithm
-	var r = radius
-	var current_point = Vector2(0,r)
-	var d : float = 5.0/4.0 - r
-	for y in current_point.y:
-		cached_pixels.append(Vector2(current_point.x,y))
-	while current_point.y >= current_point.x:
-		current_point.x += 1
 
-		if (d < 0):
-			d = d + (2 * current_point.x + 1)
-		else:
-			current_point.y -= 1
-			d = d + (2 * (current_point.x-current_point.y) + 1)
-		#Fill the circle
-		for y in current_point.y:
-			cached_pixels.append(Vector2(current_point.x,y))
 
 	
 	#Chunks
@@ -235,13 +234,12 @@ func stroke(stroke_start, stroke_end, pressure):
 	rect = Rect2i(rect.position / chunk_size, rect.end / chunk_size)
 	var key
 	var keyf
-
 	for i in rect.size.x + 1:
 		for j in rect.size.y + 1:
 			key = (rect.position + Vector2i(i, j)) * chunk_size
 			keyf = Vector2(key)
 			if !last_edits_chunks.has(key): continue
-
+			
 			paint(
 				last_edits_chunks[key],
 				stroke_end - keyf,
@@ -253,8 +251,8 @@ func stroke(stroke_start, stroke_end, pressure):
 			)
 
 
-func paint(on_image, stroke_start, stroke_end, chunk_position, pressure, radius, solid_radius):
-
+func paint(on_image, stroke_start, stroke_end, _chunk_position, pressure, radius, solid_radius):
+	
 
 	var color : Color
 	if brush_type == BRUSH_ERASE:
@@ -270,27 +268,22 @@ func paint(on_image, stroke_start, stroke_end, chunk_position, pressure, radius,
 	if pen_pressure_usage == pen_flag.opacity:
 		color.a *= pressure
 
-	var new_rect = Rect2i(stroke_start, Vector2i.ZERO)\
-		.expand(stroke_end)\
-		.grow(radius + 2)\
-		.intersection(Rect2i(Vector2i.ZERO, on_image.get_size()))
-
-	if new_rect.size == Vector2i.ZERO:
-		return
-
-	last_affected_rect = last_affected_rect\
-		.expand(Vector2i(new_rect.position) + chunk_position)\
-		.expand(Vector2i(new_rect.end) + chunk_position)
-
 	stroke_start = stroke_start.floor() + Vector2(0.5, 0.5)
 	stroke_end = stroke_end.floor() + Vector2(0.5, 0.5)
-
+	
 	for pixel in cached_pixels:
-		DrawCircle(stroke_end.x, stroke_end.y,pixel.x,pixel.y,\
-		on_image, new_rect, color, stroke_start, stroke_end, radius, solid_radius\
-		)
+		var cur_pos = stroke_end+pixel
+		if cur_pos.x < 0 or cur_pos.y < 0:
+			continue
+		if cur_pos.x > chunk_size.x or cur_pos.y > chunk_size.y:
+			continue
+		on_image.set_pixelv(cur_pos, get_new_pixel(
+			on_image, color,
+			stroke_start, stroke_end, cur_pos,
+			radius, solid_radius
+		))
 
-func DrawCircle(x_center: int, y_center:int, x:int, y:int, on_image, rect: Rect2i, color, stroke_start, stroke_end, radius, solid_radius):
+func GetCircleSym(x_center: int, y_center:int, x:int, y:int):
 	var pixels : PackedVector2Array = [
 		Vector2(x_center+x, y_center+y),
 		Vector2(x_center-x, y_center+y),
@@ -301,17 +294,12 @@ func DrawCircle(x_center: int, y_center:int, x:int, y:int, on_image, rect: Rect2
 		Vector2(x_center+y, y_center-x),
 		Vector2(x_center-y, y_center-x)
 	]
-	for pixel in pixels:
-		if !rect.has_point(pixel):
-			continue
-		on_image.set_pixelv(pixel, get_new_pixel(
-			on_image, color,
-			stroke_start, stroke_end, pixel + brush_offset,
-			radius, solid_radius
-		))
+	return pixels
+
 
 func get_new_pixel(on_image, color, _stroke_start, stroke_end, cur_pos, radius, solid_radius):
 	var old_color = on_image.get_pixelv(cur_pos)
+	
 	var distance = Geometry2D.get_closest_point_to_segment(
 		cur_pos, _stroke_start, stroke_end
 	).distance_to(cur_pos)
