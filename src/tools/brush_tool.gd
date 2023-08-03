@@ -195,23 +195,47 @@ func mouse_moved(event : InputEventMouseMotion):
 		return
 	if !edited_object:
 		return
-	if ToolsManager.mouse_position_delta.length() > 0.0:
-		var object_correction = edited_object.main_object.position-edited_object.size/2
-		if event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0.0:
-			stroke(ToolsManager.previous_mouse_position-object_correction, ToolsManager.current_mouse_position-object_correction, event.pressure)
+#	if ToolsManager.mouse_position_delta.length() > 0.0:
+	var object_correction = edited_object.main_object.position-edited_object.size/2
+	if event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0.0:
+		stroke(ToolsManager.previous_mouse_position-object_correction, ToolsManager.current_mouse_position-object_correction, event.pressure)
 
-		else:
-			stroke(ToolsManager.previous_mouse_position-object_correction, ToolsManager.current_mouse_position-object_correction, 1.0)
+	else:
+		stroke(ToolsManager.previous_mouse_position-object_correction, ToolsManager.current_mouse_position-object_correction, 1.0)
 
-
+var cached_pixels : PackedVector2Array = []
 func stroke(stroke_start, stroke_end, pressure):
+	cached_pixels.clear()
+	var unsolid_radius = (brushsize * 0.5) * (1.0 - hardness)
+	var radius = (brushsize * 0.5) * (pressure if pen_pressure_usage == pen_flag.size else 1.0)
+	var solid_radius = radius - unsolid_radius
+	#use Bresenham's algorithm
+	var r = radius
+	var current_point = Vector2(0,r)
+	var d : float = 5.0/4.0 - r
+	for y in current_point.y:
+		cached_pixels.append(Vector2(current_point.x,y))
+	while current_point.y >= current_point.x:
+		current_point.x += 1
+
+		if (d < 0):
+			d = d + (2 * current_point.x + 1)
+		else:
+			current_point.y -= 1
+			d = d + (2 * (current_point.x-current_point.y) + 1)
+		#Fill the circle
+		for y in current_point.y:
+			cached_pixels.append(Vector2(current_point.x,y))
+
+	
+	#Chunks
 	var rect = Rect2i(stroke_start, Vector2.ZERO)\
 		.expand(stroke_end)\
 		.grow(brushsize * 0.5 + 1)
 	rect = Rect2i(rect.position / chunk_size, rect.end / chunk_size)
 	var key
 	var keyf
-	
+
 	for i in rect.size.x + 1:
 		for j in rect.size.y + 1:
 			key = (rect.position + Vector2i(i, j)) * chunk_size
@@ -223,14 +247,14 @@ func stroke(stroke_start, stroke_end, pressure):
 				stroke_end - keyf,
 				stroke_start - keyf,
 				key,
-				pressure
+				pressure,
+				radius,
+				solid_radius
 			)
 
 
-func paint(on_image, stroke_start, stroke_end, chunk_position, pressure):
-	var unsolid_radius = (brushsize * 0.5) * (1.0 - hardness)
-	var radius = (brushsize * 0.5) * (pressure if pen_pressure_usage == pen_flag.size else 1.0)
-	var solid_radius = radius - unsolid_radius
+func paint(on_image, stroke_start, stroke_end, chunk_position, pressure, radius, solid_radius):
+
 
 	var color : Color
 	if brush_type == BRUSH_ERASE:
@@ -253,34 +277,44 @@ func paint(on_image, stroke_start, stroke_end, chunk_position, pressure):
 
 	if new_rect.size == Vector2i.ZERO:
 		return
-	
+
 	last_affected_rect = last_affected_rect\
 		.expand(Vector2i(new_rect.position) + chunk_position)\
 		.expand(Vector2i(new_rect.end) + chunk_position)
 
 	stroke_start = stroke_start.floor() + Vector2(0.5, 0.5)
 	stroke_end = stroke_end.floor() + Vector2(0.5, 0.5)
-	var cur_pos
 
-	for i in new_rect.size.x:
-		for j in new_rect.size.y:
-			cur_pos = new_rect.position + Vector2i(i, j)
-#			if is_out_of_bounds(cur_pos + chunk_position, selection.get_size()):
-#				continue
-#
-#			if !selection.get_bitv(cur_pos + chunk_position):
-#				continue
+	for pixel in cached_pixels:
+		DrawCircle(stroke_end.x, stroke_end.y,pixel.x,pixel.y,\
+		on_image, new_rect, color, stroke_start, stroke_end, radius, solid_radius\
+		)
 
-			on_image.set_pixelv(cur_pos, get_new_pixel(
-				on_image, color,
-				stroke_start, stroke_end, Vector2(cur_pos) + brush_offset,
-				radius, solid_radius
-			))
-
+func DrawCircle(x_center: int, y_center:int, x:int, y:int, on_image, rect: Rect2i, color, stroke_start, stroke_end, radius, solid_radius):
+	var pixels : PackedVector2Array = [
+		Vector2(x_center+x, y_center+y),
+		Vector2(x_center-x, y_center+y),
+		Vector2(x_center+x, y_center-y),
+		Vector2(x_center-x, y_center-y),
+		Vector2(x_center+y, y_center+x),
+		Vector2(x_center-y, y_center+x),
+		Vector2(x_center+y, y_center-x),
+		Vector2(x_center-y, y_center-x)
+	]
+	for pixel in pixels:
+		if !rect.has_point(pixel):
+			continue
+		on_image.set_pixelv(pixel, get_new_pixel(
+			on_image, color,
+			stroke_start, stroke_end, pixel + brush_offset,
+			radius, solid_radius
+		))
 
 func get_new_pixel(on_image, color, _stroke_start, stroke_end, cur_pos, radius, solid_radius):
 	var old_color = on_image.get_pixelv(cur_pos)
-	var distance = Vector2(stroke_end).distance_to(cur_pos)
+	var distance = Geometry2D.get_closest_point_to_segment(
+		cur_pos, _stroke_start, stroke_end
+	).distance_to(cur_pos)
 	if distance <= solid_radius:
 		var blended = old_color.blend(color)
 		blended.a = max(old_color.a, color.a)
