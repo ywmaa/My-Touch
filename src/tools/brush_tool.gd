@@ -11,38 +11,18 @@ enum {
 @export_enum("Draw", "Erase", "Clone", "Shading", "Normal Map") var brush_type := 0
 @export var chunk_size := Vector2i(2048, 2048)
 @export var crosshair_color := Color(1.0, 1.0, 1.0, 1.0)
-
+var calculate_brush_thread : Thread = Thread.new()
+var calculate_brush_mutex : Mutex = Mutex.new()
+var brush_size_calculated : float = 0.0
+var hardness_calculated : float = 0.0
 var brushsize := 50.0:
 	set(x):
 		brushsize = x
 		brush_offset = Vector2(0.5, 0.5) * float(int(x) % 2)
-		cached_pixels.clear()
-		#use Bresenham's algorithm
-		var radius = (brushsize * 0.5)
-		var r = radius
-		var current_point = Vector2(0,r)
-		var d : float = 5.0/4.0 - r
-		for y in current_point.y:
-			cached_pixels.append_array(GetCircleSym(0,0,current_point.x,y))
-		while current_point.y >= current_point.x:
-			current_point.x += 1
 
-			if (d < 0):
-				d = d + (2 * current_point.x + 1)
-			else:
-				current_point.y -= 1
-				d = d + (2 * (current_point.x-current_point.y) + 1)
-			#Fill the circle
-			for y in current_point.y:
-				cached_pixels.append_array(GetCircleSym(0,0,current_point.x,y))
 
 var brush_offset := Vector2(0.5, 0.5)
 var hardness := 1.0
-var hardness_property : float = 0.0:
-	set(x):
-		hardness = clampf(x/100.0,0.0,1.0)
-	get:
-		return hardness * 100.0
 var opacity : float = 1.0
 enum pen_flag{size,opacity,tint}
 var pen_pressure_usage : pen_flag = pen_flag.size
@@ -61,6 +41,7 @@ func _init():
 	tool_button_shortcut = "Shift+B"
 	tool_desc = ""
 	tool_icon = get_icon_from_project_folder("brush")
+	calculate_brush_thread.start(get_all_brush_pixels)
 func get_tool_inspector_properties():
 	var PropertiesView : Array = []
 	var PropertiesGroups : Array[String] = []
@@ -84,6 +65,8 @@ func get_tool_inspector_properties():
 
 
 func shortcut_pressed():
+	if brushsize != brush_size_calculated or hardness != hardness_calculated:
+		calculate_brush_thread.start(get_all_brush_pixels)
 	if Input.is_action_just_pressed("brush") and not Input.is_key_pressed(KEY_SHIFT) and not Input.is_key_pressed(KEY_CTRL) and not Input.is_key_pressed(KEY_ALT):
 		ToolsManager.shortcut_tool = self
 		if !tool_active:
@@ -138,16 +121,19 @@ func cancel_tool(): # Redo Actions
 #		for selected in ToolsManager.current_project.layers.selected_layers:
 #			ToolsManager.current_project.undo_redo.undo()
 	super.cancel_tool()
+var apply_thread : Thread = Thread.new()
 func confirm_tool(): # Confirm Actions
-	match brush_type:
-		BRUSH_ERASE:
-			apply_eraser(EditedImage)
-		_:
-			apply_brush(EditedImage)
+	if apply_thread.is_started():
+		apply_thread.wait_to_finish()
+	
+	if brush_type == BRUSH_ERASE:
+		var paint_thread : Thread = Thread.new()
+		paint_threads.append(paint_thread)
+		paint_thread.start(apply_eraser.bind(EditedImage))
+	
 
-	if edited_object:
-		edited_object.main_object.texture.update(EditedImage) #= ImageTexture.create_from_image(EditedImage)
-		edited_object.save_paint_image()
+
+	apply_thread.start(apply_texture)
 #	if EditedImage:
 #		EditedImage.save_png(ToolsManager.current_project.layers.selected_layers[0].image_path)
 #	ToolsManager.current_project.layers.selected_layers[0].texture = ImageTexture.create_from_image(EditedImage)
@@ -157,6 +143,15 @@ func confirm_tool(): # Confirm Actions
 #			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
 #		ToolsManager.current_project.undo_redo.commit_action()
 	super.confirm_tool()
+func apply_texture():
+	for thread in paint_threads:
+		thread.wait_to_finish()
+	paint_threads.clear()
+	if brush_type != BRUSH_ERASE:
+		apply_brush(EditedImage)
+	if edited_object:
+		edited_object.main_object.texture.update(EditedImage) #= ImageTexture.create_from_image(EditedImage)
+		edited_object.save_paint_image()
 
 func start_drawing(image, _start_pos):
 	# Break the image up into tiles - small images are faster to edit.
@@ -185,6 +180,7 @@ func apply_brush(image):
 func apply_eraser(image):
 	# Cutting off a smaller image does not increase performance.
 	# Must find another way - erasing is very slow.
+	paint_mutex.lock()
 	var pos
 	for k in last_edits_chunks:
 		var chunk = last_edits_chunks[k]
@@ -197,7 +193,7 @@ func apply_eraser(image):
 					image.get_pixelv(pos) - chunk.get_pixel(i, j)
 				)
 		image.blit_rect(last_edits_chunks[k], Rect2i(Vector2i.ZERO, chunk_size), k)
-
+	paint_mutex.unlock()
 
 
 func mouse_moved(event : InputEventMouseMotion):
@@ -214,7 +210,10 @@ func mouse_moved(event : InputEventMouseMotion):
 			stroke(ToolsManager.previous_mouse_position-object_correction, ToolsManager.current_mouse_position-object_correction, 1.0)
 
 var cached_pixels : PackedVector2Array = []
+var solid_color_rect : Rect2i 
+var paint_mutex : Mutex = Mutex.new()
 var last_stroke_pos
+var paint_threads : Array = []
 func stroke(stroke_start, stroke_end, pressure):
 	if last_stroke_pos == null:
 		last_stroke_pos = stroke_end
@@ -225,7 +224,7 @@ func stroke(stroke_start, stroke_end, pressure):
 	var radius = (brushsize * 0.5) * (pressure if pen_pressure_usage == pen_flag.size else 1.0)
 	var solid_radius = radius - unsolid_radius
 
-
+	
 	
 	#Chunks
 	var rect = Rect2i(stroke_start, Vector2.ZERO)\
@@ -239,8 +238,9 @@ func stroke(stroke_start, stroke_end, pressure):
 			key = (rect.position + Vector2i(i, j)) * chunk_size
 			keyf = Vector2(key)
 			if !last_edits_chunks.has(key): continue
-			
-			paint(
+			var paint_thread : Thread = Thread.new()
+			paint_threads.append(paint_thread)
+			paint_thread.start(paint.bind(
 				last_edits_chunks[key],
 				stroke_end - keyf,
 				stroke_start - keyf,
@@ -248,12 +248,12 @@ func stroke(stroke_start, stroke_end, pressure):
 				pressure,
 				radius,
 				solid_radius
-			)
+			))
 
 
 func paint(on_image, stroke_start, stroke_end, _chunk_position, pressure, radius, solid_radius):
 	
-
+	paint_mutex.lock()
 	var color : Color
 	if brush_type == BRUSH_ERASE:
 		color = Color.BLACK
@@ -270,18 +270,75 @@ func paint(on_image, stroke_start, stroke_end, _chunk_position, pressure, radius
 
 	stroke_start = stroke_start.floor() + Vector2(0.5, 0.5)
 	stroke_end = stroke_end.floor() + Vector2(0.5, 0.5)
+
+	calculate_brush_thread.wait_to_finish()
 	
+	
+#	var begin = Time.get_ticks_msec()
+	on_image.fill_rect(Rect2i(solid_color_rect.position+Vector2i(stroke_end),solid_color_rect.size), color)
 	for pixel in cached_pixels:
 		var cur_pos = stroke_end+pixel
 		if cur_pos.x < 0 or cur_pos.y < 0:
 			continue
 		if cur_pos.x > chunk_size.x or cur_pos.y > chunk_size.y:
 			continue
+		if solid_color_rect.has_point(pixel):
+			continue
 		on_image.set_pixelv(cur_pos, get_new_pixel(
 			on_image, color,
 			stroke_start, stroke_end, cur_pos,
 			radius, solid_radius
 		))
+	paint_mutex.unlock()
+#	print("OP Took ", Time.get_ticks_msec()-begin, "ms")
+
+func get_all_brush_pixels():
+		calculate_brush_mutex.lock()
+		
+		cached_pixels.clear()
+		
+		hardness_calculated = hardness
+		brush_size_calculated = brushsize
+		var unsolid_radius = (brushsize * 0.5) * (1.0 - hardness)
+		var radius = (brushsize * 0.5) #* (pressure if pen_pressure_usage == pen_flag.size else 1.0)
+		var solid_radius = radius - unsolid_radius
+		
+		
+		# for performance, we create a rect2i containing all pixels
+		# that will not blend with the background and have same color
+		# so we use Image.fill_rect() to improve performance
+		
+		# Let's assume a Square Side is called A
+		# then its value would be like this : A^2 + A^2 = D^2
+		# where D is the diagonal, and our diagonal in this case is actually the circle radius
+		var square_side = sqrt(pow(solid_radius,2)/2) 
+		solid_color_rect = Rect2i(0-square_side, 0-square_side, square_side*2,square_side*2)
+		
+		
+		
+		#use Bresenham's algorithm
+		var r = radius
+		var current_point = Vector2(0,r)
+		var d : float = 5.0/4.0 - r
+		for y in current_point.y:
+			cached_pixels.append_array(GetCircleSym(0,0,current_point.x,y))
+		while current_point.y >= current_point.x:
+			current_point.x += 1
+
+			if (d < 0):
+				d = d + (2 * current_point.x + 1)
+			else:
+				current_point.y -= 1
+				d = d + (2 * (current_point.x-current_point.y) + 1)
+			#Fill the circle
+			for y in current_point.y:
+				if solid_color_rect.has_point(Vector2i(current_point.x,y)):
+					#Skip Pixels that will be drawn anyway using the Rect2i
+					continue
+				cached_pixels.append_array(GetCircleSym(0,0,current_point.x,y))
+				
+		
+		calculate_brush_mutex.unlock()
 
 func GetCircleSym(x_center: int, y_center:int, x:int, y:int):
 	var pixels : PackedVector2Array = [
@@ -298,17 +355,17 @@ func GetCircleSym(x_center: int, y_center:int, x:int, y:int):
 
 
 func get_new_pixel(on_image, color, _stroke_start, stroke_end, cur_pos, radius, solid_radius):
+#	print("ALL ITERS")
+
+	var distance = stroke_end.distance_to(cur_pos)
 	var old_color = on_image.get_pixelv(cur_pos)
-	
-	var distance = Geometry2D.get_closest_point_to_segment(
-		cur_pos, _stroke_start, stroke_end
-	).distance_to(cur_pos)
 	if distance <= solid_radius:
+#		print("solid iter")
 		var blended = old_color.blend(color)
 		blended.a = max(old_color.a, color.a)
-		return blended
-
-	elif distance <= radius:
+		return color
+	
+	if distance <= radius:
 		var blended = old_color.blend(color)
 		distance = (distance - solid_radius) / (radius - solid_radius)
 #		Possible better handling of variable pressure,
