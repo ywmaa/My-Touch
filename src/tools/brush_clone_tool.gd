@@ -13,7 +13,7 @@ func _init():
 	tool_button_shortcut = ""
 	tool_desc = ""
 	tool_icon = get_icon_from_project_folder("colorselect")
-	brush_type = 2
+	brush_type = BRUSH_CLONE
 
 func shortcut_pressed():
 	if Input.is_action_just_pressed("mouse_left"):
@@ -44,7 +44,7 @@ func mouse_moved(event : InputEventMouseMotion):
 	super.mouse_moved(event)
 
 
-func get_new_pixel(on_image, _color, _stroke_start, stroke_end, cur_pos, radius, solid_radius):
+func get_new_pixel(on_image, _color:Color, stroke_end:Vector2, cur_pos, radius:float, solid_radius:float):
 	var old_color = on_image.get_pixelv(cur_pos)
 	var cloned_color = EditedImage.get_pixelv(
 		(Vector2(last_edits_chunks.find_key(on_image)) + cur_pos + clone_offset)
