@@ -9,8 +9,10 @@ enum {
 }
 
 @export_enum("Draw", "Erase", "Clone", "Shading", "Normal Map") var brush_type := 0
-@export var chunk_size := Vector2i(2048, 2048)
+@export var chunk_count : int = 1
 @export var crosshair_color := Color(1.0, 1.0, 1.0, 1.0)
+
+var chunk_size := Vector2i(960, 540)
 var brushsize := 50.0:
 	set(x):
 		brushsize = x
@@ -114,17 +116,13 @@ func cancel_tool(): # Redo Actions
 #		for selected in ToolsManager.current_project.layers.selected_layers:
 #			ToolsManager.current_project.undo_redo.undo()
 	super.cancel_tool()
-var apply_thread : Array[Thread] = []
-var apply_mutex : Mutex = Mutex.new()
 func confirm_tool(): # Confirm Actions
 
 	
 	if brush_type == BRUSH_ERASE:
-		var paint_thread : Thread = Thread.new()
-		paint_threads.append(paint_thread)
-		paint_thread.start(apply_eraser.bind(EditedImage))
-	var thread : Thread = Thread.new()
-	thread.start(apply_texture)
+		var worker = TaskManager.create_task(apply_eraser.bind(EditedImage))
+		paint_threads.append(worker)
+	TaskManager.create_task(apply_texture)
 #	if EditedImage:
 #		EditedImage.save_png(ToolsManager.current_project.layers.selected_layers[0].image_path)
 #	ToolsManager.current_project.layers.selected_layers[0].texture = ImageTexture.create_from_image(EditedImage)
@@ -135,18 +133,17 @@ func confirm_tool(): # Confirm Actions
 #		ToolsManager.current_project.undo_redo.commit_action()
 	super.confirm_tool()
 func apply_texture():
-	apply_mutex.lock()
 	for thread in paint_threads:
-		thread.wait_to_finish()
+		thread.wait()
 	paint_threads.clear()
 	if brush_type != BRUSH_ERASE:
 		apply_brush(EditedImage)
 	if edited_object:
 		edited_object.main_object.texture.update(EditedImage) #= ImageTexture.create_from_image(EditedImage)
 		edited_object.save_paint_image()
-	apply_mutex.unlock()
 func start_drawing(image, _start_pos):
 	# Break the image up into tiles - small images are faster to edit.
+	chunk_size = image.get_size()/chunk_count
 	for i in ceil(float(image.get_width()) / chunk_size.x):
 		for j in ceil(float(image.get_height()) / chunk_size.y):
 			last_edits_chunks[Vector2i(i, j) * chunk_size] = Image.create(
@@ -209,7 +206,7 @@ var paint_threads : Array = []
 func stroke(stroke_start:Vector2, stroke_end:Vector2, pressure):
 	if last_stroke_pos == null:
 		last_stroke_pos = stroke_end
-	if stroke_end.distance_to(last_stroke_pos) < (brushsize * 0.25):
+	if stroke_end.distance_to(last_stroke_pos) < (brushsize * 0.25) and brushsize > 200.0:
 		return
 	last_stroke_pos = stroke_end
 	var unsolid_radius : float = (brushsize * 0.5) * (1.0 - hardness)
@@ -228,19 +225,21 @@ func stroke(stroke_start:Vector2, stroke_end:Vector2, pressure):
 			key = (rect.position + Vector2i(i, j)) * chunk_size
 			keyf = Vector2(key)
 			if !last_edits_chunks.has(key): continue
-			var paint_thread : Thread = Thread.new()
-			paint_threads.append(paint_thread)
-			paint_thread.start(paint.bind(
-				last_edits_chunks[key],
-				stroke_end - keyf,
-				stroke_start - keyf,
-				pressure,
-				radius,
-				solid_radius
-			))
+			TaskManager.create_task(
+				paint.bind(
+					last_edits_chunks[key],
+					stroke_end - keyf,
+					pressure,
+					radius,
+					solid_radius
+				)
+				,true
+				,"Paint Process"
+			)
 
 
-func paint(on_image, stroke_start:Vector2, stroke_end:Vector2, pressure:float , radius:float, solid_radius:float):
+
+func paint(on_image, stroke_end:Vector2, pressure:float , radius:float, solid_radius:float):
 	paint_mutex.lock()
 	
 	get_all_brush_pixels(radius, solid_radius)
@@ -260,49 +259,47 @@ func paint(on_image, stroke_start:Vector2, stroke_end:Vector2, pressure:float , 
 	if pen_pressure_usage == pen_flag.opacity:
 		color.a *= pressure
 
-	stroke_start = stroke_start.floor() + Vector2(0.5, 0.5)
-	stroke_end = stroke_end.floor() + Vector2(0.5, 0.5)
+	stroke_end = stroke_end.floor() #+ Vector2(0.5, 0.5)
 
-	
+#	var begin = Time.get_ticks_msec()
 	var edited_image_size : Vector2i = EditedImage.get_size()
 	if brush_type == BRUSH_DRAW or brush_type == BRUSH_ERASE:
 		on_image.fill_rect(Rect2i(solid_color_rect.position-Vector2i(2,2)+Vector2i(stroke_end),solid_color_rect.size+Vector2i(4,4)), color)
-#	var begin = Time.get_ticks_msec()
-	var worker : int = WorkerThreadPool.add_group_task(set_pixels.bind(on_image, color, stroke_end, radius, solid_radius, edited_image_size),cached_pixels.size())
-	WorkerThreadPool.wait_for_group_task_completion(worker)
+	
+	var worker = TaskManager.create_group_task(set_pixels.bind(on_image, color, stroke_end, radius, solid_radius, edited_image_size),cached_pixels.size(),-1 ,true)
+	worker.wait()
 #	for pixel in cached_pixels:
 #		var cur_pos = stroke_end+pixel
 #		if cur_pos.x < 0 or cur_pos.y < 0:
-#			continue
-#		if cur_pos.x > chunk_size.x or cur_pos.y > chunk_size.y or cur_pos.x > edited_image_size.x or cur_pos.y > edited_image_size.y:
-#			continue
+#			return
+#		if cur_pos.x >= chunk_size.x or cur_pos.y >= chunk_size.y or cur_pos.x >= edited_image_size.x or cur_pos.y >= edited_image_size.y:
+#			return
 #
 #		on_image.set_pixelv(cur_pos, get_new_pixel(
 #			on_image, color,
-#			stroke_start, stroke_end, cur_pos,
+#			stroke_end, cur_pos,
 #			radius, solid_radius
 #		))
 	
+
 	for k in last_edits_chunks:
 		last_edits_textures[k].update(last_edits_chunks[k])
 	
-#	print("OP Took ", Time.get_ticks_msec()-begin, "ms")
 	paint_mutex.unlock()
 
+#	print("OP Took ", Time.get_ticks_msec()-begin, "ms")
 func set_pixels(index:int, on_image, color: Color, stroke_end:Vector2, radius:float, solid_radius:float, edited_image_size:Vector2i):
 	var cur_pos = stroke_end+cached_pixels[index]
 	if cur_pos.x < 0 or cur_pos.y < 0:
 		return
-	if cur_pos.x > chunk_size.x or cur_pos.y > chunk_size.y or cur_pos.x > edited_image_size.x or cur_pos.y > edited_image_size.y:
+	if cur_pos.x >= chunk_size.x or cur_pos.y >= chunk_size.y or cur_pos.x >= edited_image_size.x or cur_pos.y >= edited_image_size.y:
 		return
 	on_image.set_pixelv(cur_pos, get_new_pixel(
 		on_image, color,
 		stroke_end, cur_pos,
 		radius, solid_radius
 	))
-
 func get_all_brush_pixels(radius, solid_radius):
-		
 		cached_pixels.clear()
 		
 		
@@ -316,7 +313,6 @@ func get_all_brush_pixels(radius, solid_radius):
 		var square_side = sqrt(pow(solid_radius,2)/2)-2
 		solid_color_rect = Rect2i(0-square_side, 0-square_side, square_side*2,square_side*2)
 		
-		
 		#use Bresenham's algorithm
 		var r : int = radius
 		var current_point : Vector2i = Vector2i(0,r)
@@ -324,11 +320,15 @@ func get_all_brush_pixels(radius, solid_radius):
 		if brush_type == BRUSH_DRAW or brush_type == BRUSH_ERASE:
 			var first_y_count : int = current_point.y-square_side
 			for y in first_y_count:
-				cached_pixels.append_array(GetCircleSymmetry(0,0,current_point.x,2+square_side+y))
+				if square_side+y < current_point.x: # Ensure that pixel is not repeated
+					continue
+				cached_pixels.append_array(GetCircleSymmetry(current_point.x,2+square_side+y))
 		else:
 			var first_y_count : int = current_point.y
 			for y in first_y_count:
-				cached_pixels.append_array(GetCircleSymmetry(0,0,current_point.x,y))
+				if y < current_point.x: # Ensure that pixel is not repeated
+					continue
+				cached_pixels.append_array(GetCircleSymmetry(current_point.x,y))
 		while current_point.y >= current_point.x:
 			current_point.x += 1
 
@@ -342,29 +342,37 @@ func get_all_brush_pixels(radius, solid_radius):
 			if brush_type == BRUSH_DRAW or brush_type == BRUSH_ERASE: # We Will Only Use the Rect Performance Enhacement with Draw/Erase
 				var y_count : int = current_point.y-square_side
 				for y in y_count:
-					if square_side+y < current_point.x: # Ensure that pixel is not repeated
+					if square_side+y < current_point.x: # Ensure that pixel is not repeated by excluding a coordinate almost less than 45 degrees from the X Axis
 						continue
-					cached_pixels.append_array(GetCircleSymmetry(0,0,current_point.x,2+square_side+y))
+					cached_pixels.append_array(GetCircleSymmetry(current_point.x,2+square_side+y))
 			else:
 				var y_count : int = current_point.y
 				for y in y_count:
 					if y < current_point.x: # Ensure that pixel is not repeated
 						continue
-					cached_pixels.append_array(GetCircleSymmetry(0,0,current_point.x,y))
+					cached_pixels.append_array(GetCircleSymmetry(current_point.x,y))
 
 
-func GetCircleSymmetry(x_center: int, y_center:int, x:int, y:int):
+func GetCircleSymmetry(x:int, y:int, x_center:int = 0, y_center:int = 0):
 	var pixels : PackedVector2Array = []
 	if x == 0:
+		pixels.append(Vector2i(x_center, y_center+y))
+		pixels.append(Vector2i(x_center, y_center-y))
+		pixels.append(Vector2i(x_center+y, y_center))
+		pixels.append(Vector2i(x_center-y, y_center))
+		return pixels
+	elif y == 0:
+		pixels.append(Vector2i(x_center, y_center+x))
+		pixels.append(Vector2i(x_center, y_center-x))
+		pixels.append(Vector2i(x_center+x, y_center))
+		pixels.append(Vector2i(x_center-x, y_center))
+		return pixels
+	elif y == x:
 		pixels.append(Vector2i(x_center+x, y_center+y))
 		pixels.append(Vector2i(x_center+x, y_center-y))
-		pixels.append(Vector2i(x_center+y, y_center+x))
-		pixels.append(Vector2i(x_center-y, y_center+x))
-	elif y == 0:
-		pixels.append(Vector2i(x_center+y, y_center+x))
-		pixels.append(Vector2i(x_center+y, y_center-x))
-		pixels.append(Vector2i(x_center+x, y_center+y))
 		pixels.append(Vector2i(x_center-x, y_center+y))
+		pixels.append(Vector2i(x_center-x, y_center-y))
+		return pixels
 	else:
 		pixels.append(Vector2i(x_center+x, y_center+y))
 		pixels.append(Vector2i(x_center-x, y_center+y))
@@ -374,7 +382,9 @@ func GetCircleSymmetry(x_center: int, y_center:int, x:int, y:int):
 		pixels.append(Vector2i(x_center-y, y_center+x))
 		pixels.append(Vector2i(x_center+y, y_center-x))
 		pixels.append(Vector2i(x_center-y, y_center-x))
-	return pixels
+		return pixels
+	
+
 
 
 func get_new_pixel(on_image, color:Color, stroke_end:Vector2, cur_pos, radius:float, solid_radius:float):

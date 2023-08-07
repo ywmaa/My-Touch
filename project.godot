@@ -24,6 +24,7 @@ config/actual_release="0.4"
 mt_globals="*res://globals.tscn"
 ToolsManager="*res://src/tools/tools_manager.gd"
 ProjectsManager="*res://src/projects/projects_manager.gd"
+TaskManager="*res://task_manager.gd"
 
 [debug]
 
@@ -34,9 +35,6 @@ gdscript/warnings/unused_local_constant=2
 gdscript/warnings/unused_private_class_variable=2
 gdscript/warnings/unused_parameter=2
 gdscript/warnings/unused_signal=2
-gdscript/warnings/shadowed_variable=2
-gdscript/warnings/shadowed_variable_base_class=2
-gdscript/warnings/shadowed_global_identifier=2
 gdscript/warnings/unreachable_code=2
 gdscript/warnings/unreachable_pattern=2
 gdscript/warnings/standalone_expression=2
