@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dg35jlqxnf8qy"]
+[gd_scene load_steps=12 format=3 uid="uid://dg35jlqxnf8qy"]
 
 [ext_resource type="Script" path="res://UI/panels/graph/graph.gd" id="1_a3h74"]
 [ext_resource type="PackedScene" uid="uid://bm0lg64mbtyim" path="res://UI/panels/tools bar/tools_panel.tscn" id="1_ys8hk"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://UI/panels/graph/Preview.gd" id="5_n10pt"]
 [ext_resource type="Script" path="res://UI/panels/graph/PixelGrid.gd" id="5_p4b4e"]
 [ext_resource type="Script" path="res://UI/panels/graph/Camera2D.gd" id="6_ge858"]
+[ext_resource type="PackedScene" uid="uid://bk7yf4oyhhqyi" path="res://UI/panels/graph/resize_rect.tscn" id="8_giq5n"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_nodqv"]
 blend_mode = 4
@@ -38,7 +39,7 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="." node_paths=PackedStringArray("tool_bar")]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." node_paths=PackedStringArray("tool_bar", "resize_tool")]
 material = SubResource("CanvasItemMaterial_nodqv")
 layout_mode = 2
 size_flags_horizontal = 3
@@ -49,6 +50,7 @@ mouse_filter = 0
 stretch = true
 script = ExtResource("1_a3h74")
 tool_bar = NodePath("../Tools")
+resize_tool = NodePath("Viewport/TransparentChecker/Resize")
 
 [node name="Viewport" type="SubViewport" parent="SubViewportContainer"]
 disable_3d = true
@@ -78,6 +80,10 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("ViewportTexture_gruml")
 script = ExtResource("5_n10pt")
+
+[node name="Resize" parent="SubViewportContainer/Viewport/TransparentChecker" instance=ExtResource("8_giq5n")]
+layout_mode = 1
+sensitivity = 0.25
 
 [node name="PixelGrid" type="Node2D" parent="SubViewportContainer/Viewport" node_paths=PackedStringArray("graph")]
 script = ExtResource("5_p4b4e")

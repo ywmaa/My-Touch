@@ -1,4 +1,3 @@
-@tool
 extends Control
 
 signal preview_changed(current_delta, expand_direction)
@@ -19,6 +18,8 @@ func _ready():
 	$"Y-".gui_input.connect(_on_child_gui_input.bind(Vector2.UP))
 	$"Y+".gui_input.connect(_on_child_gui_input.bind(Vector2.DOWN))
 
+func _process(_delta):
+	visible = ToolsManager.TOOLS[3].tool_active
 
 func _draw():
 	var anchor = (resize_direction + Vector2.ONE) * 0.5

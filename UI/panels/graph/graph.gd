@@ -23,14 +23,19 @@ func on_canvas_size_changed(value):
 @onready var transparent_checker = $Viewport/TransparentChecker
 @onready var camera: Camera2D = get_node("Viewport/Camera2D")
 @export var tool_bar : Node 
-
+@export var resize_tool : Control
 func _ready() -> void:
 	self.connect("mouse_entered",_on_mouse_entered)
 	self.connect("mouse_exited",_on_mouse_exited)
 	mt_globals.main_window.connect("signal_view_center",center_view)
 	mt_globals.main_window.connect("signal_view_reset_zoom",camera.zoom_100)
 	OS.low_processor_usage_mode = true
-
+	resize_tool.connect("value_changed",resize_canvas)
+	
+func resize_canvas(delta, expand_direction):
+	ProjectsManager.project.canvas_size += delta.round()
+	if expand_direction < Vector2i.ZERO:
+		mt_globals.main_window.get_node("AppRender/Canvas").position += delta.round()
 var dragging : bool = false
 var drag_start : Vector2 = Vector2.ZERO
 

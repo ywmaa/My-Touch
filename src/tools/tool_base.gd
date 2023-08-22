@@ -4,7 +4,7 @@ class_name ToolBase
 @export var tool_name := "Box Selection"
 @export var tool_button_shortcut := "Shift+B"
 @export_multiline var tool_desc := ""
-var tool_active : bool
+var tool_active : bool = false
 @export var tool_icon : Texture2D
 var selection : BitMap
 @export var preview_shader : ShaderMaterial
