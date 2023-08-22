@@ -46,6 +46,7 @@ jobs:
        mv Godot_v${{ env.GODOT_VERSION }}-stable_linux.x86_64 godot
        ls
        chmod +x godot
+       mkdir ~/.config/godot/
        cat <<EOT >> ~/.config/godot/editor_settings-4.tres
        [gd_resource type="EditorSettings" format=3]
 
