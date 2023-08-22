@@ -1,4 +1,4 @@
-[gd_scene load_steps=63 format=3 uid="uid://bc0weyhuhf5di"]
+[gd_scene load_steps=62 format=3 uid="uid://bc0weyhuhf5di"]
 
 [ext_resource type="Script" path="res://addons/sprite_painter/src/main.gd" id="1_pn6xr"]
 [ext_resource type="Script" path="res://addons/sprite_painter/editor_icon_button.gd" id="2_ahevp"]
@@ -9,7 +9,6 @@
 [ext_resource type="Script" path="res://addons/sprite_painter/src/image_transform_menu.gd" id="9_20sxo"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/workspace.gd" id="9_gvnc2"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/image_view/image_view.gd" id="10_etjnr"]
-[ext_resource type="PackedScene" path="res://addons/sprite_painter/src/image_view/resize_rect.tscn" id="11_jhyl6"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/image_view/image_selection_view.gd" id="13_81c1e"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/floating/tool_switcher.gd" id="14_ig7f3"]
 [ext_resource type="Script" path="res://addons/sprite_painter/src/editing_tools/tool_select.gd" id="15_2n2l5"]
@@ -832,10 +831,6 @@ expand_mode = 1
 stretch_mode = 1
 metadata/_edit_lock_ = true
 
-[node name="Resize" parent="Box/Workspace/ViewportOverlay/ImageBorder" instance=ExtResource("11_jhyl6")]
-layout_mode = 1
-sensitivity = 0.25
-
 [node name="Border" type="Panel" parent="Box/Workspace/ViewportOverlay"]
 layout_mode = 1
 anchors_preset = 15
@@ -1004,7 +999,5 @@ offset_bottom = 0.0
 [connection signal="pressed" from="Box/Toolbar/Save" to="." method="_on_save_pressed"]
 [connection signal="pressed" from="Box/Toolbar/Discard" to="." method="_on_close_pressed"]
 [connection signal="visibility_changed" from="Box/Workspace/ViewportOverlay/EditedImageView/SelectionView" to="Box/Workspace/ViewportOverlay/EditedImageView/SelectionView" method="_on_visibility_changed"]
-[connection signal="preview_changed" from="Box/Workspace/ViewportOverlay/ImageBorder/Resize" to="Box/Workspace/ViewportOverlay/EditedImageView" method="_on_resize_preview_changed"]
-[connection signal="value_changed" from="Box/Workspace/ViewportOverlay/ImageBorder/Resize" to="Box/Workspace" method="_on_resize_value_changed"]
 [connection signal="tool_changed" from="Box/Workspace/Floating/Control/ToolSettings/ToolSwitcher" to="Box/Workspace/ViewportOverlay/EditedImageView/SubViewport/ShaderView" method="_on_tool_switcher_tool_changed"]
 [connection signal="color_changed" from="Box/Workspace/Floating/Control/ColorSettings" to="Box/Workspace/Floating/Control/ToolSettings/ToolSwitcher" method="_on_color_settings_color_changed"]

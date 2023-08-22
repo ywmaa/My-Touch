@@ -17,6 +17,7 @@ var TOOLS : Array[ToolBase] = [
 	preload("res://src/tools/move_tool.gd").new(),
 	preload("res://src/tools/rotate_tool.gd").new(),
 	preload("res://src/tools/scale_tool.gd").new(),
+	preload("res://src/tools/crop_tool.gd").new(),
 	preload("res://src/tools/pencil_tool.gd").new(),
 	preload("res://src/tools/brush_tool.gd").new(),
 	preload("res://src/tools/brush_clone_tool.gd").new(),
@@ -31,6 +32,7 @@ var camera : Camera2D
 var current_mouse_position : Vector2
 var previous_mouse_position : Vector2
 var mouse_position_delta : Vector2
+
 func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
 	if shortcut_tool != null: shortcut_tool.draw_preview(image_view, mouse_position)
 	if current_tool != null: current_tool.draw_preview(image_view, mouse_position)

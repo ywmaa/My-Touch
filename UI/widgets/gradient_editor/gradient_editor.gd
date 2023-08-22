@@ -80,6 +80,8 @@ var popup = null
 signal updated(value, cc)
 
 
+
+
 func _ready() -> void:
 	$Gradient.material = $Gradient.material.duplicate(true)
 	value = MMGradient.new()

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="SectionResource" load_steps=5 format=3 uid="uid://bh8yjhfgb8tpj"]
+
+[ext_resource type="Script" path="res://addons/godot_style/section_resource.gd" id="1_lvt60"]
+[ext_resource type="Script" path="res://addons/godot_style/item_resource.gd" id="1_q32sb"]
+
+[sub_resource type="Resource" id="Resource_4jmvx"]
+script = ExtResource("1_q32sb")
+name = "Booleans"
+content_title = "Booleans"
+content_path = "res://addons/godot_style/items_md/booleans.md"
+
+[sub_resource type="Resource" id="Resource_no7yp"]
+script = ExtResource("1_q32sb")
+name = "Signal callbacks"
+content_title = "Signal callbacks"
+content_path = "res://addons/godot_style/items_md/signal_callbacks.md"
+
+[resource]
+script = ExtResource("1_lvt60")
+name = "Good Practices"
+items = Array[ExtResource("1_q32sb")]([SubResource("Resource_4jmvx"), SubResource("Resource_no7yp")])
