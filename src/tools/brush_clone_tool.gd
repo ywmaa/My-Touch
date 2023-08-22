@@ -6,8 +6,8 @@ var replace_alpha := false
 
 var clone_offset := Vector2.ZERO
 var clone_offset_editing := false
-
-
+var copy_from_whole_canvas: bool = true
+var image_to_copy : Image
 func _init():
 	tool_name = "Clone Tool"
 	tool_button_shortcut = ""
@@ -36,6 +36,13 @@ func mouse_pressed(
 	else:
 		super.mouse_pressed(event, image)
 
+func enable_tool():
+	if copy_from_whole_canvas:
+		image_to_copy = mt_globals.main_window.get_node("AppRender").get_texture().get_image()
+	super.enable_tool()
+	if !copy_from_whole_canvas:
+		image_to_copy = EditedImage
+	
 
 func mouse_moved(event : InputEventMouseMotion):
 	if clone_offset_editing:
@@ -46,7 +53,8 @@ func mouse_moved(event : InputEventMouseMotion):
 
 func get_new_pixel(on_image, _color:Color, stroke_end:Vector2, cur_pos, radius:float, solid_radius:float):
 	var old_color = on_image.get_pixelv(cur_pos)
-	var cloned_color = EditedImage.get_pixelv(
+	
+	var cloned_color = image_to_copy.get_pixelv(
 		(Vector2(last_edits_chunks.find_key(on_image)) + cur_pos + clone_offset)
 		)
 	var distance = Vector2(stroke_end).distance_to(cur_pos)

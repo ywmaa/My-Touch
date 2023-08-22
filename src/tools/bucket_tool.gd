@@ -8,6 +8,8 @@ var drawing_color := Color.BLACK
 var start_color := Color.TRANSPARENT
 var affected_pixels := BitMap.new()
 var last_affected_rect := Rect2i()
+var copy_from_whole_canvas: bool = true
+var image_to_copy : Image
 
 var edited_object
 var EditedImage : Image
@@ -23,6 +25,7 @@ func get_tool_inspector_properties():
 	PropertiesGroups.append("Settings")
 	PropertiesGroups.append("Color")
 	var PropertiesToShow : Dictionary = {}
+	PropertiesToShow["copy_from_whole_canvas"] = "Settings"
 	PropertiesToShow["tolerance:minvalue:0.0:maxvalue:1.0:step:0.01"] = "Settings"
 	PropertiesToShow["fill_mode,Contiguous,Global"] = "Settings"
 	PropertiesToShow["drawing_color"] = "Color"
@@ -36,16 +39,11 @@ func shortcut_pressed():
 	if Input.is_action_just_pressed("bucket") and not Input.is_key_pressed(KEY_SHIFT) and not Input.is_key_pressed(KEY_CTRL) and not Input.is_key_pressed(KEY_ALT):
 		ToolsManager.shortcut_tool = self
 		enable_tool()
-#		print(tool_active)
-#		if !tool_active:
-#			enable_tool()
-#			return
+		return
 	if Input.is_action_just_pressed("mouse_left"):
-		enable_tool()
-#		print(tool_active)
-#		if !tool_active and ToolsManager.current_tool == self:
-#			enable_tool()
-#			return
+		if ToolsManager.current_tool == self:
+			enable_tool()
+			return
 
 func mouse_pressed(
 	_event : InputEventMouseButton,
@@ -62,9 +60,13 @@ func enable_tool(): # Save History and Enable Tool
 		print("please select a brush layer")
 		return
 	edited_object = ToolsManager.current_project.layers.selected_layers[0]
+
 	EditedImage = edited_object.main_object.texture.get_image()
-	
-	start_color = EditedImage.get_pixelv(ToolsManager.current_mouse_position)
+	if copy_from_whole_canvas:
+		image_to_copy = mt_globals.main_window.get_node("AppRender").get_texture().get_image()
+	else:
+		image_to_copy = EditedImage
+	start_color = image_to_copy.get_pixelv(ToolsManager.current_mouse_position)
 	affected_pixels.create(EditedImage.get_size())
 	var _task : TaskManager.Task = TaskManager.create_task(fill.bind(ToolsManager.current_mouse_position))
 	confirm_tool()
@@ -96,7 +98,7 @@ func confirm_tool(): # Confirm Actions
 
 func fill(start_pos : Vector2):
 	last_affected_rect = ImageFillTools.fill_on_image(
-		EditedImage,
+		image_to_copy,
 		affected_pixels,
 		start_pos,
 		tolerance,

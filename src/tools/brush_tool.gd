@@ -8,7 +8,7 @@ enum {
   BRUSH_NORMALMAP,
 }
 
-@export_enum("Draw", "Erase", "Clone", "Shading", "Normal Map") var brush_type := 0
+@export_enum("Draw", "Erase", "Clone", "Normal Map") var brush_type := 0
 @export var chunk_count : int = 1
 @export var crosshair_color := Color(1.0, 1.0, 1.0, 1.0)
 
@@ -48,6 +48,8 @@ func get_tool_inspector_properties():
 	var PropertiesToShow : Dictionary = {}
 	if brush_type == 0 or brush_type == 1:
 		PropertiesToShow["brush_type,Draw,Erase"] = "Settings"
+	if brush_type == 2:
+		PropertiesToShow["copy_from_whole_canvas"] = "Settings"
 	PropertiesToShow["brushsize:minvalue:1.0:maxvalue:1024.0:step:1.0"] = "Settings"
 	PropertiesToShow["hardness:minvalue:0.0:maxvalue:1.0:step:0.01"] = "Settings"
 	PropertiesToShow["opacity:minvalue:0.0:maxvalue:1.0:step:0.01"] = "Settings"
