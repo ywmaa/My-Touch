@@ -66,7 +66,6 @@ jobs:
 
   - name: Import Project
     run: |
-     mkdir -p ./exports
      ./godot --headless -e --quit --path ./
 
   - name: Export Windows Desktop
@@ -121,10 +120,10 @@ jobs:
     
     - name: Zip
       run: |
-       zip -r windows-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My Touch.x86_64.exe
-       zip -r linux-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My Touch.x86_64
-       zip -r macos-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My Touch.app.zip
-       zip -r android-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My Touch.apk
+       zip -r windows-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My\ Touch.x86_64.exe
+       zip -r linux-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My\ Touch.x86_64
+       zip -r macos-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My\ Touch.app.zip
+       zip -r android-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My\ Touch.apk
     
     - name: Create Github Release
       id: create_release
