@@ -7,13 +7,29 @@ on:
  pull_request:
   branches:
   - master
+  inputs:
+    godot_version:
+      description: "Godot Version"
+      required: true
+      default: "4.1.1"
+    export_name:
+      description: "Export Name"
+      required: true
+      default: "My Touch"
+    export_version:
+      description: "Export Version"
+      required: true
+      default: "0.x"
+    itch_io:
+      description: "Itch.io Build"
+      required: false
+      default: "false"
 env:
  BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }} # Needs to be added through github
  DISCORD_WEBHOOK: ${{secrets.DISCORD_WEBHOOK}} # Needs to be added through github
  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
  IS_MAIN: ${{ contains(github.ref, 'master') }}
  PROJECT_NAME: "My Touch"
-
 jobs:
  CleanArtifacts:
   # This job clears out the previous artifacts made so you don't run out of space in your github account
@@ -30,48 +46,53 @@ jobs:
   steps:
   - uses: actions/checkout@v2
   
+  - name: Set up JDK 11
+    uses: actions/setup-java@v3
+    with:
+      java-version: '11'
+      distribution: 'adopt'
+
+  - name: Setup Android SDK
+    uses: android-actions/setup-android@v2
+
   - name: Download + Authorize Godot
     run: |
-       curl -L -o godot.zip https://downloads.tuxfamily.org/godotengine/4.1.1/Godot_v4.1.1-stable_linux.x86_64.zip
+       curl -L -o godot.zip https://downloads.tuxfamily.org/godotengine/${{ env.GODOT_VERSION }}/Godot_v${{ env.GODOT_VERSION }}-stable_linux.x86_64.zip
        unzip godot.zip
-       mv Godot_v4.1.1-stable_linux.x86_64 godot
+       mv Godot_v${{ env.GODOT_VERSION }}-stable_linux.x86_64 godot
        ls
        chmod +x godot
  
   - name: Download Export Templates
     run: |
-     curl -L -o export_templates.zip https://downloads.tuxfamily.org/godotengine/4.1.1/Godot_v4.1.1-stable_export_templates.tpz
+     curl -L -o export_templates.zip https://downloads.tuxfamily.org/godotengine/${{ env.GODOT_VERSION }}/Godot_v${{ env.GODOT_VERSION }}-stable_export_templates.tpz
      unzip export_templates.zip
   
   - name: Install Export Templates
     run: |
-     mkdir -p ~/.local/share/godot/export_templates/4.1.1.stable
-     mv ./templates/* ~/.local/share/godot/export_templates/4.1.1.stable
+     mkdir -p ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable
+     mv ./templates/* ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable
   
   - name: Export Windows Desktop
     run: |
      mkdir -p ./.
-     ./godot --headless --path ./ --export-release "windows" ././My Touch.x86_64.exe
+     ./godot --headless --path ./ --export-release "windows" ./exports/My Touch.x86_64.exe
     
   - name: Export macOS
     run: |
      mkdir -p ./.
-     ./godot --headless --path ./ --export-release "mac" ././My Touch.app.zip
+     ./godot --headless --path ./ --export-release "mac" ./exports/My Touch.app.zip
     
   - name: Export Linux/X11
     run: |
      mkdir -p ./.
-     ./godot --headless --path ./ --export-release "Linux/X11" ././My Touch.x86_64
+     ./godot --headless --path ./ --export-release "Linux/X11" ./exports/My Touch.x86_64
     
   - name: Export Android
     run: |
      mkdir -p ./.
-     ./godot --headless --path ./ --export-release "Android" ././My Touch.apk
+     ./godot --headless --path ./ --export-release "Android" ./exports/My Touch.apk
     
-  - name: Export Web
-    run: |
-     mkdir -p ./.
-     ./godot --headless --path ./ --export-release "Web" ././index.html
     
 
   - uses: actions/upload-artifact@v2
@@ -81,7 +102,7 @@ jobs:
   
  Release:
   needs: Export
-  if: ${{ contains(github.ref, 'main') }}
+  if: ${{ contains(github.ref, 'master') }}
   runs-on: ubuntu-latest
   steps:
     - uses: actions/checkout@v2
@@ -103,7 +124,11 @@ jobs:
        path: exports
     
     - name: Zip
-      run: zip -r release-${{ steps.tag_version.outputs.new_tag }}.zip exports
+      run: |
+       zip -r windows-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My Touch.x86_64.exe
+       zip -r linux-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My Touch.x86_64
+       zip -r macos-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My Touch.app.zip
+       zip -r android-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My Touch.apk
     
     - name: Create Github Release
       id: create_release
@@ -121,8 +146,7 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./release-${{ steps.tag_version.outputs.new_tag }}.zip
-       asset_name: release-${{ steps.tag_version.outputs.new_tag }}.zip
+       asset_path: ./
        asset_content_type: application/zip
     
     - uses: frdrwrt/write-to-file@v1.3
@@ -138,7 +162,7 @@ jobs:
  
  Publish:
   needs: Release
-  if: ${{ contains(github.ref, 'main') }}
+  if: ${{ contains(github.ref, 'master') }}
   runs-on: ubuntu-latest
   steps:
     - uses: actions/download-artifact@v2
@@ -154,10 +178,10 @@ jobs:
       run: ./butler login
     
 
- Cleanup:
-  needs: [Export, Release, Publish]
-  runs-on: ubuntu-latest
-  steps:
-    - uses: geekyeggo/delete-artifact@v1
-      with:
-       name: VERSION
+# Cleanup:
+#  needs: [Export, Release, Publish]
+#  runs-on: ubuntu-latest
+#  steps:
+#    - uses: geekyeggo/delete-artifact@v1
+#      with:
+#       name: VERSION
