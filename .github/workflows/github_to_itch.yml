@@ -66,22 +66,22 @@ jobs:
   
   - name: Export Windows Desktop
     run: |
-     mkdir -p ./.
+     mkdir -p ./exports
      ./godot --headless --path ./ --export-release "windows" ./exports/My Touch.x86_64.exe
     
   - name: Export macOS
     run: |
-     mkdir -p ./.
+     mkdir -p ./exports
      ./godot --headless --path ./ --export-release "mac" ./exports/My Touch.app.zip
     
   - name: Export Linux/X11
     run: |
-     mkdir -p ./.
+     mkdir -p ./exports
      ./godot --headless --path ./ --export-release "Linux/X11" ./exports/My Touch.x86_64
     
   - name: Export Android
     run: |
-     mkdir -p ./.
+     mkdir -p ./exports
      ./godot --headless --path ./ --export-release "Android" ./exports/My Touch.apk
     
     
