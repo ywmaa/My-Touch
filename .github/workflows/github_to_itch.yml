@@ -7,19 +7,6 @@ on:
  pull_request:
   branches:
   - master
-  inputs:
-    export_name:
-      description: "Export Name"
-      required: true
-      default: "My Touch"
-    export_version:
-      description: "Export Version"
-      required: true
-      default: "0.x"
-    itch_io:
-      description: "Itch.io Build"
-      required: false
-      default: "false"
 env:
  BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }} # Needs to be added through github
  DISCORD_WEBHOOK: ${{secrets.DISCORD_WEBHOOK}} # Needs to be added through github
@@ -60,11 +47,11 @@ jobs:
        ls
        chmod +x godot
        cat <<EOT >> ~/.config/godot/editor_settings-4.tres
-[gd_resource type="EditorSettings" format=3]
+       [gd_resource type="EditorSettings" format=3]
 
-[resource]
-export/android/android_sdk_path = "/usr/local/lib/android/sdk"
-EOT
+       [resource]
+       export/android/android_sdk_path = "/usr/local/lib/android/sdk"
+       EOT
        
   - name: Download Export Templates
     run: |
