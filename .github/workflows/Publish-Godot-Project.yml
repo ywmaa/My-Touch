@@ -1,4 +1,4 @@
-name: Publish My Touch to Itch.io
+name: Publish My Touch
 
 on:
  workflow_dispatch:
@@ -134,10 +134,10 @@ jobs:
     
     - name: Zip
       run: |
-       zip -r windows-release-${{ github.event.inputs.export_version }}.zip exports/My\ Touch.x86_64.exe
-       zip -r linux-release-${{ github.event.inputs.export_version }}.zip exports/My\ Touch.x86_64
-       zip -r macos-release-${{ github.event.inputs.export_version }}.zip exports/My\ Touch.app.zip
-       zip -r android-release-${{ github.event.inputs.export_version }}.zip exports/My\ Touch.apk
+       zip -r windows-release-v${{ github.event.inputs.export_version }}.zip exports/My\ Touch.x86_64.exe
+       zip -r linux-release-v${{ github.event.inputs.export_version }}.zip exports/My\ Touch.x86_64
+       zip -r macos-release-v${{ github.event.inputs.export_version }}.zip exports/My\ Touch.app.zip
+       zip -r android-release-v${{ github.event.inputs.export_version }}.zip exports/My\ Touch.apk
     
     - name: Create Github Release
       id: create_release
@@ -145,8 +145,8 @@ jobs:
       env:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-       tag_name: ${{ github.event.inputs.export_version }}
-       release_name: Release ${{ github.event.inputs.export_version }}
+       tag_name: v${{ github.event.inputs.export_version }}
+       release_name: Release v${{ github.event.inputs.export_version }}
        body: ${{ steps.tag_version.outputs.changelog }}
     
     - name: Upload Linux Artifact
@@ -155,8 +155,8 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./linux-release-${{ github.event.inputs.export_version }}.zip
-       asset_name: linux-release-${{ github.event.inputs.export_version }}.zip
+       asset_path: ./linux-release-v${{ github.event.inputs.export_version }}.zip
+       asset_name: linux-release-v${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - name: Upload Windows Artifact
@@ -165,8 +165,8 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./windows-release-${{ github.event.inputs.export_version }}.zip
-       asset_name: windows-release-${{ github.event.inputs.export_version }}.zip
+       asset_path: ./windows-release-v${{ github.event.inputs.export_version }}.zip
+       asset_name: windows-release-v${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - name: Upload MacOS Artifact
@@ -175,8 +175,8 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./macos-release-${{ github.event.inputs.export_version }}.zip
-       asset_name: macos-release-${{ github.event.inputs.export_version }}.zip
+       asset_path: ./macos-release-v${{ github.event.inputs.export_version }}.zip
+       asset_name: macos-release-v${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - name: Upload Android Artifact
@@ -185,14 +185,14 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./android-release-${{ github.event.inputs.export_version }}.zip
-       asset_name: android-release-${{ github.event.inputs.export_version }}.zip
+       asset_path: ./android-release-v${{ github.event.inputs.export_version }}.zip
+       asset_name: android-release-v${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - uses: frdrwrt/write-to-file@v1.3
       with:
        filepath: ./VERSION.txt
-       content: ${{ github.event.inputs.export_version }}
+       content: v${{ github.event.inputs.export_version }}
        mode: 0655
     
     - uses: actions/upload-artifact@v2
