@@ -20,6 +20,7 @@ var TOOLS : Array[ToolBase] = [
 	preload("res://src/tools/pencil_tool.gd").new(),
 	preload("res://src/tools/brush_tool.gd").new(),
 	preload("res://src/tools/brush_clone_tool.gd").new(),
+	preload("res://src/tools/bucket_tool.gd").new(),
 	preload("res://src/tools/context_menu_tool.gd").new(),
 ]
 var current_tool : ToolBase
