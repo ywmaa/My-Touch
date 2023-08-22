@@ -63,26 +63,31 @@ jobs:
     run: |
      mkdir -p ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable
      mv ./templates/* ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable
-  
+
+  - name: Import Project
+    run: |
+     mkdir -p ./exports
+     ./godot --headless -e --quit --path ./
+
   - name: Export Windows Desktop
     run: |
      mkdir -p ./exports
-     ./godot --headless --path ./ --export-release "windows" ./exports/My Touch.x86_64.exe
+     ./godot --headless --path ./ --export-release "windows" ./exports/My\ Touch.x86_64.exe
     
   - name: Export macOS
     run: |
      mkdir -p ./exports
-     ./godot --headless --path ./ --export-release "mac" ./exports/My Touch.app.zip
+     ./godot --headless --path ./ --export-release "mac" ./exports/My\ Touch.app.zip
     
   - name: Export Linux/X11
     run: |
      mkdir -p ./exports
-     ./godot --headless --path ./ --export-release "Linux/X11" ./exports/My Touch.x86_64
+     ./godot --headless --path ./ --export-release "Linux/X11" ./exports/My\ Touch.x86_64
     
   - name: Export Android
     run: |
      mkdir -p ./exports
-     ./godot --headless --path ./ --export-release "Android" ./exports/My Touch.apk
+     ./godot --headless --path ./ --export-release "Android" ./exports/My\ Touch.apk
     
     
 
