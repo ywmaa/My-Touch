@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="SectionResource" load_steps=6 format=3 uid="uid://c7b7qxel3x0ar"]
+
+[ext_resource type="Script" path="res://addons/godot_style/section_resource.gd" id="1_44y3e"]
+[ext_resource type="Script" path="res://addons/godot_style/item_resource.gd" id="1_iw74d"]
+
+[sub_resource type="Resource" id="Resource_kdrw6"]
+script = ExtResource("1_iw74d")
+name = "Adding your own"
+content_title = "Adding your own"
+content_path = "res://addons/godot_style/items_md/ADDING_YOUR_OWN.md"
+
+[sub_resource type="Resource" id="Resource_hcsuu"]
+script = ExtResource("1_iw74d")
+name = "More info"
+content_title = "More info"
+content_path = "res://addons/godot_style/items_md/more_info.md"
+
+[sub_resource type="Resource" id="Resource_cg2df"]
+script = ExtResource("1_iw74d")
+name = "Issues"
+content_title = "Issues"
+content_path = "res://addons/godot_style/items_md/issues.md"
+
+[resource]
+script = ExtResource("1_44y3e")
+name = "Others"
+items = Array[ExtResource("1_iw74d")]([SubResource("Resource_kdrw6"), SubResource("Resource_hcsuu"), SubResource("Resource_cg2df")])

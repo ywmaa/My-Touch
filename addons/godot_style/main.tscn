@@ -1,0 +1,102 @@
+[gd_scene load_steps=7 format=3 uid="uid://c55mpmb6gn0lj"]
+
+[ext_resource type="Script" path="res://addons/godot_style/main.gd" id="1_2nxv4"]
+[ext_resource type="Theme" uid="uid://bnprm4dgmteqb" path="res://addons/godot_style/theme.tres" id="1_t5ltx"]
+[ext_resource type="Resource" uid="uid://2hgekr2g82ej" path="res://addons/godot_style/sections/style_guide.tres" id="3_7knle"]
+[ext_resource type="Resource" uid="uid://bh8yjhfgb8tpj" path="res://addons/godot_style/sections/good_practices.tres" id="4_po8yr"]
+[ext_resource type="Resource" uid="uid://c7b7qxel3x0ar" path="res://addons/godot_style/sections/others.tres" id="5_c0n0x"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_baw0s"]
+font_size = 28
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_t5ltx")
+script = ExtResource("1_2nxv4")
+sections = Array[Resource("res://addons/godot_style/section_resource.gd")]([ExtResource("3_7knle"), ExtResource("4_po8yr"), ExtResource("5_c0n0x")])
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="NavigationTrees" type="ScrollContainer" parent="HBoxContainer"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SectionsContainer" type="VBoxContainer" parent="HBoxContainer/NavigationTrees"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="HBoxContainer"]
+custom_minimum_size = Vector2(3, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ItemContent" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="ItemName" type="Label" parent="HBoxContainer/ItemContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Common naming conventions"
+label_settings = SubResource("LabelSettings_baw0s")
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+uppercase = true
+
+[node name="Underline" type="ColorRect" parent="HBoxContainer/ItemContent/ItemName"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Control" type="Control" parent="HBoxContainer/ItemContent"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/ItemContent/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Contents" type="MarginContainer" parent="HBoxContainer/ItemContent/Control/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 15

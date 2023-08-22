@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://x2c1kil005do"]
+
+[node name="QuoteControl" type="HBoxContainer"]
+offset_right = 322.0
+offset_bottom = 36.0
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="ColorRect" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(2, 0)
+layout_mode = 2
+color = Color(0.188235, 0.211765, 0.239216, 1)
+
+[node name="Quote" type="RichTextLabel" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RTLQuote"
+bbcode_enabled = true
+fit_content = true

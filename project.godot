@@ -71,6 +71,11 @@ enabled=PackedStringArray("res://addons/dockable_container/plugin.cfg", "res://a
 import/blender/enabled=false
 import/fbx/enabled=false
 
+[github_to_itch]
+
+config/itch_username="ywmaa"
+config/itch_project_name="my-touch"
+
 [input]
 
 move={
