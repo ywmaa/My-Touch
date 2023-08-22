@@ -1,6 +1,20 @@
 name: Publish My Touch to Itch.io
 
 on:
+ workflow_dispatch:
+  inputs:
+    export_version:
+      description: "Export Version"
+      required: true
+      default: "0.x"
+    release_github_page:
+      description: "Upload To Github Pages"
+      required: false
+      default: "false"
+    itch_io:
+      description: "Itch.io Build"
+      required: false
+      default: "false"
  push:
   branches:
   - master
@@ -97,7 +111,7 @@ jobs:
   
  Release:
   needs: Export
-  if: ${{ contains(github.ref, 'master') }}
+  if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_github_page
   runs-on: ubuntu-latest
   steps:
     - uses: actions/checkout@v2
@@ -109,7 +123,7 @@ jobs:
        github_token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Verify Tag
-      if: ${{ !steps.tag_version.outputs.new_tag }}
+      if: ${{ !github.event.inputs.export_version }}
       run: exit 1
     
     - name: Download Exports
@@ -120,10 +134,10 @@ jobs:
     
     - name: Zip
       run: |
-       zip -r windows-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My\ Touch.x86_64.exe
-       zip -r linux-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My\ Touch.x86_64
-       zip -r macos-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My\ Touch.app.zip
-       zip -r android-release-${{ steps.tag_version.outputs.new_tag }}.zip exports/My\ Touch.apk
+       zip -r windows-release-${{ github.event.inputs.export_version }}.zip exports/My\ Touch.x86_64.exe
+       zip -r linux-release-${{ github.event.inputs.export_version }}.zip exports/My\ Touch.x86_64
+       zip -r macos-release-${{ github.event.inputs.export_version }}.zip exports/My\ Touch.app.zip
+       zip -r android-release-${{ github.event.inputs.export_version }}.zip exports/My\ Touch.apk
     
     - name: Create Github Release
       id: create_release
@@ -131,8 +145,8 @@ jobs:
       env:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-       tag_name: ${{ steps.tag_version.outputs.new_tag }}
-       release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+       tag_name: ${{ github.event.inputs.export_version }}
+       release_name: Release ${{ github.event.inputs.export_version }}
        body: ${{ steps.tag_version.outputs.changelog }}
     
     - name: Upload Linux Artifact
@@ -141,8 +155,8 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./linux-release-${{ steps.tag_version.outputs.new_tag }}.zip
-       asset_name: linux-release-${{ steps.tag_version.outputs.new_tag }}.zip
+       asset_path: ./linux-release-${{ github.event.inputs.export_version }}.zip
+       asset_name: linux-release-${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - name: Upload Windows Artifact
@@ -151,8 +165,8 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./windows-release-${{ steps.tag_version.outputs.new_tag }}.zip
-       asset_name: windows-release-${{ steps.tag_version.outputs.new_tag }}.zip
+       asset_path: ./windows-release-${{ github.event.inputs.export_version }}.zip
+       asset_name: windows-release-${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - name: Upload MacOS Artifact
@@ -161,8 +175,8 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./macos-release-${{ steps.tag_version.outputs.new_tag }}.zip
-       asset_name: macos-release-${{ steps.tag_version.outputs.new_tag }}.zip
+       asset_path: ./macos-release-${{ github.event.inputs.export_version }}.zip
+       asset_name: macos-release-${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - name: Upload Android Artifact
@@ -171,14 +185,14 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./android-release-${{ steps.tag_version.outputs.new_tag }}.zip
-       asset_name: android-release-${{ steps.tag_version.outputs.new_tag }}.zip
+       asset_path: ./android-release-${{ github.event.inputs.export_version }}.zip
+       asset_name: android-release-${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - uses: frdrwrt/write-to-file@v1.3
       with:
        filepath: ./VERSION.txt
-       content: ${{ steps.tag_version.outputs.new_version }}
+       content: ${{ github.event.inputs.export_version }}
        mode: 0655
     
     - uses: actions/upload-artifact@v2
@@ -186,22 +200,22 @@ jobs:
        name: VERSION
        path: ./VERSION.txt
  
- Publish:
-  needs: Release
-  if: ${{ contains(github.ref, 'master') }}
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/download-artifact@v2
-    
-    - name: Download + Authorize Butler
-      run: |
-       curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
-       unzip butler.zip
-       chmod +x butler
-       ./butler -V
-    
-    - name: Login To Butler
-      run: ./butler login
+# Publish:
+#  needs: Release
+#  if: ${{ contains(github.ref, 'master') }}
+#  runs-on: ubuntu-latest
+#  steps:
+#    - uses: actions/download-artifact@v2
+#    
+#    - name: Download + Authorize Butler
+#      run: |
+#       curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+#       unzip butler.zip
+#       chmod +x butler
+#       ./butler -V
+#    
+#    - name: Login To Butler
+#      run: ./butler login
     
 
 # Cleanup:
