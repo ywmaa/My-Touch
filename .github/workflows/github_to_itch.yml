@@ -8,10 +8,6 @@ on:
   branches:
   - master
   inputs:
-    godot_version:
-      description: "Godot Version"
-      required: true
-      default: "4.1.1"
     export_name:
       description: "Export Name"
       required: true
@@ -30,6 +26,7 @@ env:
  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
  IS_MAIN: ${{ contains(github.ref, 'master') }}
  PROJECT_NAME: "My Touch"
+ GODOT_VERSION: 4.1.1
 jobs:
  CleanArtifacts:
   # This job clears out the previous artifacts made so you don't run out of space in your github account
@@ -62,7 +59,13 @@ jobs:
        mv Godot_v${{ env.GODOT_VERSION }}-stable_linux.x86_64 godot
        ls
        chmod +x godot
- 
+       cat <<EOT >> ~/.config/godot/editor_settings-4.tres
+[gd_resource type="EditorSettings" format=3]
+
+[resource]
+export/android/android_sdk_path = "/usr/local/lib/android/sdk"
+EOT
+       
   - name: Download Export Templates
     run: |
      curl -L -o export_templates.zip https://downloads.tuxfamily.org/godotengine/${{ env.GODOT_VERSION }}/Godot_v${{ env.GODOT_VERSION }}-stable_export_templates.tpz
