@@ -135,15 +135,46 @@ jobs:
        release_name: Release ${{ steps.tag_version.outputs.new_tag }}
        body: ${{ steps.tag_version.outputs.changelog }}
     
-    - name: Upload Release Artifact
+    - name: Upload Linux Artifact
       uses: actions/upload-release-asset@v1
       env:
-       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-       upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./
-       asset_content_type: application/zip
-    
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      asset_path: ./linux-release-${{ steps.tag_version.outputs.new_tag }}.zip
+      asset_name: linux-release-${{ steps.tag_version.outputs.new_tag }}.zip
+      asset_content_type: application/zip
+
+    - name: Upload Windows Artifact
+      uses: actions/upload-release-asset@v1
+      env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      asset_path: ./windows-release-${{ steps.tag_version.outputs.new_tag }}.zip
+      asset_name: windows-release-${{ steps.tag_version.outputs.new_tag }}.zip
+      asset_content_type: application/zip
+
+    - name: Upload MacOS Artifact
+      uses: actions/upload-release-asset@v1
+      env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      asset_path: ./macos-release-${{ steps.tag_version.outputs.new_tag }}.zip
+      asset_name: macos-release-${{ steps.tag_version.outputs.new_tag }}.zip
+      asset_content_type: application/zip
+
+    - name: Upload Android Artifact
+      uses: actions/upload-release-asset@v1
+      env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      asset_path: ./android-release-${{ steps.tag_version.outputs.new_tag }}.zip
+      asset_name: android-release-${{ steps.tag_version.outputs.new_tag }}.zip
+      asset_content_type: application/zip
+
     - uses: frdrwrt/write-to-file@v1.3
       with:
        filepath: ./VERSION.txt
