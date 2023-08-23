@@ -4,6 +4,8 @@ var projects : Array[Project]
 
 var project : Project:
 	set(value):
+		if project and mt_globals.get_config("save_inactive_project"):
+			project.save_project()
 		project = value
 		if !project:
 			return

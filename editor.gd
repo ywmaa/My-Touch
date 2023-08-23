@@ -207,6 +207,7 @@ func on_config_changed() -> void:
 		TranslationServer.set_locale(locale)
 		get_tree().call_group("updated_from_locale", "update_from_locale")
 	
+	
 	var ui_scale = mt_globals.get_config("ui_scale")
 	if ui_scale <= 0:
 		# If scale is set to 0 (auto), scale everything if the display requires it (crude hiDPI support).

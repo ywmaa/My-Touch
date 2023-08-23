@@ -48,6 +48,7 @@ const DEFAULT_CONFIG = {
 	locale = "",
 	confirm_quit = true,
 	confirm_close_project = true,
+	save_inactive_project = true,
 	vsync = true,
 	fps_limit = 145,
 	idle_fps_limit = 20,
@@ -72,7 +73,7 @@ func has_config(key : String) -> bool:
 	return config.has_section_key("config", key)
 
 func get_config(key : String):
-	if ! config.has_section_key("config", key):
+	if !config.has_section_key("config", key):
 		return DEFAULT_CONFIG[key]
 	return config.get_value("config", key)
 
