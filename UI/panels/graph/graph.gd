@@ -98,6 +98,27 @@ func _process(_delta):
 	if Input.is_action_just_pressed("show_tool_bar"):
 		tool_bar.visible = !tool_bar.visible
 	ToolsManager.camera = camera
+	if Input.is_action_just_pressed("focus"):
+		if ProjectsManager.project.layers.selected_layers.is_empty():
+			return
+		var camera_position = Vector2.ZERO
+		for layer in ProjectsManager.project.layers.selected_layers:
+			camera_position += layer.main_object.global_position
+		camera_position = camera_position/ProjectsManager.project.layers.selected_layers.size()
+		
+#		var margin = Vector2(100, 100)
+		var r = Rect2(Vector2.ZERO, Vector2.ZERO)
+		for i in ProjectsManager.project.layers.selected_layers.size():
+			var layer = ProjectsManager.project.layers.selected_layers[i]
+			if i == 0:
+				r = Rect2(layer.main_object.global_position, layer.size*layer.scale)
+				continue
+			r = r.expand(layer.main_object.global_position)
+#		r = r.grow_individual(margin.x, margin.y, margin.x, margin.y)
+
+		camera.fit_to_frame(r.size)
+		camera.offset = camera_position
+		
 
 
 

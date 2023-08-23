@@ -78,8 +78,8 @@ func refresh():
 		position = Vector2.ZERO #Just Invoking the setter, no need to assign a value
 
 
-func get_rect() -> Rect2:
-	var graph : MTGraph = mt_globals.main_window.get_current_graph_edit()
-	var camera = graph.camera
-	var canvas_position : Vector2 = graph.size/2-camera.offset*(camera.zoom)
-	return Rect2(canvas_position+(main_object.position*camera.zoom)-(Vector2(10,10)*main_object.scale*camera.zoom/2),Vector2(10,10)*main_object.scale*camera.zoom)
+#func get_rect() -> Rect2:
+##	var graph : MTGraph = mt_globals.main_window.get_current_graph_edit()
+#	var camera = graph.camera
+#	var canvas_position : Vector2 = graph.size/2-camera.offset*(camera.zoom)
+#	return Rect2(canvas_position+(main_object.position*camera.zoom)-(Vector2(10,10)*main_object.scale*camera.zoom/2),Vector2(10,10)*main_object.scale*camera.zoom)

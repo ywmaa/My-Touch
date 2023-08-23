@@ -6,7 +6,7 @@ const KEY_MOVE_ACTION_NAMES := ["ui_left", "ui_right", "ui_up", "ui_down"]
 const CAMERA_SPEED_RATE := 15.0
 
 var zoom_min := Vector2(0.005, 0.005)
-var zoom_max := Vector2.ONE
+var zoom_max := Vector2(5,5)
 var viewport_container: SubViewportContainer
 var transparent_checker: ColorRect
 var mouse_pos := Vector2.ZERO
@@ -223,7 +223,7 @@ func fit_to_frame(size: Vector2) -> void:
 		ratio = 0.1  # Set it to a non-zero value just in case
 
 	ratio = clamp(ratio, 0.1, ratio)
-	zoom = Vector2(1 / ratio, 1 / ratio)
+	zoom = Vector2(1 / ratio, 1 / ratio) - (Vector2.ONE*0.01)
 	zoom_changed()
 
 
