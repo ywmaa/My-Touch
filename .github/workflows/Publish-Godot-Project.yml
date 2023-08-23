@@ -26,7 +26,7 @@ env:
  DISCORD_WEBHOOK: ${{secrets.DISCORD_WEBHOOK}} # Needs to be added through github
  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
  IS_MAIN: ${{ contains(github.ref, 'master') }}
- PROJECT_NAME: "My Touch" # Needs to be added
+ PROJECT_NAME: "My\ Touch" # Needs to be added, Must be escaped for commands 
  ITCH_PROJECT_NAME: "my-touch" # Needs to be added
  ITCH_USER_NAME: "ywmaa" # Needs to be added
  GODOT_VERSION: 4.1.1 # Needs to be added
