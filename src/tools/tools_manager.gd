@@ -114,5 +114,25 @@ func update_tool_cursors() -> void:
 
 
 
-
-
+func get_paint_layer() -> paint_layer:
+	if ToolsManager.current_project.layers.selected_layers.is_empty():
+		select_or_create_paint_layer()
+	if ToolsManager.current_project.layers.selected_layers[0].type != base_layer.layer_type.brush:
+		select_or_create_paint_layer()
+	return ToolsManager.current_project.layers.selected_layers[0]
+	
+func select_or_create_paint_layer():
+	print(ToolsManager.current_project.layers.layers)
+	var selected_paint_layer : bool = false
+	for layer in ToolsManager.current_project.layers.layers:
+		if layer.type == base_layer.layer_type.brush:
+			ToolsManager.current_project.layers.selected_layers.insert(0,layer)
+			selected_paint_layer = true
+			break
+	if selected_paint_layer:
+		return
+	if !ProjectsManager.project:
+		return
+	var new_paint_layer = paint_layer.new()
+	new_paint_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),"", ProjectsManager.project,base_layer.layer_type.brush)
+	ToolsManager.current_project.layers.selected_layers.insert(0,new_paint_layer) 

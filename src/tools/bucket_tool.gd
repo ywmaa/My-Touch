@@ -53,13 +53,7 @@ func mouse_pressed(
 
 
 func enable_tool(): # Save History and Enable Tool
-	if ToolsManager.current_project.layers.selected_layers.is_empty():
-		edited_object = null
-		return
-	if ToolsManager.current_project.layers.selected_layers[0].type != base_layer.layer_type.brush:
-		print("please select a brush layer")
-		return
-	edited_object = ToolsManager.current_project.layers.selected_layers[0]
+	edited_object = ToolsManager.get_paint_layer()
 
 	EditedImage = edited_object.main_object.texture.get_image()
 	if copy_from_whole_canvas:

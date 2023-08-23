@@ -54,12 +54,10 @@ func shortcut_pressed():
 	
 func mouse_pressed(
 	event : InputEventMouseButton,
-	image : base_layer,
+	_image : base_layer,
 ):
 	
-	if image.type != base_layer.layer_type.brush:
-		print("please select a brush layer")
-		return
+
 	if event.button_index == MOUSE_BUTTON_RIGHT and tool_active:
 		cancel_tool()
 	if event.button_index == MOUSE_BUTTON_LEFT and tool_active and !event.pressed:
@@ -70,13 +68,7 @@ func mouse_pressed(
 		last_affected_rect = Rect2i(ToolsManager.current_mouse_position-object_correction, Vector2i.ZERO)
 		_add_point(ToolsManager.current_mouse_position-object_correction)
 func enable_tool(): # Save History and Enable Tool
-	if ToolsManager.current_project.layers.selected_layers.is_empty():
-		edited_object = null
-		return
-	if ToolsManager.current_project.layers.selected_layers[0].type != base_layer.layer_type.brush:
-		print("please select a brush layer")
-		return
-	edited_object = ToolsManager.current_project.layers.selected_layers[0]
+	edited_object = ToolsManager.get_paint_layer()
 	EditedImage = edited_object.main_object.texture.get_image()
 	image_size = EditedImage.get_size()
 	super.enable_tool()
