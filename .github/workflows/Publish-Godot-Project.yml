@@ -30,7 +30,7 @@ env:
  ITCH_PROJECT_NAME: "my-touch" # Needs to be added
  ITCH_USER_NAME: "ywmaa" # Needs to be added
  GODOT_VERSION: 4.1.1 # Needs to be added
- GODOT_ANDROID_KEYSTORE_DEBUG_PATH: "./android/debug.keystore" # Needs to be added
+ GODOT_ANDROID_KEYSTORE_DEBUG_PATH: "/home/runner/work/My-Touch/My-Touch/android/debug.keystore" # Needs to be added
  GODOT_ANDROID_KEYSTORE_DEBUG_USER: "androiddebugkey" # Needs to be added
  GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: "android" # Needs to be added
  GODOT_ANDROID_KEYSTORE_RELEASE_PATH: "" # Needs to be added
