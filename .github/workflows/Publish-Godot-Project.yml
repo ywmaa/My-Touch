@@ -26,10 +26,16 @@ env:
  DISCORD_WEBHOOK: ${{secrets.DISCORD_WEBHOOK}} # Needs to be added through github
  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
  IS_MAIN: ${{ contains(github.ref, 'master') }}
- PROJECT_NAME: "MyTouch" # Needs to be added, PLEASE DON'T USE SPACES
+ PROJECT_NAME: "My-Touch" # Needs to be added, PLEASE DON'T USE SPACES
  ITCH_PROJECT_NAME: "my-touch" # Needs to be added
  ITCH_USER_NAME: "ywmaa" # Needs to be added
  GODOT_VERSION: 4.1.1 # Needs to be added
+ GODOT_ANDROID_KEYSTORE_DEBUG_PATH: "./android/debug.keystore" # Needs to be added
+ GODOT_ANDROID_KEYSTORE_DEBUG_USER: "androiddebugkey" # Needs to be added
+ GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: "android" # Needs to be added
+ GODOT_ANDROID_KEYSTORE_RELEASE_PATH: "" # Needs to be added
+ GODOT_ANDROID_KEYSTORE_RELEASE_USER: "" # Needs to be added
+ GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: "" # Needs to be added
 jobs:
  CleanArtifacts:
   # This job clears out the previous artifacts made so you don't run out of space in your github account
