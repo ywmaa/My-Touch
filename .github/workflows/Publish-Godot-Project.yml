@@ -26,8 +26,10 @@ env:
  DISCORD_WEBHOOK: ${{secrets.DISCORD_WEBHOOK}} # Needs to be added through github
  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
  IS_MAIN: ${{ contains(github.ref, 'master') }}
- PROJECT_NAME: "My Touch"
- GODOT_VERSION: 4.1.1
+ PROJECT_NAME: "My Touch" # Needs to be added
+ ITCH_PROJECT_NAME: "my-touch" # Needs to be added
+ ITCH_USER_NAME: "ywmaa" # Needs to be added
+ GODOT_VERSION: 4.1.1 # Needs to be added
 jobs:
  CleanArtifacts:
   # This job clears out the previous artifacts made so you don't run out of space in your github account
@@ -85,22 +87,22 @@ jobs:
   - name: Export Windows Desktop
     run: |
      mkdir -p ./exports
-     ./godot --headless --path ./ --export-release "windows" ./exports/My\ Touch.x86_64.exe
+     ./godot --headless --path ./ --export-release "windows" ./exports/${{ env.PROJECT_NAME }}.x86_64.exe
     
   - name: Export macOS
     run: |
      mkdir -p ./exports
-     ./godot --headless --path ./ --export-release "mac" ./exports/My\ Touch.app.zip
+     ./godot --headless --path ./ --export-release "mac" ./exports/${{ env.PROJECT_NAME }}.app.zip
     
   - name: Export Linux/X11
     run: |
      mkdir -p ./exports
-     ./godot --headless --path ./ --export-release "Linux/X11" ./exports/My\ Touch.x86_64
+     ./godot --headless --path ./ --export-release "Linux/X11" ./exports/${{ env.PROJECT_NAME }}.x86_64
     
   - name: Export Android
     run: |
      mkdir -p ./exports
-     ./godot --headless --path ./ --export-release "Android" ./exports/My\ Touch.apk
+     ./godot --headless --path ./ --export-release "Android" ./exports/${{ env.PROJECT_NAME }}.apk
     
     
 
@@ -132,12 +134,20 @@ jobs:
        name: exports
        path: exports
     
+    - name: Move Out Of Export Folder
+      run: |
+       mv exports/${{ env.PROJECT_NAME }}.x86_64.exe ${{ env.PROJECT_NAME }}.x86_64.exe
+       mv exports/${{ env.PROJECT_NAME }}.x86_64 ${{ env.PROJECT_NAME }}.x86_64
+       mv exports/${{ env.PROJECT_NAME }}.app.zip ${{ env.PROJECT_NAME }}.app.zip
+       mv exports/${{ env.PROJECT_NAME }}.apk ${{ env.PROJECT_NAME }}.apk
+
     - name: Zip
       run: |
-       zip -r windows-release-v${{ github.event.inputs.export_version }}.zip exports/My\ Touch.x86_64.exe
-       zip -r linux-release-v${{ github.event.inputs.export_version }}.zip exports/My\ Touch.x86_64
-       zip -r macos-release-v${{ github.event.inputs.export_version }}.zip exports/My\ Touch.app.zip
-       zip -r android-release-v${{ github.event.inputs.export_version }}.zip exports/My\ Touch.apk
+       chmod +x ${{ env.PROJECT_NAME }}.x86_64
+       zip -r ${{ env.PROJECT_NAME }}-windows-release-v${{ github.event.inputs.export_version }}.zip ${{ env.PROJECT_NAME }}.x86_64.exe
+       zip -r ${{ env.PROJECT_NAME }}-linux-release-v${{ github.event.inputs.export_version }}.zip ${{ env.PROJECT_NAME }}.x86_64
+       zip -r ${{ env.PROJECT_NAME }}-macos-release-v${{ github.event.inputs.export_version }}.zip ${{ env.PROJECT_NAME }}.app.zip
+       zip -r ${{ env.PROJECT_NAME }}-android-release-v${{ github.event.inputs.export_version }}.zip ${{ env.PROJECT_NAME }}.apk
     
     - name: Create Github Release
       id: create_release
@@ -155,8 +165,8 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./linux-release-v${{ github.event.inputs.export_version }}.zip
-       asset_name: linux-release-v${{ github.event.inputs.export_version }}.zip
+       asset_path: ./${{ env.PROJECT_NAME }}-linux-release-v${{ github.event.inputs.export_version }}.zip
+       asset_name: ${{ env.PROJECT_NAME }}-linux-release-v${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - name: Upload Windows Artifact
@@ -165,8 +175,8 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./windows-release-v${{ github.event.inputs.export_version }}.zip
-       asset_name: windows-release-v${{ github.event.inputs.export_version }}.zip
+       asset_path: ./${{ env.PROJECT_NAME }}-windows-release-v${{ github.event.inputs.export_version }}.zip
+       asset_name: ${{ env.PROJECT_NAME }}-windows-release-v${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - name: Upload MacOS Artifact
@@ -175,8 +185,8 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./macos-release-v${{ github.event.inputs.export_version }}.zip
-       asset_name: macos-release-v${{ github.event.inputs.export_version }}.zip
+       asset_path: ./${{ env.PROJECT_NAME }}-macos-release-v${{ github.event.inputs.export_version }}.zip
+       asset_name: ${{ env.PROJECT_NAME }}-macos-release-v${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - name: Upload Android Artifact
@@ -185,8 +195,8 @@ jobs:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
        upload_url: ${{ steps.create_release.outputs.upload_url }}
-       asset_path: ./android-release-v${{ github.event.inputs.export_version }}.zip
-       asset_name: android-release-v${{ github.event.inputs.export_version }}.zip
+       asset_path: ./${{ env.PROJECT_NAME }}-android-release-v${{ github.event.inputs.export_version }}.zip
+       asset_name: ${{ env.PROJECT_NAME }}-android-release-v${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
     - uses: frdrwrt/write-to-file@v1.3
@@ -200,23 +210,49 @@ jobs:
        name: VERSION
        path: ./VERSION.txt
  
-# Publish:
-#  needs: Release
-#  if: ${{ contains(github.ref, 'master') }}
-#  runs-on: ubuntu-latest
-#  steps:
-#    - uses: actions/download-artifact@v2
-#    
-#    - name: Download + Authorize Butler
-#      run: |
-#       curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
-#       unzip butler.zip
-#       chmod +x butler
-#       ./butler -V
-#    
-#    - name: Login To Butler
-#      run: ./butler login
+ Publish:
+  needs: Release
+  if: github.event_name == 'workflow_dispatch' && github.event.inputs.itch_io
+  runs-on: ubuntu-latest
+  steps:
+    - name: Download Exports
+      uses: actions/download-artifact@v2
+      with:
+       name: exports
+       path: exports
     
+    - name: Move Out Of Export Folder
+      run: |
+       mv exports/${{ env.PROJECT_NAME }}.x86_64.exe ${{ env.PROJECT_NAME }}.x86_64.exe
+       mv exports/${{ env.PROJECT_NAME }}.x86_64 ${{ env.PROJECT_NAME }}.x86_64
+       mv exports/${{ env.PROJECT_NAME }}.app.zip ${{ env.PROJECT_NAME }}.app.zip
+       mv exports/${{ env.PROJECT_NAME }}.apk ${{ env.PROJECT_NAME }}.apk
+
+    - name: Zip
+      run: |
+       chmod +x ${{ env.PROJECT_NAME }}.x86_64
+       zip -r windows-release-v${{ github.event.inputs.export_version }}.zip ${{ env.PROJECT_NAME }}.x86_64.exe
+       zip -r linux-release-v${{ github.event.inputs.export_version }}.zip ${{ env.PROJECT_NAME }}.x86_64
+       zip -r mac-release-v${{ github.event.inputs.export_version }}.zip ${{ env.PROJECT_NAME }}.app.zip
+       zip -r android-release-v${{ github.event.inputs.export_version }}.zip ${{ env.PROJECT_NAME }}.apk
+    
+    - name: Download + Authorize Butler
+      run: |
+       curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+       unzip butler.zip
+       chmod +x butler
+       ./butler -V
+    
+    - name: Login To Butler
+      run: ./butler login
+    
+    - name: Butler Push
+      run: |
+       butler push windows-release-v${{ github.event.inputs.export_version }}.zip ${{env.ITCH_USER_NAME}}/${{env.ITCH_PROJECT_NAME}}:windows-release
+       butler push linux-release-v${{ github.event.inputs.export_version }}.zip ${{env.ITCH_USER_NAME}}/${{env.ITCH_PROJECT_NAME}}:linux-release
+       butler push mac-release-v${{ github.event.inputs.export_version }}.zip ${{env.ITCH_USER_NAME}}/${{env.ITCH_PROJECT_NAME}}:mac-release
+       butler push android-release-v${{ github.event.inputs.export_version }}.zip ${{env.ITCH_USER_NAME}}/${{env.ITCH_PROJECT_NAME}}:android-release
+
 
 # Cleanup:
 #  needs: [Export, Release, Publish]
