@@ -97,6 +97,7 @@ func enable_tool(): # Save History and Enable Tool
 	edited_object = ToolsManager.get_paint_layer()
 	EditedImage = edited_object.main_object.texture.get_image()
 	start_drawing(EditedImage, ToolsManager.current_mouse_position)
+	
 #	ToolsManager.current_project.undo_redo.create_action("Move Layers")
 #	for selected in ToolsManager.current_project.layers.selected_layers:
 #		ToolsManager.current_project.undo_redo.add_undo_property(selected,"position",selected.position)
@@ -136,6 +137,7 @@ func apply_texture():
 		edited_object.save_paint_image()
 func start_drawing(image, _start_pos):
 	# Break the image up into tiles - small images are faster to edit.
+	last_stroke_pos = _start_pos
 	chunk_size = image.get_size()/chunk_count
 	for i in ceil(float(image.get_width()) / chunk_size.x):
 		for j in ceil(float(image.get_height()) / chunk_size.y):
@@ -177,7 +179,7 @@ func apply_eraser(image):
 		image.blit_rect(last_edits_chunks[k], Rect2i(Vector2i.ZERO, chunk_size), k)
 	paint_mutex.unlock()
 
-
+#var cached_to_draw_mouse_moves : PackedVector2Array
 func mouse_moved(event : InputEventMouseMotion):
 	if !tool_active:
 		return
@@ -185,23 +187,28 @@ func mouse_moved(event : InputEventMouseMotion):
 		return
 	if ToolsManager.mouse_position_delta.length() > 0.0:
 		var object_correction = edited_object.main_object.position-edited_object.size/2
+		var stroke_end :Vector2 = ToolsManager.current_mouse_position-object_correction
+		if last_stroke_pos == null:
+			last_stroke_pos = stroke_end
+#		cached_to_draw_mouse_moves.append(stroke_end)
+		if stroke_end.distance_to(last_stroke_pos) < (brushsize * 0.5) and (ToolsManager.effect_scaling_factor == 0.25 or brushsize > 200.0):
+			return
+#		for v in cached_to_draw_mouse_moves:
+		var draw_pos = last_stroke_pos.lerp(stroke_end,0.1) if ToolsManager.effect_scaling_factor == 0.25 and brushsize < 200.0 else stroke_end
 		if event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0.0:
-			stroke(ToolsManager.previous_mouse_position-object_correction, ToolsManager.current_mouse_position-object_correction, event.pressure)
-
+			stroke(last_stroke_pos, draw_pos, event.pressure)
 		else:
-			stroke(ToolsManager.previous_mouse_position-object_correction, ToolsManager.current_mouse_position-object_correction, 1.0)
+			stroke(last_stroke_pos, draw_pos, 1.0)
+		last_stroke_pos = draw_pos
+#		cached_to_draw_mouse_moves.clear()
 
 var cached_pixels : PackedVector2Array = []
 var solid_color_rect : Rect2i 
 var paint_mutex : Mutex = Mutex.new()
-var last_stroke_pos
+var last_stroke_pos : Vector2
 var paint_threads : Array = []
 func stroke(stroke_start:Vector2, stroke_end:Vector2, pressure):
-	if last_stroke_pos == null:
-		last_stroke_pos = stroke_end
-	if stroke_end.distance_to(last_stroke_pos) < (brushsize * 0.25) and brushsize > 200.0:
-		return
-	last_stroke_pos = stroke_end
+
 	var unsolid_radius : float = (brushsize * 0.5) * (1.0 - hardness)
 	var radius : float = (brushsize * 0.5) * (pressure if pen_pressure_usage == pen_flag.size else 1.0)
 	var solid_radius : float = radius - unsolid_radius
@@ -210,6 +217,7 @@ func stroke(stroke_start:Vector2, stroke_end:Vector2, pressure):
 	var rect = Rect2i(stroke_start, Vector2.ZERO)\
 		.expand(stroke_end)\
 		.grow(brushsize * 0.5 + 1)
+	
 	rect = Rect2i(rect.position / chunk_size, rect.end / chunk_size)
 	var key
 	var keyf
