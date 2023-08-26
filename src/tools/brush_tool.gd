@@ -417,5 +417,8 @@ func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
 	var circle_center = Vector2(mouse_position + Vector2i.ONE) - brush_offset
 	image_view.draw_arc(circle_center, brushsize * 0.5 + 0.5, PI * 0.1, PI * 0.9, 32, crosshair_color, 1.0)
 	image_view.draw_arc(circle_center, brushsize * 0.5 + 0.5, PI * 1.1, PI * 1.9, 32, crosshair_color, 1.0)
+	
+	if ToolsManager.effect_scaling_factor == 0.25:
+		image_view.draw_line(last_stroke_pos, mouse_position, Color.RED)
 	# With region set to (0, 0, 0, 0), hides the image.
 	# image_view.region_enabled = drawing

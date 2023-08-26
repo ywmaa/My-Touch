@@ -117,12 +117,12 @@ func update_tool_cursors() -> void:
 func get_paint_layer() -> paint_layer:
 	if ToolsManager.current_project.layers.selected_layers.is_empty():
 		select_or_create_paint_layer()
+		return ToolsManager.current_project.layers.selected_layers[0]
 	if ToolsManager.current_project.layers.selected_layers[0].type != base_layer.layer_type.brush:
 		select_or_create_paint_layer()
 	return ToolsManager.current_project.layers.selected_layers[0]
 	
 func select_or_create_paint_layer():
-	print(ToolsManager.current_project.layers.layers)
 	var selected_paint_layer : bool = false
 	for layer in ToolsManager.current_project.layers.layers:
 		if layer.type == base_layer.layer_type.brush:
