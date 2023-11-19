@@ -102,9 +102,9 @@ func _input(event: InputEvent) -> void:
 			zoom_camera(-1)
 	elif event is InputEventPanGesture and OS.get_name() != "Android":
 		# Pan Gesture on a Latop touchpad
-		offset = offset + event.delta.rotated(rotation) * zoom * 7  # for moving the canvas
+		offset = offset + event.delta.rotated(rotation) * 1/zoom * 7  # for moving the canvas
 	elif event is InputEventMouseMotion && drag:
-		offset = offset - event.relative.rotated(rotation) * zoom
+		offset = offset - event.relative.rotated(rotation) * 1/zoom
 		update_transparent_checker_offset()
 #		_update_rulers()
 
@@ -142,7 +142,7 @@ func zoom_camera(dir: int) -> void:
 		if new_zoom > zoom_min && new_zoom < zoom_max:
 			var new_offset = (
 				offset
-				+ (-0.5 * viewport_size + mouse_pos).rotated(rotation) * (new_zoom - zoom)
+				+ ((viewport_size * 0.5) - mouse_pos).rotated(rotation) * -(new_zoom - zoom)
 			)
 			var tween := create_tween().set_parallel()
 			tween.set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
@@ -159,7 +159,7 @@ func zoom_camera(dir: int) -> void:
 		if zoom > zoom_max:
 			zoom = zoom_max
 
-		offset = offset + (-0.5 * viewport_size + mouse_pos).rotated(rotation) * (zoom - prev_zoom)
+		offset = offset + ((viewport_size * 0.5) - mouse_pos).rotated(rotation) * -(zoom - prev_zoom)
 		zoom_changed()
 
 

@@ -28,6 +28,7 @@ var pen_pressure_usage : pen_flag = pen_flag.size
 #var drawing := false
 var drawing_color1 := Color()
 var drawing_color2 := Color()
+var switch_color_function : Callable = switch_color
 var last_edits_chunks := {}
 var last_edits_textures := {}
 
@@ -57,11 +58,16 @@ func get_tool_inspector_properties():
 	if brush_type == 0 or brush_type == 1:
 		PropertiesToShow["drawing_color1"] = "Color"
 		PropertiesToShow["drawing_color2"] = "Color"
+		PropertiesToShow["switch_color_function"] = "Color"
 	PropertiesView.append(PropertiesGroups)
 	PropertiesView.append(PropertiesToShow)
 	return PropertiesView
 
-
+func switch_color():
+	var color1 : Color = drawing_color1
+	drawing_color1 = drawing_color2
+	drawing_color2 = color1
+	changed.emit()
 
 func shortcut_pressed():
 	if Input.is_action_just_pressed("brush") and not Input.is_key_pressed(KEY_SHIFT) and not Input.is_key_pressed(KEY_CTRL) and not Input.is_key_pressed(KEY_ALT):

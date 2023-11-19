@@ -3,7 +3,7 @@ class_name text_layer
 
 
 var default_icon = preload("res://icon.png")
-@export var text_label : RichTextLabel = RichTextLabel.new()
+var text_label : RichTextLabel = RichTextLabel.new()
 
 func set_position(v):
 	if !text_label:

@@ -58,6 +58,8 @@ func create_ui():
 					
 				
 				var property_value = current_tool.get(property.split(":")[0] if property.contains(":") else property)
+				if property_value is Callable:
+					properties_box.add_button(property, property_value)
 				if property_value is int:
 					if property.contains(":"): # hardness_property:min:1.0:max:100.0
 						var property_info : PackedStringArray = property.split(":")

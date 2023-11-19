@@ -14,6 +14,7 @@ var effect_scaling_factor : float = 1.0
 var current_color1 : Color
 var current_color2 : Color
 var TOOLS : Array[ToolBase] = [
+	preload("res://src/tools/select_tool.gd").new(),
 	preload("res://src/tools/move_tool.gd").new(),
 	preload("res://src/tools/rotate_tool.gd").new(),
 	preload("res://src/tools/scale_tool.gd").new(),

@@ -5,7 +5,7 @@ enum layer_type {brush, image, project, mask, text, light, postprocess}
 
 var parent_project : Project
 var main_object : Node = null
-@export var image : Sprite2D = Sprite2D.new()
+var image : Sprite2D = Sprite2D.new()
 var position : Vector2:
 	set(v):
 		set_position(v)

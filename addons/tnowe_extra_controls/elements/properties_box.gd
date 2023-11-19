@@ -8,6 +8,7 @@ signal number_changed(key : StringName, new_value : float)
 signal string_changed(key : StringName, new_value : String)
 signal color_changed(key : StringName, new_value : Color)
 signal bool_changed(key : StringName, new_value : bool)
+signal button_pressed(key : StringName, new_value : Callable)
 
 const UnfoldedOptionButton := preload("res://addons/tnowe_extra_controls/elements/unfolded_option_button.gd")
 
@@ -36,6 +37,12 @@ func update():
 		if editor is RichTextLabel: editor.text = str(_keys[key])
 		if editor is UnfoldedOptionButton: editor.value = _keys[key]
 		index += 1
+## Adds a [Button]. Retrieve the value with [method get_button].
+func add_button(key : StringName, value : Callable):
+	var editor = Button.new()
+	editor.text = key
+	editor.pressed.connect(value)
+	_add_property_editor(key, editor, editor.pressed, _on_button_pressed)
 ## Adds a [CheckBox]. Retrieve the value with [method get_bool].
 func add_bool(key : StringName, value : bool = false):
 	var editor = CheckBox.new()
@@ -192,6 +199,11 @@ func get_value_at(index : int) -> Variant:
 	if editor is UnfoldedOptionButton: return editor.value
 	return null
 
+
+func get_button(key : StringName) -> bool:
+	var editor = _editors[_keys[key]]
+	return editor.pressed
+
 ## Retrieve a boolean.
 func get_bool(key : StringName) -> bool:
 	var editor = _editors[_keys[key]]
@@ -271,4 +283,8 @@ func _on_color_changed(value : Color, key : StringName):
 
 func _on_bool_changed(value : bool, key : StringName):
 	bool_changed.emit(key, value)
+	value_changed.emit(key, value)
+
+func _on_button_pressed(value : Callable, key : StringName):
+	button_pressed.emit(key, value)
 	value_changed.emit(key, value)
