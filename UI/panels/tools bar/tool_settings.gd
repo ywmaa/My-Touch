@@ -13,14 +13,14 @@ func _ready():
 
 func _process(_delta):
 #	return
-	if !ProjectsManager.project:
+	if !ProjectsManager.current_project:
 		visible = false
 		current_tool = null
 		current_tool_changed.emit()
 		return
-	if !current_project or current_project != ProjectsManager.project:
+	if !current_project or current_project != ProjectsManager.current_project:
 		visible = false
-		current_project = ProjectsManager.project
+		current_project = ProjectsManager.current_project
 		return
 	
 	## Assign Current Tool

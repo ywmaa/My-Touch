@@ -1,43 +1,54 @@
 extends Resource
 class_name base_layer
 
-enum layer_type {brush, image, project, mask, text, light, postprocess}
+enum LAYER_TYPE {BRUSH, IMAGE, PROJECT, MASK, TEXT, LIGHT, POST_PROCESS, BASE}
 
-var parent_project : Project
-var main_object : Node = null
-var image : Sprite2D = Sprite2D.new()
-var position : Vector2:
+var parent_project : Project:
+	set(v):
+		parent_project = v
+		for child in children:
+			child.parent_project = parent_project
+
+var main_object : Node = null:
+	set(_v):
+		pass
+	get: return get_canvas_node()
+
+@export var position : Vector2:
 	set(v):
 		set_position(v)
 	get:
 		return get_position()
 func set_position(v):
-	if !image:
+	if !main_object:
 		return
-	image.position = v
+	main_object.position = v
 	emit_changed()
-func get_position():
-	if !image:
-		return Vector2.ZERO
-	return image.position
 
-var rotation : float:
+func get_position():
+	if !main_object:
+		return Vector2.ZERO
+	return main_object.position
+
+@export var rotation : float:
 	set(v):
 		set_rotation(v)
 	get:
 		return get_rotation()
+
 func set_rotation(v):
-	if !image:
+	if !main_object:
 		return
-	image.rotation_degrees = v
+	main_object.rotation_degrees = v
 	emit_changed()
+
 func get_rotation():
-	if !image:
+	if !main_object:
 		return 0.0
-	return image.rotation_degrees
+	return main_object.rotation_degrees
 
 
-var size : Vector2:
+@export var size : Vector2:
 	set(v):
 		set_size(v)
 	get:
@@ -45,43 +56,36 @@ var size : Vector2:
 func set_size(_v):
 	return
 func get_size():
-	if !image:
+	if !main_object:
 		return Vector2.ZERO
-	return image.get_rect().size
+	return main_object.get_rect().size
 
-var scale : Vector2:
+@export var scale : Vector2:
 	set(v):
 		set_scale(v)
 	get:
 		return get_scale()
 func set_scale(v):
-	if !image:
+	if !main_object:
 		return
-	image.scale = v
+	main_object.scale = v
 	emit_changed()
 func get_scale():
-	if !image:
+	if !main_object:
 		return Vector2.ZERO
-	return image.scale
+	return main_object.scale
 
 
 @export var name : String
-
-@export var type : layer_type = layer_type.image
+@export var type : LAYER_TYPE = LAYER_TYPE.BASE
 @export var hidden : bool :
 	set(new_hidden):
 		hidden = new_hidden
 		emit_changed()
 		if main_object:
 			main_object.visible = !hidden
-		
-@export var image_path : String
-
-#@export var extents : RectExtents = RectExtents.new()
-
-#var parent : Node
-
-
+@export var parent: base_layer
+@export var children : Array[base_layer]
 @export var opacity : float:
 	set(new_opacity):
 		new_opacity = clamp(new_opacity,0.0,1.0)
@@ -97,11 +101,10 @@ func get_scale():
 			return main_object.self_modulate.a
 		
 		return opacity
-
 @export var lock_aspect : bool = false
 @export var affect_children_opacity :bool = false
 
-var texture = ImageTexture.new()
+
 
 func get_layer_inspector_properties() -> Array:
 	var PropertiesView : Array = []
@@ -123,36 +126,44 @@ func get_layer_inspector_properties() -> Array:
 	PropertiesView.append(PropertiesToShow)
 	return PropertiesView
 
-func init(_name: String, path: String, project:Project, p_layer_type : layer_type):
-	name = _name
-	parent_project = project
-	image_path = path
-	type = p_layer_type
-	main_object = image
-	refresh()
-	parent_project.layers.add_layer(self)
+## Init Functions used for creating a new layer out of this layer type
+#func init(_name: String, project:Project):
+	#name = _name
+	#parent_project = project
+	#type = LAYER_TYPE.BASE
+	#refresh()
+	#parent_project.layers_container.add_layer(self)
 
 
-func get_image() -> Node:
-	refresh()
-	if main_object == null:
-		return null
-	return main_object
+func get_canvas_node() -> Node:
+	printerr("Not implemented: get_canvas_node! (" + get_script().resource_path.get_file() + ")")
+	return null
+
 func refresh():
-	if !texture.get_image():
-		var load_image = Image.load_from_file(parent_project.project_folder_abs_path + "/" + image_path)
-		texture.set_image(load_image)
-		if image:
-			image.texture = texture
-			image.name = name
-			main_object = image
+	printerr("Not implemented: refresh! (" + get_script().resource_path.get_file() + ")")
+	return null
 
 func get_copy(_name: String = "copy"):
 	var layer = base_layer.new()
-	layer.init(_name,image_path,parent_project,type)
+	layer.init(_name, parent_project)
 	return layer
 
 
+func add_child(child:base_layer):
+	if child == self:
+		return
+	#print("added child", child)
+	children.append(child)
+	child.parent = self
+
+func remove_child(child:base_layer):
+	var index = children.find(child)
+	if index == -1:
+		return
+	remove_child_index(index)
+
+func remove_child_index(index:int):
+	children.remove_at(index)
 
 #Used to get rect relative to the real viewport
 #func get_rect() -> Rect2:

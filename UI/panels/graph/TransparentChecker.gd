@@ -9,10 +9,10 @@ func _ready() -> void:
 
 
 func update_rect() -> void:
-	if !ProjectsManager.project:
+	if !ProjectsManager.current_project:
 		return
 	visible = true
-	size = ProjectsManager.project.canvas_size
+	size = ProjectsManager.current_project.canvas_size
 	if graph.tiles:
 		fit_rect(graph.tiles.get_bounding_rect())
 	material.set_shader_parameter("size", mt_globals.checker_size)

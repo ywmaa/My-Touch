@@ -6,7 +6,7 @@ var current_tab = -1 :
 			return
 		current_tab = t
 		$Tabs.current_tab = current_tab
-		ProjectsManager.project = ProjectsManager.projects[t]
+		ProjectsManager.current_project = ProjectsManager.projects[t]
 		emit_signal("tab_changed")
 signal tab_changed
 signal no_more_tabs
@@ -16,9 +16,9 @@ func _process(_delta):
 		var project = ProjectsManager.projects[index]
 		var title : String = (project.save_path) + (" *" if project.need_save else "")
 		set_tab_title(index, title)
-	if current_tab != ProjectsManager.projects.find(ProjectsManager.project):
+	if current_tab != ProjectsManager.projects.find(ProjectsManager.current_project):
 		create_tabs()
-		current_tab = ProjectsManager.projects.find(ProjectsManager.project)
+		current_tab = ProjectsManager.projects.find(ProjectsManager.current_project)
 	if $Tabs.tab_count == ProjectsManager.projects.size():
 		return
 	create_tabs()

@@ -1,10 +1,12 @@
-extends base_layer
+extends image_layer
 class_name paint_layer
 
 var paint_image_path : String 
 
 func set_position(_v):
 	if !image:
+		return
+	if !image.texture:
 		return
 	image.position = image.texture.get_size()/2
 	emit_changed()
@@ -21,25 +23,9 @@ func set_scale(_v):
 func update_path(path:String = "./"):
 	paint_image_path = path.path_join(name.c_unescape() + ".png")
 
-func init(_name: String,_path: String, project:Project ,p_layer_type : layer_type):
-	name = _name
-	type = p_layer_type
-	main_object = image
-	parent_project = project
-	refresh()
-	parent_project.layers.add_layer(self)
-	
-
 func _init():
-	type = layer_type.brush
+	type = LAYER_TYPE.BRUSH
 	affect_children_opacity = true
-	
-
-func get_image() -> Node:
-	refresh()
-	if main_object == null:
-		return null
-	return main_object
 
 func save_paint_image():
 	if paint_image_path:
@@ -53,6 +39,10 @@ func canvas_changed(_prev:Vector2, new:Vector2):
 	texture.set_image(prev_image)
 	position = Vector2.ZERO #Just Invoking the setter, no need to assign a value
 
+func get_canvas_node() -> Node:
+	if image == null:
+		return null
+	return image
 
 func refresh():
 	update_path(parent_project.project_folder_abs_path + "/")
@@ -65,16 +55,14 @@ func refresh():
 		if image:
 			image.texture = texture
 			image.name = name
-			main_object = image
 		position = Vector2.ZERO #Just Invoking the setter, no need to assign a value
 	else:
-		Image.create(ProjectsManager.project.canvas_size.x,ProjectsManager.project.canvas_size.y,false,Image.FORMAT_RGBA8).save_png(paint_image_path)
+		Image.create(ProjectsManager.current_project.canvas_size.x,ProjectsManager.current_project.canvas_size.y,false,Image.FORMAT_RGBA8).save_png(paint_image_path)
 		var load_image = Image.load_from_file(paint_image_path)
 		texture.set_image(load_image)
 		if image:
 			image.texture = texture
 			image.name = name
-			main_object = image
 		position = Vector2.ZERO #Just Invoking the setter, no need to assign a value
 
 

@@ -12,23 +12,23 @@ func _ready():
 
 
 func _process(_delta):
-	if !ProjectsManager.project:
+	if !ProjectsManager.current_project:
 		visible = false
 		current_layer = null
 		current_layer_changed.emit()
 		return
-	if !current_project or current_project != ProjectsManager.project:
+	if !current_project or current_project != ProjectsManager.current_project:
 		visible = false
-		current_project = ProjectsManager.project
+		current_project = ProjectsManager.current_project
 		return
-	if current_project.layers.selected_layers.is_empty():
+	if current_project.layers_container.selected_layers.is_empty():
 		current_layer = null
 		current_layer_changed.emit()
 		visible = false
 		return
 	
-	if current_layer != current_project.layers.selected_layers.front():
-		current_layer = current_project.layers.selected_layers.front()
+	if current_layer != current_project.layers_container.selected_layers.front():
+		current_layer = current_project.layers_container.selected_layers.front()
 		current_layer_changed.emit()
 	if current_layer.main_object == null:
 		return

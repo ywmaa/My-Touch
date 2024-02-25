@@ -1,47 +1,9 @@
 extends base_layer
 class_name text_layer
 
-
-var default_icon = preload("res://icon.png")
 var text_label : RichTextLabel = RichTextLabel.new()
 
-func set_position(v):
-	if !text_label:
-		return
-	text_label.position = v
-	emit_changed()
-func get_position():
-	if !text_label:
-		return Vector2.ZERO
-	return text_label.position
-
-func set_rotation(v):
-	if !text_label:
-		return
-	text_label.rotation_degrees = v
-	emit_changed()
-func get_rotation():
-	if !text_label:
-		return 0.0
-	return text_label.rotation_degrees
-
-func set_size(_v):
-	return
-func get_size():
-	if !text_label:
-		return Vector2.ZERO
-	return text_label.get_rect().size
-
-func set_scale(v):
-	if !text_label:
-		return
-	text_label.scale = v
-	emit_changed()
-func get_scale():
-	if !text_label:
-		return Vector2.ZERO
-	return text_label.scale
-var text : String:
+@export var text : String:
 	set(v):
 		text_label.text = v
 		emit_changed()
@@ -57,51 +19,34 @@ func get_layer_inspector_properties() -> Array:
 	PropertiesView[1].merge(PropertiesToShow)
 	return PropertiesView
 
-# we don't need an image or texture so we will override everything 
-# and reset all images and textures to free memory
-func init(_name: String,_path: String,project:Project, p_layer_type : layer_type):
+func init(_name: String, project:Project, parent_layer:base_layer=null):
 	name = _name
-	type = p_layer_type
-	main_object = text_label
 	parent_project = project
 	text_label.text = "Hello World" #Default Text
+	refresh()
+	parent_project.layers_container.add_layer(self, parent_layer)
+
+func _init():
+	type = LAYER_TYPE.TEXT
+	affect_children_opacity = true
 	text_label.fit_content = true
 	text_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	text_label.bbcode_enabled = true
-	refresh()
-	parent_project.layers.add_layer(self)
-
-func _init():
-	type = layer_type.text
-	main_object = text_label
-	affect_children_opacity = true
-	image = null
-	texture = null
 	
 
-#func clear_image(parent:Node):
-#	if text_label == null:
-#		return
-#	for instance in instances:
-#		if instance in parent.get_children():
-#			parent.get_child(parent.get_children().find(instance)).queue_free()
-#			instances.remove_at(instances.find(instance))
-#
-#func draw_image(parent:Node):
-#	if text_label == null:
-#		return
-#	for instance in instances:
-#		if instance in parent.get_children():
-#			return
-#	var instance = text_label.duplicate(8)
-#	parent.add_child(instance)
-#	instances.append(instance)
+func get_canvas_node() -> Node:
+	if text_label == null:
+		return null
+	return text_label
+
 func refresh():
-	main_object = text_label
+	pass
 
 func get_copy(_name: String = "copy"):
 	var layer = text_layer.new()
-	layer.init(_name, image_path, parent_project, type)
+	layer.init(_name, parent_project, parent)
+	for k in get_layer_inspector_properties()[1].keys(): # Copy Properties
+		layer.set(k, get(k))
 	return layer
 
 func get_rect() -> Rect2:

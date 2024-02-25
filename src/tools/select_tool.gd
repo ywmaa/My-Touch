@@ -89,7 +89,7 @@ func get_affected_rect() -> Rect2i:
 func mouse_moved(_event : InputEventMouseMotion):
 	if !tool_active:
 		return
-	if !ToolsManager.current_project.layers.selected_layers:
+	if !ToolsManager.current_project.layers_container.selected_layers:
 		tool_active = false
 	
 
@@ -98,25 +98,25 @@ func draw_preview(_image_view : CanvasItem, _mouse_position : Vector2i):
 		return
 	if !ToolsManager.current_project:
 		return
-	if ToolsManager.current_project.layers.selected_layers.is_empty():
+	if ToolsManager.current_project.layers_container.selected_layers.is_empty():
 		return
 	
 func enable_tool(): # Save History and Enable Tool
 	ToolsManager.current_project.undo_redo.create_action("Move Layers")
-	for selected in ToolsManager.current_project.layers.selected_layers:
+	for selected in ToolsManager.current_project.layers_container.selected_layers:
 		ToolsManager.current_project.undo_redo.add_undo_property(selected,"position",selected.position)
 	super.enable_tool()
 func cancel_tool(): # Redo Actions
-	if ToolsManager.current_project.layers.selected_layers:
-		for selected in ToolsManager.current_project.layers.selected_layers:
+	if ToolsManager.current_project.layers_container.selected_layers:
+		for selected in ToolsManager.current_project.layers_container.selected_layers:
 			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
 		ToolsManager.current_project.undo_redo.commit_action()
-		for selected in ToolsManager.current_project.layers.selected_layers:
+		for selected in ToolsManager.current_project.layers_container.selected_layers:
 			ToolsManager.current_project.undo_redo.undo()
 	super.cancel_tool()
 func confirm_tool(): # Confirm Actions
-	if ToolsManager.current_project.layers.selected_layers:
-		for selected in ToolsManager.current_project.layers.selected_layers:
+	if ToolsManager.current_project.layers_container.selected_layers:
+		for selected in ToolsManager.current_project.layers_container.selected_layers:
 			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
 		ToolsManager.current_project.undo_redo.commit_action()
 	super.confirm_tool()

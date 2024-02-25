@@ -1,7 +1,8 @@
 extends Resource
 class_name Project
 
-@export var layers : layers_manager
+@export var animations : Array[Animation]
+@export var layers_container : layers_manager
 @export var canvas_size : Vector2:
 	set(value):
 		emit_signal("canvas_size_changed", canvas_size, value)
@@ -63,7 +64,7 @@ static func project_exists(path:String) -> bool:
 static func load_project(path:String) -> Project:
 	if ResourceLoader.exists(path):
 		var project : Project = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_REUSE) as Project
-		for layer in project.layers.layers:
+		for layer in project.layers_container.layers:
 			layer.parent_project = project
 		return project 
 	return null

@@ -65,26 +65,26 @@ func enable_tool(): # Save History and Enable Tool
 	var _task : TaskManager.Task = TaskManager.create_task(fill.bind(ToolsManager.current_mouse_position))
 	confirm_tool()
 #	ToolsManager.current_project.undo_redo.create_action("Move Layers")
-#	for selected in ToolsManager.current_project.layers.selected_layers:
+#	for selected in ToolsManager.current_project.layers_container.selected_layers:
 #		ToolsManager.current_project.undo_redo.add_undo_property(selected,"position",selected.position)
 	super.enable_tool()
 func cancel_tool(): # Redo Actions
 	
-#	if ToolsManager.current_project.layers.selected_layers:
-#		for selected in ToolsManager.current_project.layers.selected_layers:
+#	if ToolsManager.current_project.layers_container.selected_layers:
+#		for selected in ToolsManager.current_project.layers_container.selected_layers:
 #			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
 #		ToolsManager.current_project.undo_redo.commit_action()
-#		for selected in ToolsManager.current_project.layers.selected_layers:
+#		for selected in ToolsManager.current_project.layers_container.selected_layers:
 #			ToolsManager.current_project.undo_redo.undo()
 	super.cancel_tool()
 func confirm_tool(): # Confirm Actions
 	super.confirm_tool()
 #	if EditedImage:
-#		EditedImage.save_png(ToolsManager.current_project.layers.selected_layers[0].image_path)
-#	ToolsManager.current_project.layers.selected_layers[0].texture = ImageTexture.create_from_image(EditedImage)
-#	ToolsManager.current_project.layers.selected_layers[0].image.texture = ToolsManager.current_project.layers.selected_layers[0].texture
-#	if ToolsManager.current_project.layers.selected_layers:
-#		for selected in ToolsManager.current_project.layers.selected_layers:
+#		EditedImage.save_png(ToolsManager.current_project.layers_container.selected_layers[0].image_path)
+#	ToolsManager.current_project.layers_container.selected_layers[0].texture = ImageTexture.create_from_image(EditedImage)
+#	ToolsManager.current_project.layers_container.selected_layers[0].image.texture = ToolsManager.current_project.layers_container.selected_layers[0].texture
+#	if ToolsManager.current_project.layers_container.selected_layers:
+#		for selected in ToolsManager.current_project.layers_container.selected_layers:
 #			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
 #		ToolsManager.current_project.undo_redo.commit_action()
 	

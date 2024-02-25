@@ -8,12 +8,12 @@ var has_focus
 func on_canvas_size_changed(value):
 	if !tiles:
 		return
-	if ProjectsManager.project.canvas_size.x != 0:
-		tiles.x_basis = (tiles.x_basis * value.x / ProjectsManager.project.canvas_size.x).round()
+	if ProjectsManager.current_project.canvas_size.x != 0:
+		tiles.x_basis = (tiles.x_basis * value.x / ProjectsManager.current_project.canvas_size.x).round()
 	else:
 		tiles.x_basis = Vector2(value.x, 0)
-	if ProjectsManager.project.canvas_size.y != 0:
-		tiles.y_basis = (tiles.y_basis * value.y / ProjectsManager.project.canvas_size.y).round()
+	if ProjectsManager.current_project.canvas_size.y != 0:
+		tiles.y_basis = (tiles.y_basis * value.y / ProjectsManager.current_project.canvas_size.y).round()
 	else:
 		tiles.y_basis = Vector2(0, value.y)
 	tiles.tile_size = value
@@ -33,7 +33,7 @@ func _ready() -> void:
 	resize_tool.connect("value_changed",resize_canvas)
 	
 func resize_canvas(delta, expand_direction):
-	ProjectsManager.project.canvas_size += delta.round()
+	ProjectsManager.current_project.canvas_size += delta.round()
 	if expand_direction < Vector2i.ZERO:
 		mt_globals.main_window.get_node("AppRender/Canvas").position += delta.round()
 var dragging : bool = false
@@ -68,7 +68,7 @@ func pass_event_to_tool(event) -> bool:
 #			queue_redraw()
 #			var drag_end = get_local_mouse_position()
 #
-#			for layer in ProjectsManager.project.layers.layers:
+#			for layer in ProjectsManager.current_project.layers_container.layers:
 #
 #				if drag_end.y - drag_start.y < 0.0:
 #					mouse_rect = Rect2(drag_end,abs(drag_end-drag_start))
@@ -77,20 +77,20 @@ func pass_event_to_tool(event) -> bool:
 #				mouse_rect.position.x = drag_start.x if drag_start.x < drag_end.x else drag_end.x
 				
 #				if mouse_rect.intersects(layer.get_rect(),true):
-#					ProjectsManager.project.layers.select_layer(layer)
+#					ProjectsManager.current_project.layers_container.select_layer(layer)
 
 
 	
 func _process(_delta):
-	if !ProjectsManager.project:
+	if !ProjectsManager.current_project:
 		visible = false
 		return
 	visible = true
 	if !tiles:
 		tiles = Tiles.new(Vector2.ONE)
 		center_view()
-	if ProjectsManager.project.canvas_size != tiles.tile_size:
-		on_canvas_size_changed(ProjectsManager.project.canvas_size)
+	if ProjectsManager.current_project.canvas_size != tiles.tile_size:
+		on_canvas_size_changed(ProjectsManager.current_project.canvas_size)
 	if $Viewport.msaa_2d != get_viewport().msaa_2d:
 		$Viewport.msaa_2d = get_viewport().msaa_2d
 	if has_focus == false:
@@ -99,17 +99,17 @@ func _process(_delta):
 		tool_bar.visible = !tool_bar.visible
 	ToolsManager.camera = camera
 	if Input.is_action_just_pressed("focus"):
-		if ProjectsManager.project.layers.selected_layers.is_empty():
+		if ProjectsManager.current_project.layers_container.selected_layers.is_empty():
 			return
 		var camera_position = Vector2.ZERO
-		for layer in ProjectsManager.project.layers.selected_layers:
+		for layer in ProjectsManager.current_project.layers_container.selected_layers:
 			camera_position += layer.main_object.global_position
-		camera_position = camera_position/ProjectsManager.project.layers.selected_layers.size()
+		camera_position = camera_position/ProjectsManager.current_project.layers_container.selected_layers.size()
 		
 #		var margin = Vector2(100, 100)
 		var r = Rect2(Vector2.ZERO, Vector2.ZERO)
-		for i in ProjectsManager.project.layers.selected_layers.size():
-			var layer = ProjectsManager.project.layers.selected_layers[i]
+		for i in ProjectsManager.current_project.layers_container.selected_layers.size():
+			var layer = ProjectsManager.current_project.layers_container.selected_layers[i]
 			if i == 0:
 				r = Rect2(layer.main_object.global_position, layer.size*layer.scale)
 				continue
@@ -125,9 +125,9 @@ func _process(_delta):
 # Center view
 
 func center_view() -> void:
-	if !ProjectsManager.project:
+	if !ProjectsManager.current_project:
 		return
-	camera.fit_to_frame(ProjectsManager.project.canvas_size)
+	camera.fit_to_frame(ProjectsManager.current_project.canvas_size)
 
 
 func _on_mouse_entered():

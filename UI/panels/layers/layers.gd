@@ -9,12 +9,12 @@ func _ready():
 	self.connect("mouse_entered",_on_mouse_entered)
 	self.connect("mouse_exited",_on_mouse_exited)
 func _process(_delta):
-	if !ProjectsManager.project:
+	if !ProjectsManager.current_project:
 		visible = false
 		return
 	visible = true
-	if ProjectsManager.project:
-		set_layers(ProjectsManager.project.layers)
+	if ProjectsManager.current_project:
+		set_layers(ProjectsManager.current_project.layers_container)
 	else:
 		set_layers([])
 func set_layers(_layers) -> void:
@@ -28,9 +28,9 @@ func set_layers(_layers) -> void:
 
 func _on_Tree_selection_changed(new_selected) -> void:
 	var empty_layers_array : Array[base_layer] = []
-	ProjectsManager.project.layers.selected_layers = empty_layers_array
+	ProjectsManager.current_project.layers_container.selected_layers = empty_layers_array
 	for item in new_selected:
-		ProjectsManager.project.layers.select_layer(item.get_meta("layer"))
+		ProjectsManager.current_project.layers_container.select_layer(item.get_meta("layer"))
 
 func _on_Add_pressed():
 	pass

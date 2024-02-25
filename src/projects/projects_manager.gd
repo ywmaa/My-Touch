@@ -2,30 +2,31 @@ extends Node
 
 var projects : Array[Project]
 
-var project : Project:
+var current_project : Project:
 	set(value):
-		if project and mt_globals.get_config("save_inactive_project"):
-			project.save_project()
-		project = value
-		if !project:
+		if current_project and mt_globals.get_config("save_inactive_project"):
+			current_project.save_project()
+		current_project = value
+		if !current_project:
 			return
-		if !project.undo_redo:
-			project.undo_redo = UndoRedo.new()
+		if !current_project.undo_redo:
+			current_project.undo_redo = UndoRedo.new()
 var clipboard_file_path = "user://my_touch_clipboard.res"
 var default_icon = "res://icon.png"
 
 func new_project() -> void:
 #	center_view()
-	project = Project.new()
-	project.canvas_size = Vector2(mt_globals.default_width,mt_globals.default_height)
-	project.layers = layers_manager.new()
-	projects.append(project)
-	project.save_path = project_get_unused_save_path()
+	current_project = Project.new()
+	current_project.canvas_size = Vector2(mt_globals.default_width,mt_globals.default_height)
+	current_project.layers_container = layers_manager.new()
+	projects.append(current_project)
+	current_project.save_path = project_get_unused_save_path()
 	#default layer
-	var new_layer : base_layer = base_layer.new()
-	var new_image_path : String = project.project_folder_abs_path + "/" + default_icon.get_file()
+	#var new_layer : base_layer = base_layer.new()
+	var new_image_path : String = current_project.project_folder_abs_path + "/" + default_icon.get_file()
 	DirAccess.copy_absolute(default_icon, new_image_path)
-	new_layer.init(project.layers.get_unused_layer_name(), default_icon.get_file(), project ,base_layer.layer_type.image)
+	image_layer.new().init(current_project.layers_container.get_unused_layer_name(), default_icon.get_file(), current_project)
+	#new_layer.init(current_project.layers_container.get_unused_layer_name(), default_icon.get_file(), current_project ,base_layer.layer_type.image)
 	
 func project_get_unused_save_path() -> String:
 	var naming = "unnamed"
@@ -41,79 +42,83 @@ func project_get_unused_save_path() -> String:
 
 func close_project(index:int):
 	if projects.size() > 1:
-		if projects[index] == project:
+		if projects[index] == current_project:
 			if index-1 < 0:
-				project = projects[index+1]
+				current_project = projects[index+1]
 			else:
-				project = projects[index-1]
+				current_project = projects[index-1]
 		projects.remove_at(index)
 	else:
-		project = null
+		current_project = null
 		projects.clear()
 
 
 
 
 func on_import_image_file(path:String):
-	if !project:
+	if !current_project:
 		return
-	var new_layer : base_layer = base_layer.new()
-	var new_image_path : String = project.project_folder_abs_path + "/" + path.get_file()
+	#var new_layer : base_layer = base_layer.new()
+	var new_image_path : String = current_project.project_folder_abs_path + "/" + path.get_file()
 	DirAccess.copy_absolute(path, new_image_path) # Move Image to Project Folder
-	new_layer.init(project.layers.get_unused_layer_name(), new_image_path.get_file(), project, base_layer.layer_type.image)
+	image_layer.new().init(current_project.layers_container.get_unused_layer_name(), new_image_path.get_file(), current_project)
+	#new_layer.init(current_project.layers_container.get_unused_layer_name(), new_image_path.get_file(), current_project, base_layer.layer_type.image)
 
 # Cut / copy / paste / duplicate
 
 func remove_selection() -> void:
-	if !project:
+	if !current_project:
 		return
-	project.need_save = true
-	for selection in project.layers.selected_layers:
-		project.layers.remove_layer(selection)
+	current_project.need_save = true
+	for selection in current_project.layers_container.selected_layers:
+		current_project.layers_container.remove_layer(selection)
 		
 func cut() -> void:
 	copy()
 	remove_selection()
 
 func copy() -> void:
-	if !project:
+	if !current_project:
 		return
 	var data : mt_clipboard = mt_clipboard.new()
-	data.layers = project.layers.selected_layers
+	data.layers = current_project.layers_container.selected_layers
 	ResourceSaver.save(data,clipboard_file_path)
 
-func paste() -> void:
-	if !project:
+func paste(duplicate:bool = false) -> void:
+	if !current_project:
 		return
-	project.need_save = true
+	current_project.need_save = true
 	var data = ResourceLoader.load(clipboard_file_path) as mt_clipboard
+	var paste_parent = current_project.layers_container.selected_layers.back().parent if duplicate else current_project.layers_container.selected_layers.back()
 	select_none()
 	for layer in data.layers:
-		project.layers.duplicate_layer(layer)
+		layer.parent_project = current_project
+		layer.parent = paste_parent
+		current_project.layers_container.duplicate_layer(layer)
 
 func duplicate_selected() -> void:
 	copy()
-	paste()
+	paste(true)
 
 func select_all():
-	if !project:
+	if !current_project:
 		return
-	project.layers.selected_layers = project.layers.layers
+	current_project.layers_container.selected_layers = current_project.layers_container.layers
 func select_none():
-	if !project:
+	if !current_project:
 		return
-	project.layers.selected_layers = []
+	current_project.layers_container.selected_layers = []
 func select_invert():
-	if !project:
+	if !current_project:
 		return
 	var inverted_selections : Array[base_layer] = []
-	for layer in project.layers.layers:
-		if layer in project.layers.selected_layers:
+	for layer in current_project.layers_container.layers:
+		if layer in current_project.layers_container.selected_layers:
 			continue
 		inverted_selections.append(layer)
-	project.layers.selected_layers = inverted_selections
+	current_project.layers_container.selected_layers = inverted_selections
 func load_selection(filenames) -> void:
-	if !project:
+	if !current_project:
 		return
 	var file_name : String = ""
 	for f in filenames:
@@ -123,8 +128,8 @@ func load_selection(filenames) -> void:
 		file_name = file.get_path_absolute()
 		var data = ResourceLoader.load(file_name) as Project
 		if data != null:
-			project.layers.layers.append_array(data.layers.layers)
-			project.need_save = true
+			current_project.layers_container.layers.append_array(data.layers.layers)
+			current_project.need_save = true
 		else:
 			var dialog : AcceptDialog = AcceptDialog.new()
 			add_child(dialog)
@@ -134,7 +139,7 @@ func load_selection(filenames) -> void:
 			dialog.popup_centered()
 
 func save_selection() -> void:
-	if !project:
+	if !current_project:
 		return
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
@@ -142,8 +147,8 @@ func save_selection() -> void:
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.mt.tres;My Touch text files")
-	if mt_globals.config.has_section_key("path", "project"):
-		dialog.current_dir = mt_globals.config.get_value("path", "project")
+	if mt_globals.config.has_section_key("path", "current_project"):
+		dialog.current_dir = mt_globals.config.get_value("path", "current_project")
 	var files = await dialog.select_files()
 	if files.size() == 1:
 		if do_save_selection(files[0]):
@@ -153,12 +158,12 @@ func save_selection() -> void:
 func do_save_selection(filename) -> bool:
 	var data : Project = Project.new()
 	data.layers = layers_manager.new()
-	data.layers.layers = project.layers.selected_layers
+	data.layers.layers = current_project.layers_container.selected_layers
 	ResourceSaver.save(data,filename)
 	return true
 
 func load_project_layer(filenames) -> void:
-	if !project:
+	if !current_project:
 		return
 	var file_name : String = ""
 	for f in filenames:
@@ -168,8 +173,9 @@ func load_project_layer(filenames) -> void:
 		file_name = file.get_path_absolute()
 		var data = ResourceLoader.load(file_name,"",ResourceLoader.CACHE_MODE_IGNORE) as Project
 		if data != null:
-			var new_project_layer = project_layer.new()
-			new_project_layer.init(file_name, default_icon, project, base_layer.layer_type.project)
+			project_layer.new().init(file_name, file_name, current_project)
+			#var new_project_layer = project_layer.new()
+			#new_project_layer.init(file_name, default_icon, current_project)
 		else:
 			var dialog : AcceptDialog = AcceptDialog.new()
 			add_child(dialog)
@@ -178,7 +184,7 @@ func load_project_layer(filenames) -> void:
 			dialog.connect("popup_hide", dialog.queue_free)
 			dialog.popup_centered()
 func refresh():
-	if !project:
+	if !current_project:
 		return
 	mt_globals.main_window.get_node("AppRender/Canvas").rerender()
 
@@ -187,9 +193,9 @@ func load_file(filename, name_used:bool) -> bool:
 	
 	var data : Project = Project.load_project(filename)
 	if data != null:
-		project = data
-		project.name_used = name_used
-		projects.append(project)
+		current_project = data
+		current_project.name_used = name_used
+		projects.append(current_project)
 		return true
 	else:
 		var dialog : AcceptDialog = AcceptDialog.new()
@@ -203,17 +209,17 @@ func load_file(filename, name_used:bool) -> bool:
 # Save
 
 func save() -> bool:
-	if !project:
+	if !current_project:
 		return false
 	var status
-	if project.save_path != "":
-		status = project.save_project()
+	if current_project.save_path != "":
+		status = current_project.save_project()
 	else:
 		status = await save_as()
 	return status
 
 func save_as() -> bool:
-	if !project:
+	if !current_project:
 		return false
 	#replace with preload
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
@@ -223,48 +229,48 @@ func save_as() -> bool:
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.mt.tres;My Touch text files")
 
-	if mt_globals.config.has_section_key("path", "project"):
-		dialog.current_dir = mt_globals.config.get_value("path", "project")
+	if mt_globals.config.has_section_key("path", "current_project"):
+		dialog.current_dir = mt_globals.config.get_value("path", "current_project")
 	var files = await dialog.select_files()
 	if files.size() == 1:
-		var old_file = ProjectSettings.globalize_path(project.save_path)
-		project.save_path = files[0]
-		if project.save_project():
+		var old_file = ProjectSettings.globalize_path(current_project.save_path)
+		current_project.save_path = files[0]
+		if current_project.save_project():
 			var dir = DirAccess.open(old_file.get_base_dir())
 			if dir.file_exists(old_file.get_file()): # Remove Old MT File
 				dir.remove(old_file.get_file())
 #			main_window.add_recent(save_path)
-			mt_globals.config.set_value("path", "project", project.save_path.get_base_dir())
+			mt_globals.config.set_value("path", "current_project", current_project.save_path.get_base_dir())
 			return true
 	return false
 
 
 
 func auto_save():
-	if !project:
+	if !current_project:
 		return
-	if project.save_path != "" and project.need_save:
-		project.save_project()
+	if current_project.save_path != "" and current_project.need_save:
+		current_project.save_project()
 		get_node("/root/Editor/MessageLabel").show_message("auto saved")
 
 
 func send_changed_signal() -> void:
-	if !project:
+	if !current_project:
 		return
-	project.need_save = true
+	current_project.need_save = true
 
 
 
 func undo():
-	if !project:
+	if !current_project:
 		return
-	project.undo_redo.undo()
-	get_node("/root/Editor/MessageLabel").show_message("Current Step : " + str(project.undo_redo.get_current_action() + 1))
+	current_project.undo_redo.undo()
+	get_node("/root/Editor/MessageLabel").show_message("Current Step : " + str(current_project.undo_redo.get_current_action() + 1))
 
 func redo():
-	if !project:
+	if !current_project:
 		return
-	project.undo_redo.redo()
-	get_node("/root/Editor/MessageLabel").show_message("Current Step : " + str(project.undo_redo.get_current_action() + 1))
+	current_project.undo_redo.redo()
+	get_node("/root/Editor/MessageLabel").show_message("Current Step : " + str(current_project.undo_redo.get_current_action() + 1))
 	
 

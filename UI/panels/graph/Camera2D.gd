@@ -196,7 +196,7 @@ func _on_tween_step(_idx: int) -> void:
 
 func zoom_100() -> void:
 	zoom = Vector2.ONE
-	offset = ProjectsManager.project.canvas_size / 2
+	offset = ProjectsManager.current_project.canvas_size / 2
 	zoom_changed()
 
 

@@ -10,10 +10,10 @@ func _ready():
 	self.connect("mouse_entered",_on_mouse_entered)
 	self.connect("mouse_exited",_on_mouse_exited)
 func _process(_delta):
-	if !ProjectsManager.project:
+	if !ProjectsManager.current_project:
 		return
-	if !project or project != ProjectsManager.project:
-		project = ProjectsManager.project
+	if !project or project != ProjectsManager.current_project:
+		project = ProjectsManager.current_project
 		if project:
 			var canvas_size : Vector2 = project.canvas_size
 			%CanvasX.value = canvas_size.x

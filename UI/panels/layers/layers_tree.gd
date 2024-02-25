@@ -31,11 +31,11 @@ func update_from_layers(layers_array : Array, selected_layers:Array[base_layer])
 	if !editing:
 		selected_items.clear()
 		clear()
-		do_update_from_layers(layers_array, create_item(), selected_layers)
+		do_update_from_layers(layers_array, selected_layers, create_item())
 
-func do_update_from_layers(layers_array : Array, _item : TreeItem, selected_layers:Array[base_layer]) -> void:
+func do_update_from_layers(layers_array : Array, selected_layers:Array[base_layer], parent_item : TreeItem=null) -> void:
 	for l in layers_array:
-		var new_item = create_item()
+		var new_item : TreeItem = create_item(parent_item)
 		new_item.set_text(0, l.name)
 		new_item.set_icon(0, ICONS[l.type])
 		new_item.add_button(1, BUTTON_HIDDEN if l.hidden else BUTTON_SHOWN)
@@ -44,6 +44,9 @@ func do_update_from_layers(layers_array : Array, _item : TreeItem, selected_laye
 		if l in selected_layers:
 			new_item.select(0)
 			selected_items.append(new_item)
+		if l.children.size() > 0:
+			do_update_from_layers(l.children, selected_layers, new_item)
+
 
 func get_drag_data(_position : Vector2):
 	var l = get_selected().get_meta("layer")

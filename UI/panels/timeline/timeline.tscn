@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://bq4su5uur30vy"]
+
+[sub_resource type="Animation" id="Animation_ufppa"]
+resource_name = "new_animation"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_r5u28"]
+_data = {
+"new_animation": SubResource("Animation_ufppa")
+}
+
+[node name="Timeline" type="Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Node2D"]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_r5u28")
+}

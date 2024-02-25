@@ -101,19 +101,19 @@ func mouse_pressed(
 
 func enable_tool(): # Save History and Enable Tool
 	edited_object = ToolsManager.get_paint_layer()
-	EditedImage = edited_object.main_object.texture.get_image()
+	EditedImage = edited_object.image.texture.get_image()
 	start_drawing(EditedImage, ToolsManager.current_mouse_position)
 	
 #	ToolsManager.current_project.undo_redo.create_action("Move Layers")
-#	for selected in ToolsManager.current_project.layers.selected_layers:
+#	for selected in ToolsManager.current_project.layers_container.selected_layers:
 #		ToolsManager.current_project.undo_redo.add_undo_property(selected,"position",selected.position)
 	super.enable_tool()
 func cancel_tool(): # Redo Actions
-#	if ToolsManager.current_project.layers.selected_layers:
-#		for selected in ToolsManager.current_project.layers.selected_layers:
+#	if ToolsManager.current_project.layers_container.selected_layers:
+#		for selected in ToolsManager.current_project.layers_container.selected_layers:
 #			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
 #		ToolsManager.current_project.undo_redo.commit_action()
-#		for selected in ToolsManager.current_project.layers.selected_layers:
+#		for selected in ToolsManager.current_project.layers_container.selected_layers:
 #			ToolsManager.current_project.undo_redo.undo()
 	super.cancel_tool()
 func confirm_tool(): # Confirm Actions
@@ -124,11 +124,11 @@ func confirm_tool(): # Confirm Actions
 		paint_threads.append(worker)
 	TaskManager.create_task(apply_texture)
 #	if EditedImage:
-#		EditedImage.save_png(ToolsManager.current_project.layers.selected_layers[0].image_path)
-#	ToolsManager.current_project.layers.selected_layers[0].texture = ImageTexture.create_from_image(EditedImage)
-#	ToolsManager.current_project.layers.selected_layers[0].image.texture = ToolsManager.current_project.layers.selected_layers[0].texture
-#	if ToolsManager.current_project.layers.selected_layers:
-#		for selected in ToolsManager.current_project.layers.selected_layers:
+#		EditedImage.save_png(ToolsManager.current_project.layers_container.selected_layers[0].image_path)
+#	ToolsManager.current_project.layers_container.selected_layers[0].texture = ImageTexture.create_from_image(EditedImage)
+#	ToolsManager.current_project.layers_container.selected_layers[0].image.texture = ToolsManager.current_project.layers_container.selected_layers[0].texture
+#	if ToolsManager.current_project.layers_container.selected_layers:
+#		for selected in ToolsManager.current_project.layers_container.selected_layers:
 #			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
 #		ToolsManager.current_project.undo_redo.commit_action()
 	super.confirm_tool()
@@ -139,7 +139,7 @@ func apply_texture():
 	if brush_type != BRUSH_ERASE:
 		apply_brush(EditedImage)
 	if edited_object:
-		edited_object.main_object.texture.update(EditedImage) #= ImageTexture.create_from_image(EditedImage)
+		edited_object.image.texture.update(EditedImage) #= ImageTexture.create_from_image(EditedImage)
 		edited_object.save_paint_image()
 func start_drawing(image, _start_pos):
 	# Break the image up into tiles - small images are faster to edit.
@@ -192,7 +192,7 @@ func mouse_moved(event : InputEventMouseMotion):
 	if !edited_object:
 		return
 	if ToolsManager.mouse_position_delta.length() > 0.0:
-		var object_correction = edited_object.main_object.position-edited_object.size/2
+		var object_correction = edited_object.image.position-edited_object.size/2
 		var stroke_end :Vector2 = ToolsManager.current_mouse_position-object_correction
 		if last_stroke_pos == null:
 			last_stroke_pos = stroke_end

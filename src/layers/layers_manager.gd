@@ -6,15 +6,21 @@ var selected_layers : Array[base_layer] = []
 var canvas: Node 
 
 signal layers_changed
-func add_layer(new_layer:base_layer):
-	layers.append(new_layer)
+func add_layer(new_layer:base_layer, parent:base_layer=null):
+	if parent:
+		remove_layer(new_layer)
+		parent.add_child(new_layer)
+	else:
+		if !layers.has(new_layer):
+			layers.append(new_layer)
 	_on_layers_changed()
 
 func remove_layer(layer : base_layer) -> void:
 	var layers_array = find_parent_array(layer)
-	layers_array.erase(layer)
+	if layers_array:
+		layers_array.erase(layer)
 #	layer.clear_image()
-	_on_layers_changed()
+		_on_layers_changed()
 
 func select_layer_name(layer_name):
 	if find_layer(layer_name) == null:
@@ -29,9 +35,9 @@ func find_layer(name:String):
 	return null
 
 func select_layer(layer : base_layer) -> void:
-	if layers.has(layer):
-		if !selected_layers.has(layer):
-			selected_layers.append(layer)
+	#if layers.has(layer):
+	if !selected_layers.has(layer):
+		selected_layers.append(layer)
 	_on_layers_changed()
 
 func deselect_layer(layer : base_layer) -> void:
@@ -46,7 +52,6 @@ func _on_layers_changed() -> void:
 
 func duplicate_layer(source_layer) -> void:
 	var layer = source_layer.get_copy(get_unused_layer_name())
-	add_layer(layer)
 	select_layer(layer)
 	_on_layers_changed()
 
@@ -84,9 +89,10 @@ func move_layer_down(layer : base_layer) -> void:
 
 
 func find_parent_array(layer : base_layer, layer_array : Array = layers):
-	for l in layer_array:
-		if l == layer:
-			return layer_array
+	if layer.parent:
+		return layer.parent.children
+	if layer_array.has(layer):
+		return layer_array
 	return null
 
 

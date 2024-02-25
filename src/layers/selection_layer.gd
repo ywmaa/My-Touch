@@ -1,4 +1,4 @@
-extends base_layer
+extends image_layer
 class_name selection_layer
 var color : Color:
 	set(v):
@@ -31,21 +31,17 @@ func get_layer_inspector_properties() -> Array:
 	PropertiesView[1].merge(PropertiesToShow)
 	return PropertiesView
 
-func init(_name: String,_path: String, project:Project ,p_layer_type : layer_type):
-	name = _name
-	type = p_layer_type
-	parent_project = project
-	refresh()
-	parent_project.layers.add_layer(self)
+#func init(_name: String,_path: String, project:Project):
+	#name = _name
+	#parent_project = project
+	#refresh()
+	#parent_project.layers_container.add_layer(self)
 
 func _init():
-	type = layer_type.mask
+	type = LAYER_TYPE.MASK
 	affect_children_opacity = true
 	image = shape_generator.new()
 
-
-func refresh():
-	main_object = image
 
 func get_rect() -> Rect2:
 	var graph : MTGraph = mt_globals.main_window.get_current_graph_edit()

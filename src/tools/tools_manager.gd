@@ -48,7 +48,7 @@ func handle_image_input(event) -> bool:
 		return false
 	
 	
-	if current_project.layers.selected_layers.is_empty():
+	if current_project.layers_container.selected_layers.is_empty():
 		return false
 	
 	
@@ -63,25 +63,25 @@ func handle_image_input(event) -> bool:
 	#		current_tool.selection = selection
 			current_tool.mouse_pressed(
 				event,
-				current_project.layers.selected_layers[0],
+				current_project.layers_container.selected_layers[0],
 			)
 		if shortcut_tool:
 			shortcut_tool.mouse_pressed(
 				event,
-				current_project.layers.selected_layers[0],
+				current_project.layers_container.selected_layers[0],
 			)
 		if current_tool:
 			if current_tool.image_hide_mode != 2:
-				for layer in current_project.layers.selected_layers:
+				for layer in current_project.layers_container.selected_layers:
 					layer.main_object.self_modulate.a = 1.0
 		if current_tool:
 			if event.pressed && current_tool.image_hide_mode == 1:
-				for layer in current_project.layers.selected_layers:
+				for layer in current_project.layers_container.selected_layers:
 					layer.main_object.self_modulate.a = 0.0
 
 	return true
 func _process(_delta):
-	current_project = ProjectsManager.project
+	current_project = ProjectsManager.current_project
 	if !current_project:
 		return
 	var left_mouse_cursor_visible : bool = false
@@ -116,24 +116,24 @@ func update_tool_cursors() -> void:
 
 
 func get_paint_layer() -> paint_layer:
-	if ToolsManager.current_project.layers.selected_layers.is_empty():
+	if ToolsManager.current_project.layers_container.selected_layers.is_empty():
 		select_or_create_paint_layer()
-		return ToolsManager.current_project.layers.selected_layers[0]
-	if ToolsManager.current_project.layers.selected_layers[0].type != base_layer.layer_type.brush:
+		return ToolsManager.current_project.layers_container.selected_layers[0]
+	if ToolsManager.current_project.layers_container.selected_layers[0].type != base_layer.LAYER_TYPE.BRUSH:
 		select_or_create_paint_layer()
-	return ToolsManager.current_project.layers.selected_layers[0]
+	return ToolsManager.current_project.layers_container.selected_layers[0]
 	
 func select_or_create_paint_layer():
 	var selected_paint_layer : bool = false
-	for layer in ToolsManager.current_project.layers.layers:
-		if layer.type == base_layer.layer_type.brush:
-			ToolsManager.current_project.layers.selected_layers.insert(0,layer)
+	for layer in ToolsManager.current_project.layers_container.layers:
+		if layer.type == base_layer.LAYER_TYPE.BRUSH:
+			ToolsManager.current_project.layers_container.selected_layers.insert(0,layer)
 			selected_paint_layer = true
 			break
 	if selected_paint_layer:
 		return
-	if !ProjectsManager.project:
+	if !ProjectsManager.current_project:
 		return
 	var new_paint_layer = paint_layer.new()
-	new_paint_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),"", ProjectsManager.project,base_layer.layer_type.brush)
-	ToolsManager.current_project.layers.selected_layers.insert(0,new_paint_layer) 
+	new_paint_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),"", ProjectsManager.current_project)
+	ToolsManager.current_project.layers_container.selected_layers.insert(0,new_paint_layer) 

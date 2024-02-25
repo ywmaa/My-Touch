@@ -55,6 +55,7 @@ const MENU = [
 	{ menu="Edit/Select All", command="edit_select_all", shortcut="A" },
 	{ menu="Edit/Select None", command="edit_select_none", shortcut="Alt+A" },
 	{ menu="Edit/Invert Selection", command="edit_select_invert", shortcut="Control+I" },
+	{ menu="Edit/Parent Layer", command="parent_layer", shortcut="Control+P" },
 	{ menu="Edit/-" },
 	{ menu="Edit/Load Selection", command="edit_load_selection" },
 	{ menu="Edit/Save Selection", command="edit_save_selection" },
@@ -89,6 +90,7 @@ func _input(event: InputEvent) -> void:
 
 func _enter_tree():
 	mt_globals.main_window = self
+
 
 #func _process(_delta):
 #	layout._update_layout_with_children()
@@ -171,28 +173,31 @@ func create_add_context_menu(pos: Vector2 = get_global_mouse_position()):
 func add_context_menu_item_pressed(id: int):
 	match id:
 		0: #import image
-			if !ProjectsManager.project:
+			if !ProjectsManager.current_project:
 				return
 			import_image()
 		1: #project layer
-			if !ProjectsManager.project:
+			if !ProjectsManager.current_project:
 				return
 			edit_load_project_as_image()
 		3: #project layer
-			if !ProjectsManager.project:
+			if !ProjectsManager.current_project:
 				return
-			var new_paint_layer = paint_layer.new()
-			new_paint_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),"", ProjectsManager.project,base_layer.layer_type.brush)
+			#var new_paint_layer = paint_layer.new()
+			#new_paint_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),"", ProjectsManager.current_project,base_layer.layer_type.brush)
+			paint_layer.new().init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),"", ProjectsManager.current_project)
 		5: #text layer
-			if !ProjectsManager.project:
+			if !ProjectsManager.current_project:
 				return
-			var new_text_layer = text_layer.new()
-			new_text_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.project, base_layer.layer_type.text)
+			text_layer.new().init(ProjectsManager.current_project.layers_container.get_unused_layer_name(), ProjectsManager.current_project)
+			#var new_text_layer = text_layer.new()
+			#new_text_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.current_project, base_layer.layer_type.text)
 		6: #selection layer
-			if !ProjectsManager.project:
+			if !ProjectsManager.current_project:
 				return
-			var new_selection_layer = selection_layer.new()
-			new_selection_layer.init(ProjectsManager.project.layers.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.project, base_layer.layer_type.mask)
+			selection_layer.new().init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.current_project)
+			#var new_selection_layer = selection_layer.new()
+			#new_selection_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.current_project, base_layer.layer_type.mask)
 
 	
 func on_config_changed() -> void:
@@ -289,7 +294,7 @@ func do_load_mt(filename : String) -> bool:
 	var name_without_path = filename.substr(filename.rfind("/")+1)
 	for project in ProjectsManager.projects:
 		if project.save_path == filename:
-			ProjectsManager.project = project
+			ProjectsManager.current_project = project
 			return true
 		if project.save_path.substr(filename.rfind("/")+1) == name_without_path:
 			project.name_used = true
@@ -369,7 +374,7 @@ func _on_export_id_pressed(id) -> void:
 		"jpeg":
 			export_jpeg_image()
 func export_png_image():
-	if !ProjectsManager.project:
+	if !ProjectsManager.current_project:
 		return
 	# Prompt for a target PNG file
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
@@ -390,7 +395,7 @@ func export_png_image():
 	image.save_png(files[0])
 	
 func export_jpeg_image():
-	if !ProjectsManager.project:
+	if !ProjectsManager.current_project:
 		return
 	# Prompt for a target PNG file
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
@@ -412,9 +417,9 @@ func export_jpeg_image():
 func refresh():
 	ProjectsManager.refresh()
 func open_file_location():
-	if ProjectsManager.project != null:
-		if ProjectsManager.project.save_path != "":
-			var path = ProjectsManager.project.save_path
+	if ProjectsManager.current_project != null:
+		if ProjectsManager.current_project.save_path != "":
+			var path = ProjectsManager.current_project.save_path
 			var path_array = path.split("/")
 			path_array.remove_at(path_array.size()-1)
 			path = ""
@@ -423,7 +428,7 @@ func open_file_location():
 			
 			OS.shell_open(path)
 func close_project() -> void:
-	ProjectsManager.close_project(ProjectsManager.projects.find(ProjectsManager.project))
+	ProjectsManager.close_project(ProjectsManager.projects.find(ProjectsManager.current_project))
 
 func quit() -> void:
 	if quitting:
@@ -495,6 +500,16 @@ func edit_select_none() -> void:
 
 func edit_select_invert() -> void:
 	ProjectsManager.select_invert()
+func parent_layer() -> void:
+	var selected_layers = ProjectsManager.current_project.layers_container.selected_layers
+	
+	if selected_layers.size() < 2:
+		return
+	
+	for i in selected_layers.size():
+		if i == 0:
+			continue
+		ProjectsManager.current_project.layers_container.add_layer(selected_layers[i], selected_layers[0])
 func edit_load_selection() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	add_child(dialog)
