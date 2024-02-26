@@ -165,9 +165,6 @@ func remove_child(child:base_layer):
 func remove_child_index(index:int):
 	children.remove_at(index)
 
-#Used to get rect relative to the real viewport
-#func get_rect() -> Rect2:
-#	var graph : MTGraph = mt_globals.main_window.get_current_graph_edit()
-#	var camera = graph.camera
-#	var canvas_position : Vector2 = graph.size/2-camera.offset*(camera.zoom)
-#	return Rect2(canvas_position+(main_object.position*camera.zoom)-(main_object.get_rect().size*main_object.scale*camera.zoom/2),main_object.get_rect().size*main_object.scale*camera.zoom)
+
+func get_rect() -> Rect2:
+	return Rect2(position-(size*scale)/2, size*scale)

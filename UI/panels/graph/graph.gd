@@ -118,9 +118,6 @@ func _process(_delta):
 
 		camera.fit_to_frame(r.size)
 		camera.offset = camera_position
-		
-
-
 
 # Center view
 

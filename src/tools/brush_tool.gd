@@ -13,7 +13,7 @@ enum {
 @export var crosshair_color := Color(1.0, 1.0, 1.0, 1.0)
 
 var chunk_size := Vector2i(960, 540)
-var brushsize := 50.0:
+var brushsize := 20.0:
 	set(x):
 		brushsize = x
 		brush_offset = Vector2(0.5, 0.5) * float(int(x) % 2)
