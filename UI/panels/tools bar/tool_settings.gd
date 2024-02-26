@@ -31,9 +31,10 @@ func _process(_delta):
 	
 	visible = true
 	if !current_tool.changed.is_connected(create_ui):
-		current_tool.connect("changed",create_ui)
+		current_tool.changed.connect(create_ui)
 
 func create_ui():
+	print("Tools Settings UI Refresh")
 	properties_box.clear()
 	
 	if !current_tool:

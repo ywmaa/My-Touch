@@ -19,9 +19,9 @@ var TOOLS : Array[ToolBase] = [
 	preload("res://src/tools/rotate_tool.gd").new(),
 	preload("res://src/tools/scale_tool.gd").new(),
 	preload("res://src/tools/crop_tool.gd").new(),
-	preload("res://src/tools/pencil_tool.gd").new(),
+	#preload("res://src/tools/pencil_tool.gd").new(),
 	preload("res://src/tools/brush_tool.gd").new(),
-	preload("res://src/tools/brush_clone_tool.gd").new(),
+	#preload("res://src/tools/brush_clone_tool.gd").new(),
 	preload("res://src/tools/bucket_tool.gd").new(),
 	preload("res://src/tools/context_menu_tool.gd").new(),
 ]
@@ -135,5 +135,5 @@ func select_or_create_paint_layer():
 	if !ProjectsManager.current_project:
 		return
 	var new_paint_layer = paint_layer.new()
-	new_paint_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),"", ProjectsManager.current_project)
+	new_paint_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(), ProjectsManager.current_project)
 	ToolsManager.current_project.layers_container.selected_layers.insert(0,new_paint_layer) 

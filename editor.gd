@@ -185,7 +185,7 @@ func add_context_menu_item_pressed(id: int):
 				return
 			#var new_paint_layer = paint_layer.new()
 			#new_paint_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),"", ProjectsManager.current_project,base_layer.layer_type.brush)
-			paint_layer.new().init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),"", ProjectsManager.current_project)
+			paint_layer.new().init(ProjectsManager.current_project.layers_container.get_unused_layer_name(), ProjectsManager.current_project)
 		5: #text layer
 			if !ProjectsManager.current_project:
 				return
