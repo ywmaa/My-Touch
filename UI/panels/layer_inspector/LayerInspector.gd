@@ -24,5 +24,5 @@ func _process(_delta):
 	if current_object.main_object == null:
 		return
 	visible = true
-	if !current_object.changed.is_connected(create_ui):
-		current_object.connect("changed",create_ui)
+	if !current_object.changed.is_connected(update):
+		current_object.connect("changed",update)

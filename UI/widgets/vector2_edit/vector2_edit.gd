@@ -1,7 +1,16 @@
 extends HBoxContainer
 class_name Vector2Edit
 
-var value: Vector2
+var value: Vector2:
+	set(v):
+		value = v
+		if float_edit_x and float_edit_y:
+			float_edit_x.value_changed.disconnect(x_value_changed)
+			float_edit_y.value_changed.disconnect(y_value_changed)
+			float_edit_x.value = value.x
+			float_edit_y.value = value.y
+			float_edit_x.value_changed.connect(x_value_changed)
+			float_edit_y.value_changed.connect(y_value_changed)
 var lock_aspect: bool = false
 signal value_changed(value:Vector2)
 signal lock_aspect_changed(value:bool)

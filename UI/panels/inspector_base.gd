@@ -98,11 +98,15 @@ func create_ui():
 					continue
 		properties_box.end_group()
 	
-
+func update():
+	for k in properties_box._keys:
+		
+		properties_box._keys[k] = current_object.get(k)
+	properties_box.update()
 
 func value_changed(property:String, value):
-	current_object.disconnect("changed",create_ui)
+	current_object.disconnect("changed",update)
 	current_object.set(property, value)
-	current_object.connect("changed",create_ui)
+	current_object.connect("changed",update)
 
 

@@ -31,15 +31,16 @@ func update():
 	var index = 0
 	for key in _keys:
 		var editor = _editors[index]
-		if editor is Button: editor.pressed = _keys[key]
-		if editor is SpinBox: editor.value = _keys[key]
-		if editor is FloatEdit: editor.value = _keys[key]
-		if editor is Vector2Edit: editor.value = _keys[key]
-		if editor is LineEdit: editor.text = _keys[key]
-		if editor is TextEdit: editor.text = _keys[key]
-		if editor is RichTextLabel: editor.text = str(_keys[key])
-		if editor is UnfoldedOptionButton: editor.value = _keys[key]
-		index += 1
+		if _keys[key] is Callable: continue
+		if editor is ColorPickerButton: editor.color = _keys[key]; index += 1; continue
+		if editor is Button: editor.button_pressed = _keys[key]; index += 1; continue
+		if editor is SpinBox: editor.value = _keys[key]; index += 1; continue
+		if editor is FloatEdit: editor.value = _keys[key]; index += 1; continue
+		if editor is Vector2Edit: editor.value = _keys[key]; index += 1; continue
+		if editor is LineEdit: editor.text = _keys[key]; index += 1; continue
+		if editor is TextEdit: editor.text = _keys[key]; index += 1; continue
+		if editor is RichTextLabel: editor.text = str(_keys[key]); index += 1; continue
+		if editor is UnfoldedOptionButton: editor.value = _keys[key]; index += 1; continue
 ## Adds a [Button]. Retrieve the value with [method get_button].
 func add_button(key : StringName, value : Callable):
 	var editor = Button.new()
