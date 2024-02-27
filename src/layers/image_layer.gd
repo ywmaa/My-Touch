@@ -31,6 +31,6 @@ func refresh():
 func get_copy(_name: String = "copy"):
 	var layer = image_layer.new()
 	layer.init(_name, image_path, parent_project, parent)
-	for k in get_layer_inspector_properties()[1].keys(): # Copy Properties
+	for k in get_inspector_properties()[1].keys(): # Copy Properties
 		layer.set(k, get(k))
 	return layer

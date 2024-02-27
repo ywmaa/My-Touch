@@ -44,7 +44,7 @@ func _init():
 	tool_button_shortcut = "Shift+B"
 	tool_desc = ""
 	tool_icon = get_icon_from_project_folder("brush")
-func get_tool_inspector_properties():
+func get_inspector_properties():
 	var PropertiesView : Array = []
 	var PropertiesGroups : Array[String] = []
 	PropertiesGroups.append("Settings")
@@ -149,22 +149,23 @@ func mouse_moved(event : InputEventMouseMotion):
 		return
 	if !edited_object:
 		return
+	#if ToolsManager.mouse_position_delta.length() > 0.0:
 	var pt_count = max(abs(event.relative.x), abs(event.relative.y))
-	var lerp_step = 1 / pt_count
-	#if stroke_end.distance_to(last_stroke_pos) < (brushsize * 0.5) and (ToolsManager.effect_scaling_factor == 0.25 or brushsize > 200.0):
+	var lerp_step = 0.1 / pt_count
+	#if stroke_end.distance_to(last_stroke_pos) < (brushsize * 0.5) and (ToolsManager.effect_scaling_factor == 0.25):	
 		#return
 	for i in pt_count:
 		var point : Vector2 = ToolsManager.current_mouse_position + Vector2.ONE - event.relative * i * lerp_step - Vector2.ONE
+		var draw_pos = last_stroke_pos.lerp(point,0.01) if ToolsManager.effect_scaling_factor == 0.25 else point
 		if event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0.0:
-			stroke(point, event.pressure)
+			stroke(draw_pos, event.pressure)
 		else:
-			stroke(point, 1.0)
-
+			stroke(draw_pos, 1.0)
+		last_stroke_pos = draw_pos
 
 var current_stroke : Stroke
 var last_stroke_pos : Vector2
 func stroke(point:Vector2, pressure):
-
 	var unsolid_radius : float = (brushsize * 0.5) * (1.0 - hardness)
 	var radius : float = (brushsize * 0.5) * (pressure if pen_pressure_usage == pen_flag.size else 1.0)
 	var _solid_radius : float = radius - unsolid_radius
@@ -204,6 +205,9 @@ func stroke(point:Vector2, pressure):
 			for i in points_to_remove:
 				stroke.remove_point(i)
 				edited_object.main_object.queue_redraw()
+				for j in points_to_remove:
+					j -= 1
+				
 
 
 func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):

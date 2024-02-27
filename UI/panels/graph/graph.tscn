@@ -60,7 +60,7 @@ snap_2d_vertices_to_pixel = true
 physics_object_picking = true
 sdf_oversize = 0
 sdf_scale = 0
-size = Vector2i(1240, 720)
+size = Vector2i(2, 2)
 render_target_update_mode = 4
 
 [node name="TransparentChecker" type="ColorRect" parent="SubViewportContainer/Viewport" node_paths=PackedStringArray("graph")]

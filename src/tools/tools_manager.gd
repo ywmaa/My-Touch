@@ -19,7 +19,6 @@ var TOOLS : Array[ToolBase] = [
 	preload("res://src/tools/rotate_tool.gd").new(),
 	preload("res://src/tools/scale_tool.gd").new(),
 	preload("res://src/tools/crop_tool.gd").new(),
-	#preload("res://src/tools/pencil_tool.gd").new(),
 	preload("res://src/tools/brush_tool.gd").new(),
 	#preload("res://src/tools/brush_clone_tool.gd").new(),
 	preload("res://src/tools/bucket_tool.gd").new(),

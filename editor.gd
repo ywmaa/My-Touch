@@ -10,7 +10,7 @@ var updating : bool = false
 var need_update : bool = false
 
 #@onready var projects = $VBoxContainer/ProjectTabs
-
+@onready var app_render : SubViewport = $AppRender
 @onready var layout : DockableContainer = $VBoxContainer/Layout
 const SAVED_LAYOUT_PATH := "user://layout.tres"
 var library

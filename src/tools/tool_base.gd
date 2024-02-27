@@ -34,8 +34,8 @@ func set_image_pixelv(image : Image, pos : Vector2i, color : Color):
 #		if selection.get_bitv(pos):
 			image.set_pixelv(pos, color)
 
-func get_tool_inspector_properties():
-	printerr("Not implemented: get_tool_inspector_properties! (" + get_script().resource_path.get_file() + ")")
+func get_inspector_properties():
+	printerr("Not implemented: get_inspector_properties! (" + get_script().resource_path.get_file() + ")")
 
 func shortcut_pressed():
 	printerr("Not implemented: shortcut_pressed! (" + get_script().resource_path.get_file() + ")")

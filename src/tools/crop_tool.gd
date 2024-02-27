@@ -8,7 +8,7 @@ func _init():
 	tool_icon = get_icon_from_project_folder("crop")
 
 
-func get_tool_inspector_properties():
+func get_inspector_properties():
 	pass
 
 

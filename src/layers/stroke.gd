@@ -37,7 +37,7 @@ func draw(draw_node: CanvasItem):
 		TYPE.LINE:
 			for i in points.size():
 				var next_point = i+1 if i < points.size()-1 else i
-				draw_node.draw_line(points[i], points[next_point], color[i], -1, aliasing)
+				draw_node.draw_line(points[i], points[next_point], color[i], 1, aliasing)
 		TYPE.TEXTURE:
 			for i in points.size():
 				pass

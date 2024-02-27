@@ -29,6 +29,8 @@ func _init():
 	affect_children_opacity = true
 	main_object.draw.connect(draw)
 	main_object.queue_redraw()
+	main_object.process_thread_group = Node.PROCESS_THREAD_GROUP_SUB_THREAD
+	main_object.process_thread_messages = Node.FLAG_PROCESS_THREAD_MESSAGES_ALL
 
 
 func draw():
@@ -47,7 +49,7 @@ func refresh():
 func get_copy(_name: String = "copy"):
 	var layer = paint_layer.new()
 	layer.init(_name, parent_project, parent)
-	for k in get_layer_inspector_properties()[1].keys(): # Copy Properties
+	for k in get_inspector_properties()[1].keys(): # Copy Properties
 		layer.set(k, get(k))
 	layer.strokes = strokes.duplicate(true)
 	return layer
