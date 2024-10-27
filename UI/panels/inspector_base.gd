@@ -61,9 +61,9 @@ func create_ui():
 						var property_info : PackedStringArray = property.split(":")
 						var property_key = property_info[0]
 						property_info.remove_at(0)
-						var minvalue : float = -99999900000.0
-						var maxvalue : float = 99999900000.0
-						var step : float = 1.0
+						var minvalue : float = 0.0
+						var maxvalue : float = 100.0
+						var step : float = 0.1
 						for i in property_info.size()-1:
 							if property_info[i] == "minvalue":
 								minvalue = float(property_info[i+1])

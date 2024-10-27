@@ -77,8 +77,10 @@ func add_float(key : StringName, value : float = 0.0, minvalue : float = -214748
 	var editor : FloatEdit = preload("res://UI/widgets/float_edit/float_edit.tscn").instantiate()
 	var is_slider = minvalue > -2147483648 && maxvalue < 2147483648
 	editor.step = step
-	editor.min_value = -10000 if not is_slider else minvalue#minvalue
-	editor.max_value = 10000 if not is_slider else maxvalue#maxvalue
+	editor.allow_greater = true if not is_slider else false
+	editor.allow_lesser = true if not is_slider else false
+	editor.min_value = 0 if not is_slider else minvalue#minvalue
+	editor.max_value = 100 if not is_slider else maxvalue#maxvalue
 	editor.value = value
 	_add_property_editor(key, editor, editor.value_changed, _on_number_changed)
 #	if is_slider:

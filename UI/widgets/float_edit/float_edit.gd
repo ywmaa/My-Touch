@@ -15,6 +15,7 @@ var from_upper_bound : bool = false
 signal value_changed_undo(value, merge_undo)
 var has_focus : bool
 func _ready() -> void:
+	get_line_edit().deselect_on_focus_loss_enabled = true
 	self.connect("mouse_entered",_on_mouse_entered)
 	self.connect("mouse_exited",_on_mouse_exited)
 
@@ -30,13 +31,16 @@ func get_modifiers(event):
 
 func _input(event : InputEvent) -> void:
 	#if !has_focus:
-		#return
+		#get_line_edit().deselect()
+		#get_line_edit().release_focus()
 	if !sliding and !editable:
 		return
 	
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		
 		if event.is_pressed() and has_focus:
+			get_line_edit().grab_focus()
+			get_line_edit().select_all()
 			last_position = event.position.x
 			start_position = last_position
 			start_value = value
@@ -45,7 +49,7 @@ func _input(event : InputEvent) -> void:
 			from_upper_bound = value >= max_value
 			modifiers = get_modifiers(event)
 			emit_signal("value_changed_undo", value)
-			editable = false
+			editable = true
 			get_line_edit().selecting_enabled = false
 			#Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
 		else:

@@ -117,7 +117,7 @@ func get_inspector_properties() -> Array:
 	PropertiesToShow["size"] = "Transform"
 	PropertiesToShow["scale:lock_aspect"] = "Transform"
 	
-	PropertiesToShow["opacity"] = "Visibility"
+	PropertiesToShow["opacity:minvalue:0.0:maxvalue:1.0:step:0.01"] = "Visibility"
 	PropertiesToShow["affect_children_opacity"] = "Visibility"
 	
 	

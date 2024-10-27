@@ -53,9 +53,6 @@ vertical_alignment = 1
 [node name="FloatEditX" parent="VBoxContainer/PanelContainer/HBoxContainer" instance=ExtResource("1_3ut4q")]
 layout_mode = 2
 size_flags_horizontal = 3
-step = 0.001
-allow_greater = true
-allow_lesser = true
 custom_arrow_step = 1.0
 
 [node name="Panel" type="PanelContainer" parent="VBoxContainer"]
@@ -79,9 +76,7 @@ vertical_alignment = 1
 [node name="FloatEditY" parent="VBoxContainer/Panel/HBoxContainer" instance=ExtResource("1_3ut4q")]
 layout_mode = 2
 size_flags_horizontal = 3
-min_value = -100000.0
-max_value = 100000.0
-step = 0.001
+custom_arrow_step = 1.0
 
 [node name="LockButton" type="TextureButton" parent="."]
 layout_mode = 2
