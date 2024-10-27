@@ -13,9 +13,8 @@
 [node name="About" type="PopupPanel"]
 disable_3d = true
 title = "About..."
-size = Vector2i(664, 377)
+size = Vector2i(704, 412)
 visible = true
-wrap_controls = false
 transient = false
 unresizable = false
 always_on_top = true
@@ -77,10 +76,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 tab_alignment = 1
+current_tab = 0
 
 [node name="Authors" type="ScrollContainer" parent="HBoxContainer/VBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(620, 245)
 layout_mode = 2
+metadata/_tab_index = 0
 
 [node name="List" type="GridContainer" parent="HBoxContainer/VBoxContainer/VBoxContainer/Authors"]
 layout_mode = 2
@@ -89,6 +90,7 @@ size_flags_vertical = 3
 columns = 2
 
 [node name="Godot" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/VBoxContainer/Authors/List"]
+visible = false
 layout_mode = 2
 
 [node name="Godot" type="TextureButton" parent="HBoxContainer/VBoxContainer/VBoxContainer/Authors/List/Godot"]
@@ -102,6 +104,7 @@ layout_mode = 2
 text = " Godot Engine"
 
 [node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/VBoxContainer/Authors/List"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "90% of My Touch's code is the awesome Godot Engine"
@@ -110,6 +113,7 @@ text = "90% of My Touch's code is the awesome Godot Engine"
 visible = false
 custom_minimum_size = Vector2(620, 245)
 layout_mode = 2
+metadata/_tab_index = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/VBoxContainer/Donors"]
 layout_mode = 2
@@ -157,6 +161,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
 editable = false
+metadata/_tab_index = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
 layout_mode = 2
@@ -220,5 +225,5 @@ stretch_mode = 4
 [connection signal="pressed" from="HBoxContainer/SocialNetworks/ItchIo" to="." method="open_url" binds= ["https://ywmaa.itch.io/my-touch"]]
 [connection signal="pressed" from="HBoxContainer/SocialNetworks/Github" to="." method="open_url" binds= ["https://github.com/ywmaa/my-touch"]]
 [connection signal="pressed" from="HBoxContainer/SocialNetworks/Discord" to="." method="open_url" binds= ["https://discord.com/invite/Fp7ncA2xHw"]]
-[connection signal="pressed" from="HBoxContainer/SocialNetworks/Twitter" to="." method="open_url" binds= ["https://twitter.com/ywmaadev"]]
+[connection signal="pressed" from="HBoxContainer/SocialNetworks/Twitter" to="." method="open_url" binds= ["https://x.com/ywmaapersonal"]]
 [connection signal="pressed" from="HBoxContainer/SocialNetworks/Youtube" to="." method="open_url" binds= ["https://www.youtube.com/YwmaaGamesStudio"]]

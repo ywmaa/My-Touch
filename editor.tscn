@@ -13,7 +13,7 @@
 script/source = "extends Label
 
 func show_step(step : int):
-	text = \"Undo/Redo action added (%d)\" % step
+	text = \"Undo/Redo \" + ToolsManager.current_project.undo_redo.get_current_action_name() + \" added (%d)\" % step
 	$AnimationPlayer.stop()
 	$AnimationPlayer.play(\"show\")
 
@@ -53,7 +53,7 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_21bw6"]
 _data = {
-"show": SubResource("7")
+&"show": SubResource("7")
 }
 
 [node name="Editor" type="Panel"]
@@ -153,7 +153,7 @@ script = SubResource("6")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="MessageLabel"]
 libraries = {
-"": SubResource("AnimationLibrary_21bw6")
+&"": SubResource("AnimationLibrary_21bw6")
 }
 
 [node name="LeftCursor" type="Sprite2D" parent="."]

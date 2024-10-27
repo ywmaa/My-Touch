@@ -137,7 +137,7 @@ func _set_camera_rotation_degrees(degrees: float) -> void:
 func zoom_camera(dir: int) -> void:
 	var viewport_size = get_viewport().size
 	if mt_globals.smooth_zoom:
-		var zoom_margin = zoom * dir / 5
+		var zoom_margin = (zoom * dir) / (pow(mt_globals.zoom_speed, -1))
 		var new_zoom = zoom + zoom_margin
 		if new_zoom > zoom_min && new_zoom < zoom_max:
 			var new_offset = (
@@ -152,7 +152,7 @@ func zoom_camera(dir: int) -> void:
 
 	else:
 		var prev_zoom := zoom
-		var zoom_margin = zoom * dir / 10
+		var zoom_margin = zoom * dir / 5.0
 		if zoom + zoom_margin > zoom_min:
 			zoom += zoom_margin
 

@@ -5,7 +5,7 @@ resource_name = "new_animation"
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_r5u28"]
 _data = {
-"new_animation": SubResource("Animation_ufppa")
+&"new_animation": SubResource("Animation_ufppa")
 }
 
 [node name="Timeline" type="Panel"]
@@ -21,5 +21,5 @@ grow_vertical = 2
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_r5u28")
+&"": SubResource("AnimationLibrary_r5u28")
 }

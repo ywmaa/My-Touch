@@ -3,7 +3,6 @@ class_name paint_layer
 
 var canvas : Node2D = Node2D.new()
 @export var strokes: Array[Stroke]
-
 func set_position(_v):
 	pass
 
@@ -35,7 +34,15 @@ func _init():
 
 func draw():
 	for stroke in strokes:
-		stroke.draw(main_object)
+		if !stroke.need_redraw:
+			continue
+		if !stroke.stroke_node:
+			stroke.stroke_node = Node2D.new()
+		main_object.add_child(stroke.stroke_node)
+		stroke.stroke_node.draw.connect(func(): stroke.draw(stroke.stroke_node))
+		stroke.stroke_node.queue_redraw()
+		stroke.need_redraw = false
+		#print("stroke id ", strokes.find(stroke), " redraw")
 
 
 func get_canvas_node() -> Node:

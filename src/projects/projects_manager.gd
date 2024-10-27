@@ -52,6 +52,12 @@ func close_project(index:int):
 		current_project = null
 		projects.clear()
 
+func on_import_image_clipboard():
+	if !current_project:
+		return
+	var new_image_path : String = current_project.project_folder_abs_path + "/" + current_project.layers_container.get_unused_layer_name() + ".png"
+	DisplayServer.clipboard_get_image().save_png(new_image_path)
+	image_layer.new().init(current_project.layers_container.get_unused_layer_name(), new_image_path.get_file(), current_project)
 
 
 
@@ -142,11 +148,11 @@ func save_selection() -> void:
 	if !current_project:
 		return
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.mt.tres;My Touch text files")
+	add_child(dialog)
 	if mt_globals.config.has_section_key("path", "current_project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "current_project")
 	var files = await dialog.select_files()
@@ -223,12 +229,12 @@ func save_as() -> bool:
 		return false
 	#replace with preload
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
+	#add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.mt.tres;My Touch text files")
-
+	add_child(dialog)
 	if mt_globals.config.has_section_key("path", "current_project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "current_project")
 	var files = await dialog.select_files()
@@ -273,4 +279,3 @@ func redo():
 	current_project.undo_redo.redo()
 	get_node("/root/Editor/MessageLabel").show_message("Current Step : " + str(current_project.undo_redo.get_current_action() + 1))
 	
-

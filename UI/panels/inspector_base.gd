@@ -108,5 +108,3 @@ func value_changed(property:String, value):
 	current_object.disconnect("changed",update)
 	current_object.set(property, value)
 	current_object.connect("changed",update)
-
-

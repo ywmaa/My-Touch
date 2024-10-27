@@ -112,32 +112,54 @@ func mouse_pressed(
 
 
 func enable_tool(): # Save History and Enable Tool
-	edited_object = ToolsManager.get_paint_layer()
+	edited_object = ToolsManager.get_paint_layer() as paint_layer
 	start_drawing(ToolsManager.current_mouse_position)
-	
-#	ToolsManager.current_project.undo_redo.create_action("Move Layers")
-#	for selected in ToolsManager.current_project.layers_container.selected_layers:
-#		ToolsManager.current_project.undo_redo.add_undo_property(selected,"position",selected.position)
 	super.enable_tool()
 func cancel_tool(): # Redo Actions
-#	if ToolsManager.current_project.layers_container.selected_layers:
-#		for selected in ToolsManager.current_project.layers_container.selected_layers:
-#			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
-#		ToolsManager.current_project.undo_redo.commit_action()
-#		for selected in ToolsManager.current_project.layers_container.selected_layers:
-#			ToolsManager.current_project.undo_redo.undo()
 	super.cancel_tool()
 func confirm_tool(): # Confirm Actions
 	if brush_type != BRUSH_ERASE:
-		edited_object.strokes.append(current_stroke)
+		current_stroke.need_redraw = true
 		edited_object.main_object.queue_redraw()
+	else:
+		pass
+		#var undo_redo : UndoRedo = ToolsManager.current_project.undo_redo
+		#undo_redo.add_do_property(edited_object, "strokes", edited_object.strokes.duplicate(true))
+		#undo_redo.add_do_method(edited_object.main_object.queue_redraw)
+		#undo_redo.add_undo_method(func(): for stroke in edited_object.strokes: stroke.need_redraw=true)
+		#undo_redo.add_undo_method(edited_object.main_object.queue_redraw)
+		#undo_redo.commit_action(false)
 	super.confirm_tool()
 
+
 func start_drawing(_start_pos):
-	# Break the image up into tiles - small images are faster to edit.
 	last_stroke_pos = _start_pos
 	
-	current_stroke = Stroke.new()
+	
+	if brush_type != BRUSH_ERASE:
+		current_stroke = Stroke.new()
+		last_drawn_index = 0
+		var undo_redo : UndoRedo = ToolsManager.current_project.undo_redo
+		undo_redo.create_action("Brush Stroke")
+		
+		undo_redo.add_undo_property(edited_object, "strokes", edited_object.strokes.duplicate())
+		edited_object.strokes.append(current_stroke)
+		undo_redo.add_do_property(edited_object, "strokes", edited_object.strokes.duplicate())
+		
+		undo_redo.add_do_method(edited_object.main_object.add_child.bind(current_stroke.stroke_node))
+		undo_redo.add_do_reference(current_stroke.stroke_node)
+		undo_redo.add_do_method(edited_object.main_object.queue_redraw)
+		
+		undo_redo.add_undo_method(edited_object.main_object.remove_child.bind(current_stroke.stroke_node))
+		undo_redo.add_undo_method(edited_object.main_object.queue_redraw)
+		
+		undo_redo.commit_action(false)
+	else:
+		pass
+		#var undo_redo : UndoRedo = ToolsManager.current_project.undo_redo
+		#undo_redo.create_action("Erase Stroke")
+		#undo_redo.add_undo_property(edited_object, "strokes", edited_object.strokes.duplicate(true))
+		
 	if brush_type == BRUSH_PENCIL:
 		current_stroke.type = Stroke.TYPE.LINE
 	else:
@@ -151,12 +173,12 @@ func mouse_moved(event : InputEventMouseMotion):
 		return
 	#if ToolsManager.mouse_position_delta.length() > 0.0:
 	var pt_count = max(abs(event.relative.x), abs(event.relative.y))
-	var lerp_step = 0.1 / pt_count
-	#if stroke_end.distance_to(last_stroke_pos) < (brushsize * 0.5) and (ToolsManager.effect_scaling_factor == 0.25):	
-		#return
+	var lerp_step = 0.01 / pt_count
 	for i in pt_count:
-		var point : Vector2 = ToolsManager.current_mouse_position + Vector2.ONE - event.relative * i * lerp_step - Vector2.ONE
-		var draw_pos = last_stroke_pos.lerp(point,0.01) if ToolsManager.effect_scaling_factor == 0.25 else point
+		var point : Vector2 = ToolsManager.current_mouse_position - event.relative * lerp_step * i
+		var draw_pos = last_stroke_pos.lerp(point,0.05) if ToolsManager.effect_scaling_factor == 0.25 else point
+		if draw_pos.distance_to(last_stroke_pos) < (brushsize * 0.25): # So we don't draw on the same place
+			return
 		if event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0.0:
 			stroke(draw_pos, event.pressure)
 		else:
@@ -165,11 +187,15 @@ func mouse_moved(event : InputEventMouseMotion):
 
 var current_stroke : Stroke
 var last_stroke_pos : Vector2
+var cached_pixels : PackedVector2Array = []
+var solid_color_rect : Rect2i
+var points_to_remove: PackedInt32Array = []
 func stroke(point:Vector2, pressure):
 	var unsolid_radius : float = (brushsize * 0.5) * (1.0 - hardness)
 	var radius : float = (brushsize * 0.5) * (pressure if pen_pressure_usage == pen_flag.size else 1.0)
-	var _solid_radius : float = radius - unsolid_radius
-	
+	var solid_radius : float = radius - unsolid_radius
+	if current_stroke.type == Stroke.TYPE.PIXEL:
+		get_all_brush_pixels(radius, solid_radius)
 	var color : Color
 	if brush_type == BRUSH_ERASE:
 		color = Color(1,0,0,0.05)
@@ -191,28 +217,138 @@ func stroke(point:Vector2, pressure):
 			Stroke.TYPE.LINE:
 				current_stroke.add_point(point, color, radius)
 				current_stroke.aliasing = jaggies_removal
+			Stroke.TYPE.PIXEL:
+				for p in cached_pixels:
+					current_stroke.add_point(point+p, color, radius)
+				current_stroke.aliasing = jaggies_removal
 	else:
+		#var undo_redo : UndoRedo = ToolsManager.current_project.undo_redo
+		
 		for stroke in edited_object.strokes:
-			var points_to_remove: PackedInt32Array = []
+			points_to_remove.clear()
 			for i in stroke.points.size():
-				if stroke.points[i].distance_squared_to(point) < pow(radius,2):
+				if stroke.points[i].distance_squared_to(point) < radius*radius:
+					stroke.need_redraw = true
 					var point_color : Color = stroke.color[i]
 					point_color.a = clampf(point_color.a - opacity, 0.0, 1.0)
 					if point_color.a == 0:
 						points_to_remove.append(i)
 					else:
 						stroke.color[i] = point_color
+			#if stroke.need_redraw:
+				#var stroke_index : int = edited_object.strokes.find(stroke)
+				#undo_redo.add_do_method(set_stroke_to_redraw.bind(stroke_index))
+				#undo_redo.add_undo_method(func(): print(stroke_index);set_stroke_to_redraw(stroke_index))
+			var iter : int = 0
 			for i in points_to_remove:
+				i -= iter
 				stroke.remove_point(i)
 				edited_object.main_object.queue_redraw()
-				for j in points_to_remove:
-					j -= 1
-				
+				iter += 1
+				#for j in points_to_remove:
+
+func set_stroke_to_redraw(index:int):
+	edited_object.strokes[index].need_redraw=true
+
+func get_all_brush_pixels(radius, solid_radius):
+		cached_pixels.clear()
+		
+		
+		# for performance, we create a rect2i containing all pixels
+		# that will not blend with the background and have same color
+		# so we use Image.fill_rect() to improve performance
+		
+		# Let's assume a Square Side is called A
+		# then its value would be like this : A^2 + A^2 = D^2
+		# where D is the diagonal, and our diagonal in this case is actually the circle radius
+		var square_side = sqrt(pow(solid_radius,2)/2)-2
+		solid_color_rect = Rect2i(0-square_side, 0-square_side, square_side*2,square_side*2)
+		
+		#use Bresenham's algorithm
+		var r : int = radius
+		var current_point : Vector2i = Vector2i(0,r)
+		var d : int = 3 - 2 * r
+		if brush_type == BRUSH_DRAW or brush_type == BRUSH_ERASE:
+			var first_y_count : int = current_point.y-square_side
+			for y in first_y_count:
+				if square_side+y < current_point.x: # Ensure that pixel is not repeated
+					continue
+				cached_pixels.append_array(GetCircleSymmetry(current_point.x,2+square_side+y))
+		else:
+			var first_y_count : int = current_point.y
+			for y in first_y_count:
+				if y < current_point.x: # Ensure that pixel is not repeated
+					continue
+				cached_pixels.append_array(GetCircleSymmetry(current_point.x,y))
+		while current_point.y >= current_point.x:
+			current_point.x += 1
+
+			if (d > 0):
+				current_point.y -= 1
+				d = d + 4 * (current_point.x-current_point.y) + 10
+			else:
+				d = d + 4 * current_point.x + 6
+			
+			#Fill the circle
+			if brush_type == BRUSH_DRAW or brush_type == BRUSH_ERASE: # We Will Only Use the Rect Performance Enhacement with Draw/Erase
+				var y_count : int = current_point.y-square_side
+				for y in y_count:
+					if square_side+y < current_point.x: # Ensure that pixel is not repeated by excluding a coordinate almost less than 45 degrees from the X Axis
+						continue
+					cached_pixels.append_array(GetCircleSymmetry(current_point.x,2+square_side+y))
+			else:
+				var y_count : int = current_point.y
+				for y in y_count:
+					if y < current_point.x: # Ensure that pixel is not repeated
+						continue
+					cached_pixels.append_array(GetCircleSymmetry(current_point.x,y))
 
 
+func GetCircleSymmetry(x:int, y:int, x_center:int = 0, y_center:int = 0):
+	var pixels : PackedVector2Array = []
+	if x == 0:
+		pixels.append(Vector2i(x_center, y_center+y))
+		pixels.append(Vector2i(x_center, y_center-y))
+		pixels.append(Vector2i(x_center+y, y_center))
+		pixels.append(Vector2i(x_center-y, y_center))
+		return pixels
+	elif y == 0:
+		pixels.append(Vector2i(x_center, y_center+x))
+		pixels.append(Vector2i(x_center, y_center-x))
+		pixels.append(Vector2i(x_center+x, y_center))
+		pixels.append(Vector2i(x_center-x, y_center))
+		return pixels
+	elif y == x:
+		pixels.append(Vector2i(x_center+x, y_center+y))
+		pixels.append(Vector2i(x_center+x, y_center-y))
+		pixels.append(Vector2i(x_center-x, y_center+y))
+		pixels.append(Vector2i(x_center-x, y_center-y))
+		return pixels
+	else:
+		pixels.append(Vector2i(x_center+x, y_center+y))
+		pixels.append(Vector2i(x_center-x, y_center+y))
+		pixels.append(Vector2i(x_center+x, y_center-y))
+		pixels.append(Vector2i(x_center-x, y_center-y))
+		pixels.append(Vector2i(x_center+y, y_center+x))
+		pixels.append(Vector2i(x_center-y, y_center+x))
+		pixels.append(Vector2i(x_center+y, y_center-x))
+		pixels.append(Vector2i(x_center-y, y_center-x))
+		return pixels
+
+
+var redraw_time : float = 5.0
+var time_since_last_redraw : float = redraw_time
+var last_drawn_index : int = 0
 func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
+	time_since_last_redraw -= ToolsManager.get_process_delta_time()
+	if time_since_last_redraw <= 0.0:
+		last_drawn_index = current_stroke.points.size()-1
+		current_stroke.need_redraw = true
+		edited_object.main_object.queue_redraw()
+		time_since_last_redraw = redraw_time
+
 	if edited_object and tool_active:
-		current_stroke.draw(image_view)
+		current_stroke.draw(image_view, last_drawn_index)
 
 	if brush_type == BRUSH_PENCIL:
 		if !ruler_mode:

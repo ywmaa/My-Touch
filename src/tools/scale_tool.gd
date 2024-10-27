@@ -123,4 +123,3 @@ func lock_y():
 		direction = coordinates.xy
 	else:
 		direction = coordinates.y
-

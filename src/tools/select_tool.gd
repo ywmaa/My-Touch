@@ -120,6 +120,3 @@ func confirm_tool(): # Confirm Actions
 			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
 		ToolsManager.current_project.undo_redo.commit_action()
 	super.confirm_tool()
-
-
-

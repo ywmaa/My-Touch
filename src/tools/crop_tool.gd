@@ -3,7 +3,7 @@ extends ToolBase
 
 func _init():
 	tool_name = "Crop Tool"
-	tool_button_shortcut = "Shift+C"
+	tool_button_shortcut = "Shift+V"
 	tool_desc = ""
 	tool_icon = get_icon_from_project_folder("crop")
 

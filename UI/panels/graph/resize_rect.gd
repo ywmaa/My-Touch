@@ -19,7 +19,13 @@ func _ready():
 	$"Y+".gui_input.connect(_on_child_gui_input.bind(Vector2.DOWN))
 
 func _process(_delta):
-	visible = ToolsManager.TOOLS[3].tool_active
+	if ToolsManager.current_tool and ToolsManager.current_tool.tool_name == "Crop Tool" and ToolsManager.current_tool.tool_active:
+		visible = true
+		return
+	if ToolsManager.shortcut_tool and ToolsManager.shortcut_tool.tool_name == "Crop Tool" and ToolsManager.shortcut_tool.tool_active:
+		visible = true
+		return
+	visible = false
 
 func _draw():
 	var anchor = (resize_direction + Vector2.ONE) * 0.5

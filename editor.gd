@@ -99,9 +99,13 @@ func _ready() -> void:
 	set_physics_process(false)
 	get_tree().set_auto_accept_quit(false)
 	
+	if OS.get_name() == "Android":
+		OS.request_permissions()
+	
+	
 	if mt_globals.get_config("locale") == "":
 		mt_globals.set_config("locale", TranslationServer.get_locale())
-
+	
 	on_config_changed()
 	get_screen_position()
 	
@@ -255,12 +259,11 @@ func new_project() -> void:
 
 func load_project() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
 	dialog.add_filter("*.mt.tres;My Touch text files")
-
+	add_child(dialog)
 	if mt_globals.config.has_section_key("path", "project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
@@ -378,11 +381,11 @@ func export_png_image():
 		return
 	# Prompt for a target PNG file
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.png;PNG image file")
+	add_child(dialog)
 	var files = await dialog.select_files()
 	if files.size() != 1:
 		return
@@ -399,11 +402,11 @@ func export_jpeg_image():
 		return
 	# Prompt for a target PNG file
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.jpeg;JPEG image file")
+	add_child(dialog)
 	var files = await dialog.select_files()
 	if files.size() != 1:
 		return
@@ -487,6 +490,8 @@ func edit_copy() -> void:
 	ProjectsManager.copy()
 
 func edit_paste() -> void:
+	if DisplayServer.clipboard_has_image():
+		ProjectsManager.on_import_image_clipboard()
 	ProjectsManager.paste()
 
 func edit_duplicate() -> void:
@@ -512,12 +517,12 @@ func parent_layer() -> void:
 		ProjectsManager.current_project.layers_container.add_layer(selected_layers[i], selected_layers[0])
 func edit_load_selection() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
 	dialog.add_filter("*.mt.tres;My Touch text files")
-
+	add_child(dialog)
+	
 	if mt_globals.config.has_section_key("path", "project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
@@ -529,12 +534,11 @@ func edit_save_selection():
 
 func edit_load_project_as_image() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
 	dialog.add_filter("*.mt.tres;My Touch text files")
-
+	add_child(dialog)
 	if mt_globals.config.has_section_key("path", "project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
@@ -655,7 +659,6 @@ func about() -> void:
 #image import
 func import_image() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
@@ -664,6 +667,7 @@ func import_image() -> void:
 	dialog.add_filter("*.svg;SVG Image")
 	dialog.add_filter("*.tga;TGA Image")
 	dialog.add_filter("*.webp;WebP Image")
+	add_child(dialog)
 	var files = await dialog.select_files()
 	if files.size() > 0:
 		on_files_dropped(files)
@@ -680,6 +684,3 @@ func on_files_dropped(files : PackedStringArray) -> void:
 				do_load_project(f)
 			"jpg", "jpeg", "png", "svg", "webp":
 				ProjectsManager.on_import_image_file(f)
-
-
-

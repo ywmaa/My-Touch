@@ -7,7 +7,13 @@ var volume_option = null
 
 signal return_paths(path_list)
 
+func _enter_tree() -> void:
+	if OS.get_name() == "Android":
+		root_subfolder = "/storage/emulated/0"
+
 func _ready() -> void:
+	#root_subfolder = "/storage/emulated/0"
+	#root_subfolder = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
 	var vbox = get_vbox()
 	var hbox = HSplitContainer.new()
 	add_child(hbox)
