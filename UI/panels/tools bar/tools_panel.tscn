@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://UI/panels/tools bar/tools_panel.gd" id="1_xme5t"]
 
 [node name="Tools" type="ScrollContainer"]
-custom_minimum_size = Vector2(36, 36)
+custom_minimum_size = Vector2(50, 36)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

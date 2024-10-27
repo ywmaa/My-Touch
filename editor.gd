@@ -158,7 +158,10 @@ func _ready() -> void:
 		layout.set_layout(saved_layout.clone())
 	else:
 		print("Warning: Can't User Load Layout")
-		default_mode_switch()
+		if OS.get_name() == "Android" or OS.get_name() == "iOS":
+			touch_mode_switch()
+		else:
+			default_mode_switch()
 		
 
 var context_menu : PopupMenu = PopupMenu.new()
@@ -592,13 +595,14 @@ func touch_mode_switch() -> void:
 			var clone = saved_layout.clone()
 			clone.resource_name = "touch_layout"
 			layout.set_layout(clone)
+			view_center()
 		if size.x < size.y and layout._layout.resource_name != "vertical_touch_layout":
 			var clone = saved_layout_vertical.clone()
 			clone.resource_name = "vertical_touch_layout"
 			layout.set_layout(clone)
+			view_center()
 	else:
 		print("Error: Can't Load Layout")
-	view_center()
 func default_mode_switch() -> void:
 	var saved_layout : DockableLayout = load("res://normal_editor_layout.tres")
 	if saved_layout:

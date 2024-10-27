@@ -91,18 +91,19 @@ func _input(event: InputEvent) -> void:
 	elif event.is_action_released("pan"):
 		drag = false
 	elif event.is_action_pressed("zoom_in", false, true):  # Wheel Up Event
-		zoom_camera(-1)
+		if !drag:
+			zoom_camera(-1)
 	elif event.is_action_pressed("zoom_out", false, true):  # Wheel Down Event
-		zoom_camera(1)
-
+		if !drag:
+			zoom_camera(1)
 	elif event is InputEventMagnifyGesture:  # Zoom Gesture on a Laptop touchpad
 		if event.factor < 1:
 			zoom_camera(1)
 		else:
 			zoom_camera(-1)
-	elif event is InputEventPanGesture and OS.get_name() != "Android":
-		# Pan Gesture on a Latop touchpad
-		offset = offset + event.delta.rotated(rotation) * 1/zoom * 7  # for moving the canvas
+	elif event is InputEventPanGesture:
+		# Pan Gesture on a Laptop touchpad
+		offset = offset + event.delta.rotated(rotation) * 1/zoom * 2  # for moving the canvas
 	elif event is InputEventMouseMotion && drag:
 		offset = offset - event.relative.rotated(rotation) * 1/zoom
 		update_transparent_checker_offset()
