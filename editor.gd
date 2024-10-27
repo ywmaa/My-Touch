@@ -91,8 +91,12 @@ func _input(event: InputEvent) -> void:
 func _enter_tree():
 	mt_globals.main_window = self
 
-
-#func _process(_delta):
+var current_screen_sensor : DisplayServer.ScreenOrientation
+func _process(_delta):
+	#if current_screen_sensor != DisplayServer.screen_get_orientation():
+		#current_screen_sensor = DisplayServer.screen_get_orientation()
+	if layout._layout.resource_name.contains("touch"):
+		touch_mode_switch()
 #	layout._update_layout_with_children()
 #	print(layout.get_tab_count())
 func _ready() -> void:
@@ -582,12 +586,19 @@ func view_reset_zoom() -> void:
 
 func touch_mode_switch() -> void:
 	var saved_layout : DockableLayout = load("res://touch_editor_layout.tres")
-	if saved_layout:
-		var clone = saved_layout.clone()
-		clone.resource_name = "touch_layout"
-		layout.set_layout(clone)
+	var saved_layout_vertical : DockableLayout = load("res://vertical_touch_editor_layout.tres")
+	if saved_layout and saved_layout_vertical:
+		if size.x > size.y and layout._layout.resource_name != "touch_layout":
+			var clone = saved_layout.clone()
+			clone.resource_name = "touch_layout"
+			layout.set_layout(clone)
+		if size.x < size.y and layout._layout.resource_name != "vertical_touch_layout":
+			var clone = saved_layout_vertical.clone()
+			clone.resource_name = "vertical_touch_layout"
+			layout.set_layout(clone)
 	else:
 		print("Error: Can't Load Layout")
+	view_center()
 func default_mode_switch() -> void:
 	var saved_layout : DockableLayout = load("res://normal_editor_layout.tres")
 	if saved_layout:
@@ -596,6 +607,7 @@ func default_mode_switch() -> void:
 		layout.set_layout(clone)
 	else:
 		print("Error: Can't Load Layout")
+	view_center()
 func user_mode_switch() -> void:
 	var saved_layout : DockableLayout = ResourceLoader.load(SAVED_LAYOUT_PATH)
 	if saved_layout:

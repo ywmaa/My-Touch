@@ -340,6 +340,8 @@ var redraw_time : float = 5.0
 var time_since_last_redraw : float = redraw_time
 var last_drawn_index : int = 0
 func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
+	if !current_stroke:
+		return
 	time_since_last_redraw -= ToolsManager.get_process_delta_time()
 	if time_since_last_redraw <= 0.0:
 		last_drawn_index = current_stroke.points.size()-1

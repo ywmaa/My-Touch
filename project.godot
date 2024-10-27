@@ -47,7 +47,7 @@ gdscript/warnings/function_used_as_property=2
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
-window/handheld/orientation=4
+window/handheld/orientation=6
 window/actual_release="0.4"
 
 [editor_plugins]
@@ -63,6 +63,10 @@ import/fbx/enabled=false
 
 config/itch_username="ywmaa"
 config/itch_project_name="my-touch"
+
+[gui]
+
+theme/default_theme_scale.mobile=1.25
 
 [input]
 
