@@ -3,9 +3,10 @@
 [ext_resource type="Script" path="res://UI/windows/file_dialog/left_panel.gd" id="1"]
 
 [node name="LeftPanel" type="VBoxContainer"]
-custom_minimum_size = Vector2(100, 40)
-offset_right = 100.0
-offset_bottom = 64.0
+clip_contents = true
+custom_minimum_size = Vector2(100, 20)
+offset_right = 64.0
+offset_bottom = 58.0
 size_flags_vertical = 3
 script = ExtResource("1")
 

@@ -4,8 +4,10 @@
 
 [node name="FileDialog" type="FileDialog"]
 position = Vector2i(0, 36)
-size = Vector2i(392, 180)
 visible = true
+min_size = Vector2i(100, 70)
+content_scale_factor = 0.8
+dialog_autowrap = true
 script = ExtResource("1")
 
 [connection signal="dir_selected" from="." to="." method="_on_FileDialog_dir_selected"]

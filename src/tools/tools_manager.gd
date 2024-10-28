@@ -22,7 +22,11 @@ var TOOLS : Array[ToolBase] = [
 	preload("res://src/tools/brush_tool.gd").new(),
 	#preload("res://src/tools/brush_clone_tool.gd").new(),
 	#preload("res://src/tools/bucket_tool.gd").new(),
+	preload("res://src/tools/undo_tool_button.gd").new(),
+	preload("res://src/tools/redo_tool_button.gd").new(),
 	preload("res://src/tools/context_menu_tool.gd").new(),
+	preload("res://src/tools/layers_menu_tool.gd").new(),
+	preload("res://src/tools/properties_menu_tool.gd").new(),
 ]
 var current_tool : ToolBase
 var shortcut_tool : ToolBase
@@ -99,7 +103,11 @@ func _input(_event):
 
 
 func assign_tool(_p_name: String, button: int) -> void:
-	if TOOLS[button].tool_name == "add_layer":
+	if TOOLS[button].tool_name == "add_layer" or\
+	TOOLS[button].tool_name == "layer_properties" or\
+	TOOLS[button].tool_name == "layers_panel" or\
+	TOOLS[button].tool_name == "undo" or\
+	TOOLS[button].tool_name == "redo":
 		TOOLS[button].enable_tool()
 		return
 	current_tool = TOOLS[button]

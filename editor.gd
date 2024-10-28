@@ -66,7 +66,8 @@ const MENU = [
 	{ menu="View/Center view", command="view_center", shortcut="C" },
 	{ menu="View/Reset zoom", command="view_reset_zoom", shortcut="Control+0" },
 	{ menu="View/-" },
-	{ menu="View/Touch Friendly Layout", command="touch_mode_switch", shortcut="Control+Space" },
+	{ menu="View/Mobile Friendly Layout", command="graph_only_mode", shortcut="" },
+	{ menu="View/Tablet Friendly Layout", command="touch_mode_switch", shortcut="Control+Space" },
 	{ menu="View/Default Layout", command="default_mode_switch", shortcut="" },
 	{ menu="View/User Layout", command="user_mode_switch", shortcut="" },
 	{ menu="View/-" },
@@ -159,7 +160,7 @@ func _ready() -> void:
 	else:
 		print("Warning: Can't User Load Layout")
 		if OS.get_name() == "Android" or OS.get_name() == "iOS":
-			touch_mode_switch()
+			graph_only_mode()
 		else:
 			default_mode_switch()
 		
@@ -210,7 +211,30 @@ func add_context_menu_item_pressed(id: int):
 			#var new_selection_layer = selection_layer.new()
 			#new_selection_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.current_project, base_layer.layer_type.mask)
 
-	
+
+var popup : PopupPanel = PopupPanel.new()
+func create_temp_properties_panel(pos:Vector2 = get_global_mouse_position()):
+	add_child(popup)
+	for child in popup.get_children():
+		popup.remove_child(child)
+		child.queue_free()
+	var properties = preload("res://UI/panels/layer_inspector/LayerInspector.tscn").instantiate()
+	properties.custom_minimum_size = Vector2(300,300)
+	popup.add_child(properties)
+	popup.position = pos
+	popup.visible = true
+func create_temp_layers_panel(pos:Vector2 = get_global_mouse_position()):
+	add_child(popup)
+	for child in popup.get_children():
+		popup.remove_child(child)
+		child.queue_free()
+	var layers = preload("res://UI/panels/layers/layers.tscn").instantiate()
+	layers.custom_minimum_size = Vector2(300,300)
+	popup.add_child(layers)
+	popup.position = pos
+	popup.visible = true
+
+
 func on_config_changed() -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if mt_globals.get_config("vsync") else DisplayServer.VSYNC_DISABLED)
 	# Convert FPS to microseconds per frame.
@@ -586,6 +610,15 @@ func view_center() -> void:
 func view_reset_zoom() -> void:
 	signal_view_reset_zoom.emit()
 
+func graph_only_mode() -> void:
+	var saved_layout : DockableLayout = load("res://graph_only_layout.tres")
+	if saved_layout:
+		var clone = saved_layout.clone()
+		clone.resource_name = "graph_only_layout"
+		layout.set_layout(clone)
+	else:
+		print("Error: Can't Load Layout")
+	view_center()
 
 func touch_mode_switch() -> void:
 	var saved_layout : DockableLayout = load("res://touch_editor_layout.tres")

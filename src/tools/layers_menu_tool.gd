@@ -1,10 +1,11 @@
 extends ToolBase
 
 func _init():
-	tool_name = "add_layer"
+	tool_name = "layers_panel"
 	tool_button_shortcut = ""
-	tool_desc = "Add Layer Object"
-	tool_icon = get_icon_from_project_folder("add")
+	tool_desc = "Show Layers Panel"
+	tool_icon = get_icon_from_project_folder("layers_icon")
+
 
 
 func get_inspector_properties():
@@ -36,7 +37,7 @@ func draw_preview(_image_view : CanvasItem, _mouse_position : Vector2i):
 	
 
 func enable_tool(): # Save History and Enable Tool
-	mt_globals.main_window.create_add_context_menu()
+	mt_globals.main_window.create_temp_layers_panel()
 func cancel_tool(): # Redo Actions
 	pass
 func confirm_tool(): # Confirm Actions

@@ -266,6 +266,14 @@ func send_changed_signal() -> void:
 	current_project.need_save = true
 
 
+func can_undo() -> bool:
+	if !current_project:
+		return false
+	return current_project.undo_redo.has_undo()
+func can_redo() -> bool:
+	if !current_project:
+		return false
+	return current_project.undo_redo.has_redo()
 
 func undo():
 	if !current_project:

@@ -1,10 +1,10 @@
 extends ToolBase
 
 func _init():
-	tool_name = "add_layer"
+	tool_name = "undo"
 	tool_button_shortcut = ""
-	tool_desc = "Add Layer Object"
-	tool_icon = get_icon_from_project_folder("add")
+	tool_desc = "Undo"
+	tool_icon = get_icon_from_project_folder("undo")
 
 
 func get_inspector_properties():
@@ -34,9 +34,10 @@ func mouse_moved(_event : InputEventMouseMotion):
 func draw_preview(_image_view : CanvasItem, _mouse_position : Vector2i):
 	pass
 	
-
+func is_tool_disabled() -> bool:
+	return mt_globals.main_window.edit_undo_is_disabled()
 func enable_tool(): # Save History and Enable Tool
-	mt_globals.main_window.create_add_context_menu()
+	mt_globals.main_window.edit_undo()
 func cancel_tool(): # Redo Actions
 	pass
 func confirm_tool(): # Confirm Actions

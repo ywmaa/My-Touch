@@ -9,6 +9,11 @@ var tool_active : bool = false
 var selection : BitMap
 @export var preview_shader : ShaderMaterial
 @export_enum("None", "When Drawing", "When Active") var image_hide_mode := 0
+## Tool can't be used and won't be able to press
+var tool_disabled : bool = false
+
+func is_tool_disabled() -> bool:
+	return tool_disabled
 
 func get_icon_from_project_folder(icon_name:String) -> ImageTexture:
 	return load("res://UI/graphics/tools/%s.png" % icon_name.to_lower())

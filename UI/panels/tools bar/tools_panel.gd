@@ -5,6 +5,10 @@ extends ScrollContainer
 var has_focus
 var _tool_button_scene: PackedScene = preload("res://UI/panels/tools bar/ToolButton.tscn")
 func _ready():
+	if OS.get_name() == "Android" or OS.get_name() == "iOS":
+		custom_minimum_size.x = 75
+	else:
+		custom_minimum_size.x = 35
 	create_menu(ToolsManager.TOOLS, ToolsManager, tree)
 	ToolsManager.connect("tool_changed", selected_tool_changed)
 	self.connect("mouse_entered",_on_mouse_entered)
@@ -37,7 +41,20 @@ func create_menu(menu_def : Array, object, menu:HFlowContainer):
 		tool_button.tooltip_text = menu_item_tip
 		menu.add_child(tool_button)
 		tool_button.connect("pressed", on_menu_item_pressed.bind(menu_def, object, i))
-		
+		tool_button.connect("gui_input", create_temp_tool_settings_panel)
+var popup : PopupPanel = PopupPanel.new()
+func create_temp_tool_settings_panel(event: InputEvent, pos:Vector2 = get_global_mouse_position()):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		add_child(popup)
+		for child in popup.get_children():
+			popup.remove_child(child)
+			child.queue_free()
+		var tool_settings = preload("res://UI/panels/tools bar/tool_settings.tscn").instantiate()
+		tool_settings.custom_minimum_size = Vector2(300,300)
+		popup.add_child(tool_settings)
+		popup.position = pos
+		popup.visible = true
+
 
 
 
@@ -53,6 +70,10 @@ func update_tool_buttons() -> void:
 		var background: NinePatchRect = child.get_node("Background")
 		background.visible = ToolsManager.current_tool.tool_name == child.name
 
+func _process(delta: float) -> void:
+	for child in tree.get_children():
+		if child is BaseButton:
+			child.disabled = ToolsManager.TOOLS[tree.get_children().find(child)].is_tool_disabled()
 
 func _on_mouse_entered():
 	has_focus = true

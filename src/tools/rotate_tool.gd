@@ -83,6 +83,3 @@ func confirm_tool(): # Confirm Actions
 
 func rotate(object, rotation_amount:float):
 	object.rotation += rotation_amount *ToolsManager.effect_scaling_factor
-
-
-
