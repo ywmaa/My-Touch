@@ -10,7 +10,7 @@ var updating : bool = false
 var need_update : bool = false
 
 #@onready var projects = $VBoxContainer/ProjectTabs
-
+@onready var app_render : SubViewport = $AppRender
 @onready var layout : DockableContainer = $VBoxContainer/Layout
 const SAVED_LAYOUT_PATH := "user://layout.tres"
 var library
@@ -66,7 +66,8 @@ const MENU = [
 	{ menu="View/Center view", command="view_center", shortcut="C" },
 	{ menu="View/Reset zoom", command="view_reset_zoom", shortcut="Control+0" },
 	{ menu="View/-" },
-	{ menu="View/Touch Friendly Layout", command="touch_mode_switch", shortcut="Control+Space" },
+	{ menu="View/Mobile Friendly Layout", command="graph_only_mode", shortcut="" },
+	{ menu="View/Tablet Friendly Layout", command="touch_mode_switch", shortcut="Control+Space" },
 	{ menu="View/Default Layout", command="default_mode_switch", shortcut="" },
 	{ menu="View/User Layout", command="user_mode_switch", shortcut="" },
 	{ menu="View/-" },
@@ -91,17 +92,25 @@ func _input(event: InputEvent) -> void:
 func _enter_tree():
 	mt_globals.main_window = self
 
-
-#func _process(_delta):
+var current_screen_sensor : DisplayServer.ScreenOrientation
+func _process(_delta):
+	#if current_screen_sensor != DisplayServer.screen_get_orientation():
+		#current_screen_sensor = DisplayServer.screen_get_orientation()
+	if layout._layout.resource_name.contains("touch"):
+		touch_mode_switch()
 #	layout._update_layout_with_children()
 #	print(layout.get_tab_count())
 func _ready() -> void:
 	set_physics_process(false)
 	get_tree().set_auto_accept_quit(false)
 	
+	if OS.get_name() == "Android":
+		OS.request_permissions()
+	
+	
 	if mt_globals.get_config("locale") == "":
 		mt_globals.set_config("locale", TranslationServer.get_locale())
-
+	
 	on_config_changed()
 	get_screen_position()
 	
@@ -150,7 +159,10 @@ func _ready() -> void:
 		layout.set_layout(saved_layout.clone())
 	else:
 		print("Warning: Can't User Load Layout")
-		default_mode_switch()
+		if OS.get_name() == "Android" or OS.get_name() == "iOS":
+			graph_only_mode()
+		else:
+			default_mode_switch()
 		
 
 var context_menu : PopupMenu = PopupMenu.new()
@@ -185,7 +197,7 @@ func add_context_menu_item_pressed(id: int):
 				return
 			#var new_paint_layer = paint_layer.new()
 			#new_paint_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),"", ProjectsManager.current_project,base_layer.layer_type.brush)
-			paint_layer.new().init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),"", ProjectsManager.current_project)
+			paint_layer.new().init(ProjectsManager.current_project.layers_container.get_unused_layer_name(), ProjectsManager.current_project)
 		5: #text layer
 			if !ProjectsManager.current_project:
 				return
@@ -199,7 +211,30 @@ func add_context_menu_item_pressed(id: int):
 			#var new_selection_layer = selection_layer.new()
 			#new_selection_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.current_project, base_layer.layer_type.mask)
 
-	
+
+var popup : PopupPanel = PopupPanel.new()
+func create_temp_properties_panel(pos:Vector2 = get_global_mouse_position()):
+	add_child(popup)
+	for child in popup.get_children():
+		popup.remove_child(child)
+		child.queue_free()
+	var properties = preload("res://UI/panels/layer_inspector/LayerInspector.tscn").instantiate()
+	properties.custom_minimum_size = Vector2(300,300)
+	popup.add_child(properties)
+	popup.position = pos
+	popup.visible = true
+func create_temp_layers_panel(pos:Vector2 = get_global_mouse_position()):
+	add_child(popup)
+	for child in popup.get_children():
+		popup.remove_child(child)
+		child.queue_free()
+	var layers = preload("res://UI/panels/layers/layers.tscn").instantiate()
+	layers.custom_minimum_size = Vector2(300,300)
+	popup.add_child(layers)
+	popup.position = pos
+	popup.visible = true
+
+
 func on_config_changed() -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if mt_globals.get_config("vsync") else DisplayServer.VSYNC_DISABLED)
 	# Convert FPS to microseconds per frame.
@@ -255,12 +290,11 @@ func new_project() -> void:
 
 func load_project() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
 	dialog.add_filter("*.mt.tres;My Touch text files")
-
+	add_child(dialog)
 	if mt_globals.config.has_section_key("path", "project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
@@ -378,11 +412,11 @@ func export_png_image():
 		return
 	# Prompt for a target PNG file
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.png;PNG image file")
+	add_child(dialog)
 	var files = await dialog.select_files()
 	if files.size() != 1:
 		return
@@ -399,11 +433,11 @@ func export_jpeg_image():
 		return
 	# Prompt for a target PNG file
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.jpeg;JPEG image file")
+	add_child(dialog)
 	var files = await dialog.select_files()
 	if files.size() != 1:
 		return
@@ -487,6 +521,8 @@ func edit_copy() -> void:
 	ProjectsManager.copy()
 
 func edit_paste() -> void:
+	if DisplayServer.clipboard_has_image():
+		ProjectsManager.on_import_image_clipboard()
 	ProjectsManager.paste()
 
 func edit_duplicate() -> void:
@@ -512,12 +548,12 @@ func parent_layer() -> void:
 		ProjectsManager.current_project.layers_container.add_layer(selected_layers[i], selected_layers[0])
 func edit_load_selection() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
 	dialog.add_filter("*.mt.tres;My Touch text files")
-
+	add_child(dialog)
+	
 	if mt_globals.config.has_section_key("path", "project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
@@ -529,12 +565,11 @@ func edit_save_selection():
 
 func edit_load_project_as_image() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
 	dialog.add_filter("*.mt.tres;My Touch text files")
-
+	add_child(dialog)
 	if mt_globals.config.has_section_key("path", "project"):
 		dialog.current_dir = mt_globals.config.get_value("path", "project")
 	var files = await dialog.select_files()
@@ -575,13 +610,30 @@ func view_center() -> void:
 func view_reset_zoom() -> void:
 	signal_view_reset_zoom.emit()
 
+func graph_only_mode() -> void:
+	var saved_layout : DockableLayout = load("res://graph_only_layout.tres")
+	if saved_layout:
+		var clone = saved_layout.clone()
+		clone.resource_name = "graph_only_layout"
+		layout.set_layout(clone)
+	else:
+		print("Error: Can't Load Layout")
+	view_center()
 
 func touch_mode_switch() -> void:
 	var saved_layout : DockableLayout = load("res://touch_editor_layout.tres")
-	if saved_layout:
-		var clone = saved_layout.clone()
-		clone.resource_name = "touch_layout"
-		layout.set_layout(clone)
+	var saved_layout_vertical : DockableLayout = load("res://vertical_touch_editor_layout.tres")
+	if saved_layout and saved_layout_vertical:
+		if size.x > size.y and layout._layout.resource_name != "touch_layout":
+			var clone = saved_layout.clone()
+			clone.resource_name = "touch_layout"
+			layout.set_layout(clone)
+			view_center()
+		if size.x < size.y and layout._layout.resource_name != "vertical_touch_layout":
+			var clone = saved_layout_vertical.clone()
+			clone.resource_name = "vertical_touch_layout"
+			layout.set_layout(clone)
+			view_center()
 	else:
 		print("Error: Can't Load Layout")
 func default_mode_switch() -> void:
@@ -592,6 +644,7 @@ func default_mode_switch() -> void:
 		layout.set_layout(clone)
 	else:
 		print("Error: Can't Load Layout")
+	view_center()
 func user_mode_switch() -> void:
 	var saved_layout : DockableLayout = ResourceLoader.load(SAVED_LAYOUT_PATH)
 	if saved_layout:
@@ -655,7 +708,6 @@ func about() -> void:
 #image import
 func import_image() -> void:
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-	add_child(dialog)
 	dialog.min_size = Vector2(500, 500)
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
@@ -664,6 +716,7 @@ func import_image() -> void:
 	dialog.add_filter("*.svg;SVG Image")
 	dialog.add_filter("*.tga;TGA Image")
 	dialog.add_filter("*.webp;WebP Image")
+	add_child(dialog)
 	var files = await dialog.select_files()
 	if files.size() > 0:
 		on_files_dropped(files)
@@ -680,6 +733,3 @@ func on_files_dropped(files : PackedStringArray) -> void:
 				do_load_project(f)
 			"jpg", "jpeg", "png", "svg", "webp":
 				ProjectsManager.on_import_image_file(f)
-
-
-

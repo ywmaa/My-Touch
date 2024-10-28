@@ -11,7 +11,7 @@ func _init():
 	tool_icon = get_icon_from_project_folder("scale")
 
 
-func get_tool_inspector_properties():
+func get_inspector_properties():
 	pass
 
 
@@ -123,4 +123,3 @@ func lock_y():
 		direction = coordinates.xy
 	else:
 		direction = coordinates.y
-

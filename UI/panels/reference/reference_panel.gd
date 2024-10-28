@@ -145,7 +145,6 @@ func _on_ContextMenu_index_pressed(index):
 	match index:
 		0:
 			var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
-			add_child(dialog)
 			dialog.min_size = Vector2(500, 500)
 			dialog.access = FileDialog.ACCESS_FILESYSTEM
 			dialog.mode = FileDialog.FILE_MODE_OPEN_FILE
@@ -157,6 +156,7 @@ func _on_ContextMenu_index_pressed(index):
 			dialog.add_filter("*.svg;SVG Image")
 			dialog.add_filter("*.tga;TGA Image")
 			dialog.add_filter("*.webp;WebP Image")
+			add_child(dialog)
 			var files = await dialog.select_files()
 			if files.size() == 1:
 				on_drop_image_file(files[0])

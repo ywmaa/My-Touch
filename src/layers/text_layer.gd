@@ -11,8 +11,8 @@ var text_label : RichTextLabel = RichTextLabel.new()
 		return text_label.text
 
 
-func get_layer_inspector_properties() -> Array:
-	var PropertiesView : Array = super.get_layer_inspector_properties()
+func get_inspector_properties() -> Array:
+	var PropertiesView : Array = super.get_inspector_properties()
 	PropertiesView[0].append("Text Properties")
 	var PropertiesToShow : Dictionary = {}
 	PropertiesToShow["text"] = "Text Properties"
@@ -45,7 +45,7 @@ func refresh():
 func get_copy(_name: String = "copy"):
 	var layer = text_layer.new()
 	layer.init(_name, parent_project, parent)
-	for k in get_layer_inspector_properties()[1].keys(): # Copy Properties
+	for k in get_inspector_properties()[1].keys(): # Copy Properties
 		layer.set(k, get(k))
 	return layer
 

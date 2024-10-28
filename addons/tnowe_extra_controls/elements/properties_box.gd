@@ -4,6 +4,7 @@ extends VBoxContainer
 ## A form to input multiple values of different types. Supports numbers, strings, and options (as in [UnfoldedOptionButton])
 
 signal value_changed(key : StringName, new_value : Variant)
+signal vector2_changed(key : StringName, new_value : Vector2)
 signal number_changed(key : StringName, new_value : float)
 signal string_changed(key : StringName, new_value : String)
 signal color_changed(key : StringName, new_value : Color)
@@ -30,13 +31,16 @@ func update():
 	var index = 0
 	for key in _keys:
 		var editor = _editors[index]
-		if editor is Button: editor.pressed = _keys[key]
-		if editor is SpinBox: editor.value = _keys[key]
-		if editor is LineEdit: editor.text = _keys[key]
-		if editor is TextEdit: editor.text = _keys[key]
-		if editor is RichTextLabel: editor.text = str(_keys[key])
-		if editor is UnfoldedOptionButton: editor.value = _keys[key]
-		index += 1
+		if _keys[key] is Callable: continue
+		if editor is ColorPickerButton: editor.color = _keys[key]; index += 1; continue
+		if editor is Button: editor.button_pressed = _keys[key]; index += 1; continue
+		if editor is SpinBox: editor.value = _keys[key]; index += 1; continue
+		if editor is FloatEdit: editor.value = _keys[key]; index += 1; continue
+		if editor is Vector2Edit: editor.value = _keys[key]; index += 1; continue
+		if editor is LineEdit: editor.text = _keys[key]; index += 1; continue
+		if editor is TextEdit: editor.text = _keys[key]; index += 1; continue
+		if editor is RichTextLabel: editor.text = str(_keys[key]); index += 1; continue
+		if editor is UnfoldedOptionButton: editor.value = _keys[key]; index += 1; continue
 ## Adds a [Button]. Retrieve the value with [method get_button].
 func add_button(key : StringName, value : Callable):
 	var editor = Button.new()
@@ -54,9 +58,13 @@ func add_color(key : StringName, value : Color = Color.RED):
 	editor.color = value
 	_add_property_editor(key, editor, editor.color_changed, _on_color_changed)
 
-func add_vector2(key : StringName, value : Vector2 = Vector2.ZERO):
-	add_float(key+" X", value.x)
-	add_float(key+" Y", value.y)
+func add_vector2(key : StringName, value : Vector2 = Vector2.ZERO, lock_aspect_key : StringName = "", lock_aspect_value : bool = false):
+	var editor : Vector2Edit = preload("res://UI/widgets/vector2_edit/vector2_edit.tscn").instantiate()
+	editor.value = value
+	if lock_aspect_key != "":
+		editor.lock_aspect = lock_aspect_value
+		editor.lock_aspect_changed.connect(_on_bool_changed.bind(lock_aspect_key))
+	_add_property_editor(key, editor, editor.value_changed, _on_vector2_changed)
 
 ## Adds a [SpinBox]. Retrieve the value with [method get_float] or [method get_int].
 ## If both [code]minvalue[/code] and [code]maxvalue[/code] are specified, also creates an [HSlider].
@@ -65,12 +73,14 @@ func add_int(key : StringName, value : int = 0, minvalue : int = -2147483648, ma
 
 ## Adds a [SpinBox]. Retrieve the value with [method get_float] or [method get_int].
 ## If both [code]minvalue[/code] and [code]maxvalue[/code] are specified, also creates an [HSlider].
-func add_float(key : StringName, value : float = 0.0, minvalue : float = -2147483648.0, maxvalue : float = 2147483648.0, step : float = 1.0):
+func add_float(key : StringName, value : float = 0.0, minvalue : float = -2147483648.0, maxvalue : float = 2147483648.0, step : float = 0.1):
 	var editor : FloatEdit = preload("res://UI/widgets/float_edit/float_edit.tscn").instantiate()
 	var is_slider = minvalue > -2147483648 && maxvalue < 2147483648
 	editor.step = step
-	editor.min_value = -10000 if not is_slider else minvalue#minvalue
-	editor.max_value = 10000 if not is_slider else maxvalue#maxvalue
+	editor.allow_greater = true if not is_slider else false
+	editor.allow_lesser = true if not is_slider else false
+	editor.min_value = 0 if not is_slider else minvalue#minvalue
+	editor.max_value = 100 if not is_slider else maxvalue#maxvalue
 	editor.value = value
 	_add_property_editor(key, editor, editor.value_changed, _on_number_changed)
 #	if is_slider:
@@ -209,6 +219,11 @@ func get_bool(key : StringName) -> bool:
 	var editor = _editors[_keys[key]]
 	return editor.pressed
 
+## Retrieve a number.
+func get_vector2(key : StringName) -> Vector2:
+	var editor = _editors[_keys[key]]
+	return editor.value
+
 ## Retrieve a number or option.
 func get_int(key : StringName) -> int:
 	var editor = _editors[_keys[key]]
@@ -255,7 +270,7 @@ func _add_property_editor(key : StringName, editor : Control, editor_signal : Si
 
 	var box = HBoxContainer.new()
 	var label = Label.new()
-	label.text = key
+	label.text = key.replace("_", " ").capitalize()
 	label.clip_text = true
 	label.size_flags_vertical = 0
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
@@ -267,6 +282,9 @@ func _add_property_editor(key : StringName, editor : Control, editor_signal : Si
 	if editable:
 		editor_signal.connect(signal_handler.bind(key))
 
+func _on_vector2_changed(value : Vector2, key : StringName):
+	vector2_changed.emit(key, value)
+	value_changed.emit(key, value)
 
 func _on_number_changed(value : float, key : StringName):
 	number_changed.emit(key, value)

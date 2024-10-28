@@ -1,0 +1,86 @@
+[gd_scene load_steps=8 format=3 uid="uid://5lx6m28c4kfq"]
+
+[ext_resource type="PackedScene" uid="uid://cuc4qcivfps74" path="res://UI/widgets/float_edit/float_edit.tscn" id="1_3ut4q"]
+[ext_resource type="Script" path="res://UI/widgets/vector2_edit/vector2_edit.gd" id="1_mctat"]
+[ext_resource type="Texture2D" uid="uid://do418dfoolgwc" path="res://UI/graphics/misc/lock_aspect_2.png" id="3_0lmq8"]
+[ext_resource type="Texture2D" uid="uid://dkm5wfyx3uabc" path="res://UI/graphics/misc/lock_aspect.png" id="4_1ew8g"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4a6mv"]
+bg_color = Color(0.698039, 0.0941176, 0.12549, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_imoch"]
+font_color = Color(0, 0, 0, 1)
+shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_naxla"]
+bg_color = Color(0.619608, 0.827451, 0, 1)
+
+[node name="Vector2Edit" type="HBoxContainer"]
+process_thread_group = 2
+process_thread_group_order = 0
+process_thread_messages = 0
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -67.0625
+grow_horizontal = 0
+grow_vertical = 2
+focus_mode = 1
+script = ExtResource("1_mctat")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4a6mv")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Label" type="Label" parent="VBoxContainer/PanelContainer/HBoxContainer"]
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+size_flags_vertical = 1
+text = "X"
+label_settings = SubResource("LabelSettings_imoch")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FloatEditX" parent="VBoxContainer/PanelContainer/HBoxContainer" instance=ExtResource("1_3ut4q")]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_arrow_step = 1.0
+
+[node name="Panel" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_naxla")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Label" type="Label" parent="VBoxContainer/Panel/HBoxContainer"]
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+size_flags_vertical = 1
+text = "Y"
+label_settings = SubResource("LabelSettings_imoch")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FloatEditY" parent="VBoxContainer/Panel/HBoxContainer" instance=ExtResource("1_3ut4q")]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_arrow_step = 1.0
+
+[node name="LockButton" type="TextureButton" parent="."]
+layout_mode = 2
+size_flags_vertical = 4
+toggle_mode = true
+texture_normal = ExtResource("3_0lmq8")
+texture_pressed = ExtResource("4_1ew8g")

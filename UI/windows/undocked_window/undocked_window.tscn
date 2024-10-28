@@ -8,7 +8,6 @@ script/source = "extends Window
 
 func _ready():
 	self.connect(\"close_requested\",func(): queue_free())
-
 "
 
 [node name="Window" type="Window"]

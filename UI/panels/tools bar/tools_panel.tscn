@@ -3,13 +3,9 @@
 [ext_resource type="Script" path="res://UI/panels/tools bar/tools_panel.gd" id="1_xme5t"]
 
 [node name="Tools" type="ScrollContainer"]
-custom_minimum_size = Vector2(36, 36)
-anchors_preset = 15
-anchor_right = 1.0
+custom_minimum_size = Vector2(75, 36)
+anchors_preset = 9
 anchor_bottom = 1.0
-offset_right = -1250.0
-offset_bottom = -230.0
-grow_horizontal = 2
 grow_vertical = 2
 follow_focus = true
 script = ExtResource("1_xme5t")

@@ -1,13 +1,33 @@
-[gd_scene load_steps=3 format=3 uid="uid://ch0j87kh07p73"]
+[gd_scene load_steps=4 format=3 uid="uid://ch0j87kh07p73"]
 
 [ext_resource type="Texture2D" uid="uid://btagbsdvxesyh" path="res://UI/graphics/tools/tool_background.png" id="1_e3peg"]
 [ext_resource type="Texture2D" uid="uid://snk0kn8v44dk" path="res://UI/graphics/tools/select.png" id="2_1ou6d"]
 
+[sub_resource type="GDScript" id="GDScript_74ptu"]
+script/source = "extends Button
+
+func _enter_tree() -> void:
+	custom_minimum_size = Vector2(get_parent().owner.custom_minimum_size.x, get_parent().owner.custom_minimum_size.x) * 0.75
+	size = Vector2(get_parent().owner.custom_minimum_size.x, get_parent().owner.custom_minimum_size.x) * 0.75
+"
+
 [node name="ToolButton" type="Button"]
-custom_minimum_size = Vector2(24, 24)
-offset_right = 8.0
-offset_bottom = 8.0
+custom_minimum_size = Vector2(50, 50)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -12.0
+offset_top = -12.0
+offset_right = 12.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 mouse_default_cursor_shape = 2
+script = SubResource("GDScript_74ptu")
 
 [node name="Background" type="NinePatchRect" parent="."]
 visible = false
@@ -31,3 +51,4 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_1ou6d")
 expand_mode = 1
+stretch_mode = 5

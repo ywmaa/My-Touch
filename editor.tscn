@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cliund3ivs7rq" path="res://UI/widgets/render_counter/render_counter.tscn" id="3_dljtu"]
 [ext_resource type="Script" path="res://tabs.gd" id="4_ejxk4"]
 [ext_resource type="Script" path="res://addons/dockable_container/dockable_container.gd" id="6_jlrni"]
-[ext_resource type="Resource" uid="uid://busuw7nyk34mk" path="res://touch_editor_layout.tres" id="6_yg31v"]
+[ext_resource type="Resource" uid="uid://0wfawbv87br4" path="res://graph_only_layout.tres" id="6_upj0v"]
 [ext_resource type="PackedScene" uid="uid://di4qw4bosuns4" path="res://UI/windows/windows_manager/WindowsManager.tscn" id="7_8bflp"]
 [ext_resource type="Script" path="res://UI/panels/graph/Canvas.gd" id="7_kirsr"]
 
@@ -13,7 +13,7 @@
 script/source = "extends Label
 
 func show_step(step : int):
-	text = \"Undo/Redo action added (%d)\" % step
+	text = \"Undo/Redo \" + ToolsManager.current_project.undo_redo.get_current_action_name() + \" added (%d)\" % step
 	$AnimationPlayer.stop()
 	$AnimationPlayer.play(\"show\")
 
@@ -53,7 +53,7 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_21bw6"]
 _data = {
-"show": SubResource("7")
+&"show": SubResource("7")
 }
 
 [node name="Editor" type="Panel"]
@@ -94,7 +94,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="ProjectTabs" type="Panel" parent="VBoxContainer"]
-custom_minimum_size = Vector2(950, 25)
+custom_minimum_size = Vector2(0, 25)
 layout_mode = 2
 script = ExtResource("4_ejxk4")
 metadata/_edit_layout_mode = 1
@@ -115,9 +115,10 @@ drag_to_rearrange_enabled = true
 layout_mode = 2
 size_flags_vertical = 3
 script = ExtResource("6_jlrni")
-layout = ExtResource("6_yg31v")
+layout = ExtResource("6_upj0v")
 
 [node name="Tool Settings" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
+visible = false
 layout_mode = 2
 init_window = 3
 
@@ -131,9 +132,11 @@ layout_mode = 2
 init_window = 2
 
 [node name="Layers Panel" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
+visible = false
 layout_mode = 2
 
 [node name="Layer Inspector" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
+visible = false
 layout_mode = 2
 init_window = 1
 
@@ -153,7 +156,7 @@ script = SubResource("6")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="MessageLabel"]
 libraries = {
-"": SubResource("AnimationLibrary_21bw6")
+&"": SubResource("AnimationLibrary_21bw6")
 }
 
 [node name="LeftCursor" type="Sprite2D" parent="."]

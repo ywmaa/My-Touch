@@ -10,3 +10,4 @@ export.cfg
 
 *.mt.tres
 *.mt.res
+exports/*

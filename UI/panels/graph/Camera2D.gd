@@ -91,18 +91,19 @@ func _input(event: InputEvent) -> void:
 	elif event.is_action_released("pan"):
 		drag = false
 	elif event.is_action_pressed("zoom_in", false, true):  # Wheel Up Event
-		zoom_camera(-1)
+		if !drag:
+			zoom_camera(-1)
 	elif event.is_action_pressed("zoom_out", false, true):  # Wheel Down Event
-		zoom_camera(1)
-
+		if !drag:
+			zoom_camera(1)
+	elif event is InputEventPanGesture:
+		# Pan Gesture on a Laptop touchpad
+		offset = offset + event.delta.rotated(rotation) * 1/zoom * 2  # for moving the canvas
 	elif event is InputEventMagnifyGesture:  # Zoom Gesture on a Laptop touchpad
 		if event.factor < 1:
-			zoom_camera(1)
+			zoom_camera(-0.3)
 		else:
-			zoom_camera(-1)
-	elif event is InputEventPanGesture and OS.get_name() != "Android":
-		# Pan Gesture on a Latop touchpad
-		offset = offset + event.delta.rotated(rotation) * 1/zoom * 7  # for moving the canvas
+			zoom_camera(0.3)
 	elif event is InputEventMouseMotion && drag:
 		offset = offset - event.relative.rotated(rotation) * 1/zoom
 		update_transparent_checker_offset()
@@ -134,10 +135,10 @@ func _set_camera_rotation_degrees(degrees: float) -> void:
 
 
 # Zoom Camera
-func zoom_camera(dir: int) -> void:
+func zoom_camera(dir: float) -> void:
 	var viewport_size = get_viewport().size
 	if mt_globals.smooth_zoom:
-		var zoom_margin = zoom * dir / 5
+		var zoom_margin = (zoom * dir) / (pow(mt_globals.zoom_speed, -1))
 		var new_zoom = zoom + zoom_margin
 		if new_zoom > zoom_min && new_zoom < zoom_max:
 			var new_offset = (
@@ -148,18 +149,18 @@ func zoom_camera(dir: int) -> void:
 			tween.set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
 			tween.connect("step_finished", _on_tween_step)
 			tween.tween_property(self, "zoom", new_zoom, 0.05)
-			tween.tween_property(self, "offset", new_offset, 0.05)
+			#tween.tween_property(self, "offset", new_offset, 0.05)
 
 	else:
 		var prev_zoom := zoom
-		var zoom_margin = zoom * dir / 10
+		var zoom_margin = zoom * dir / 5.0
 		if zoom + zoom_margin > zoom_min:
 			zoom += zoom_margin
 
 		if zoom > zoom_max:
 			zoom = zoom_max
 
-		offset = offset + ((viewport_size * 0.5) - mouse_pos).rotated(rotation) * -(zoom - prev_zoom)
+		#offset = offset + ((viewport_size * 0.5) - mouse_pos).rotated(rotation) * -(zoom - prev_zoom)
 		zoom_changed()
 
 

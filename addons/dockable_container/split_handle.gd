@@ -31,11 +31,11 @@ func _draw() -> void:
 
 
 func _gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and OS.get_name() != "Android" and OS.get_name() != "iOS") or event is InputEventScreenTouch:
 		_dragging = event.is_pressed()
 		if event.double_click:
 			layout_split.percent = 0.5
-	elif _dragging and event is InputEventMouseMotion:
+	elif _dragging and (event is InputEventMouseMotion or event is InputEventScreenTouch):
 		var mouse_in_parent := get_parent_control().get_local_mouse_position()
 		if layout_split.is_horizontal():
 			layout_split.percent = (

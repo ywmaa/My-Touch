@@ -42,7 +42,7 @@ var show_y_symmetry_axis := false
 # Preferences
 var pressure_sensitivity_mode = PressureSensitivity.NONE
 var smooth_zoom := true
-
+var zoom_speed : float = 0.06
 
 const DEFAULT_CONFIG = {
 	locale = "",
@@ -79,4 +79,3 @@ func get_config(key : String):
 
 func set_config(key : String, value):
 	config.set_value("config", key, value)
-

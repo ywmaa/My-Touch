@@ -3,7 +3,7 @@ extends TextureRect
 
 func _process(delta):
 	if !texture.viewport_path:
-		texture.viewport_path = mt_globals.main_window.find_child("AppRender").get_path()
+		texture.viewport_path = mt_globals.main_window.app_render.get_path()
 	queue_redraw()
 	if !get_parent().get_parent().get_parent().visible or get_parent().get_parent().get_parent().has_focus == false:
 		return
@@ -12,7 +12,7 @@ func _process(delta):
 	ToolsManager.previous_mouse_position = get_local_mouse_position()
 	
 func _draw():
-	ToolsManager.call("draw_preview", self, get_local_mouse_position())
+	ToolsManager.call_thread_safe("draw_preview", self, get_local_mouse_position())
 
 func pass_event_to_tool(event) -> bool:
 	if Input.is_action_just_pressed("mouse_left"):

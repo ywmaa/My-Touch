@@ -9,6 +9,11 @@ var tool_active : bool = false
 var selection : BitMap
 @export var preview_shader : ShaderMaterial
 @export_enum("None", "When Drawing", "When Active") var image_hide_mode := 0
+## Tool can't be used and won't be able to press
+var tool_disabled : bool = false
+
+func is_tool_disabled() -> bool:
+	return tool_disabled
 
 func get_icon_from_project_folder(icon_name:String) -> ImageTexture:
 	return load("res://UI/graphics/tools/%s.png" % icon_name.to_lower())
@@ -34,8 +39,8 @@ func set_image_pixelv(image : Image, pos : Vector2i, color : Color):
 #		if selection.get_bitv(pos):
 			image.set_pixelv(pos, color)
 
-func get_tool_inspector_properties():
-	printerr("Not implemented: get_tool_inspector_properties! (" + get_script().resource_path.get_file() + ")")
+func get_inspector_properties():
+	printerr("Not implemented: get_inspector_properties! (" + get_script().resource_path.get_file() + ")")
 
 func shortcut_pressed():
 	printerr("Not implemented: shortcut_pressed! (" + get_script().resource_path.get_file() + ")")

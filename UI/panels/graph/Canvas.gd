@@ -65,4 +65,3 @@ func render(p:Node, layers_array:Array[base_layer], _parent_layer:base_layer=nul
 		instance.owner = self
 		if layer is project_layer:
 			render(instance, layer.project.layers_container.layers)
-

@@ -34,7 +34,7 @@ func erase():
 func invert():
 	print("test")
 
-func get_tool_inspector_properties():
+func get_inspector_properties():
 	var PropertiesView : Array = []
 	var PropertiesGroups : Array[String] = []
 	PropertiesGroups.append("Settings")
@@ -120,6 +120,3 @@ func confirm_tool(): # Confirm Actions
 			ToolsManager.current_project.undo_redo.add_do_property(selected, "position", selected.position)
 		ToolsManager.current_project.undo_redo.commit_action()
 	super.confirm_tool()
-
-
-

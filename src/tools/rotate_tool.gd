@@ -7,7 +7,7 @@ func _init():
 	tool_icon = get_icon_from_project_folder("rotate")
 
 
-func get_tool_inspector_properties():
+func get_inspector_properties():
 	pass
 
 
@@ -83,6 +83,3 @@ func confirm_tool(): # Confirm Actions
 
 func rotate(object, rotation_amount:float):
 	object.rotation += rotation_amount *ToolsManager.effect_scaling_factor
-
-
-

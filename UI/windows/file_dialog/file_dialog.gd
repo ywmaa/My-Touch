@@ -7,7 +7,14 @@ var volume_option = null
 
 signal return_paths(path_list)
 
+func _enter_tree() -> void:
+	if OS.get_name() == "Android":
+		root_subfolder = "/storage/emulated/0"
+
 func _ready() -> void:
+	if OS.get_name() == "Android" or OS.get_name() == "iOS":
+		return
+	
 	var vbox = get_vbox()
 	var hbox = HSplitContainer.new()
 	add_child(hbox)
@@ -34,10 +41,16 @@ func get_full_current_dir() -> String:
 	return prefix+get_current_dir()
 
 func _on_FileDialog_file_selected(path) -> void:
+	if !left_panel:
+		emit_signal("return_paths", [ path ])
+		return
 	left_panel.add_recent(get_full_current_dir())
 	emit_signal("return_paths", [ path ])
 
 func _on_FileDialog_files_selected(paths) -> void:
+	if !left_panel:
+		emit_signal("return_paths", paths)
+		return
 	left_panel.add_recent(get_full_current_dir())
 	emit_signal("return_paths", paths)
 
@@ -54,4 +67,6 @@ func select_files() -> Array:
 	return result
 
 func add_favorite():
+	if !left_panel:
+		return
 	left_panel.add_favorite(get_full_current_dir())

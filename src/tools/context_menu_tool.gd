@@ -7,8 +7,8 @@ func _init():
 	tool_icon = get_icon_from_project_folder("add")
 
 
-func get_tool_inspector_properties():
-	printerr("Not implemented: get_tool_inspector_properties! (" + get_script().resource_path.get_file() + ")")
+func get_inspector_properties():
+	printerr("Not implemented: get_inspector_properties! (" + get_script().resource_path.get_file() + ")")
 
 
 
@@ -41,5 +41,3 @@ func cancel_tool(): # Redo Actions
 	pass
 func confirm_tool(): # Confirm Actions
 	pass
-
-

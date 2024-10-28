@@ -106,7 +106,7 @@ func get_scale():
 
 
 
-func get_layer_inspector_properties() -> Array:
+func get_inspector_properties() -> Array:
 	var PropertiesView : Array = []
 	var PropertiesGroups : Array[String] = []
 	PropertiesGroups.append("Transform")
@@ -115,10 +115,9 @@ func get_layer_inspector_properties() -> Array:
 	PropertiesToShow["position"] = "Transform"
 	PropertiesToShow["rotation"] = "Transform"
 	PropertiesToShow["size"] = "Transform"
-	PropertiesToShow["scale"] = "Transform"
-	PropertiesToShow["lock_aspect"] = "Transform"
+	PropertiesToShow["scale:lock_aspect"] = "Transform"
 	
-	PropertiesToShow["opacity"] = "Visibility"
+	PropertiesToShow["opacity:minvalue:0.0:maxvalue:1.0:step:0.01"] = "Visibility"
 	PropertiesToShow["affect_children_opacity"] = "Visibility"
 	
 	

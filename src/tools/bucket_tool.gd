@@ -19,7 +19,7 @@ func _init():
 	tool_button_shortcut = "Shift+F"
 	tool_desc = ""
 	tool_icon = get_icon_from_project_folder("bucket")
-func get_tool_inspector_properties():
+func get_inspector_properties():
 	var PropertiesView : Array = []
 	var PropertiesGroups : Array[String] = []
 	PropertiesGroups.append("Settings")
