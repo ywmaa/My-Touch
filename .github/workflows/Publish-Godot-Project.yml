@@ -29,7 +29,7 @@ env:
  PROJECT_NAME: "My-Touch" # Needs to be added, PLEASE DON'T USE SPACES
  ITCH_PROJECT_NAME: "my-touch" # Needs to be added
  ITCH_USER_NAME: "ywmaa" # Needs to be added
- GODOT_VERSION: 4.1.1 # Needs to be added
+ GODOT_VERSION: 4.3 # Needs to be added
  GODOT_ANDROID_KEYSTORE_DEBUG_PATH: "/home/runner/work/My-Touch/My-Touch/android/debug.keystore" # Needs to be added
  GODOT_ANDROID_KEYSTORE_DEBUG_USER: "androiddebugkey" # Needs to be added
  GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: "android" # Needs to be added
@@ -37,20 +37,10 @@ env:
  GODOT_ANDROID_KEYSTORE_RELEASE_USER: "" # Needs to be added
  GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: "" # Needs to be added
 jobs:
- CleanArtifacts:
-  # This job clears out the previous artifacts made so you don't run out of space in your github account
-  runs-on: ubuntu-latest
-  steps:
-  - uses: kolpav/purge-artifacts-action@v1
-    with:
-     token: ${{ secrets.GITHUB_TOKEN }}
-     expire-in: 1hr
-
  Export:
-  needs: CleanArtifacts # wait for artifacts to clean before making a new one
   runs-on: ubuntu-latest
   steps:
-  - uses: actions/checkout@v2
+  - uses: actions/checkout@v4
   
   - name: Set up JDK 11
     uses: actions/setup-java@v3
@@ -112,10 +102,11 @@ jobs:
     
     
 
-  - uses: actions/upload-artifact@v2
+  - uses: actions/upload-artifact@v4
     with:
      name: exports
      path: exports
+     overwrite: true
   
  Release:
   needs: Export
@@ -211,7 +202,7 @@ jobs:
        content: v${{ github.event.inputs.export_version }}
        mode: 0655
     
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
        name: VERSION
        path: ./VERSION.txt
@@ -222,7 +213,7 @@ jobs:
   runs-on: ubuntu-latest
   steps:
     - name: Download Exports
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
        name: exports
        path: exports
@@ -258,12 +249,3 @@ jobs:
        ./butler push linux-release-v${{ github.event.inputs.export_version }}.zip ${{env.ITCH_USER_NAME}}/${{env.ITCH_PROJECT_NAME}}:linux-release
        ./butler push mac-release-v${{ github.event.inputs.export_version }}.zip ${{env.ITCH_USER_NAME}}/${{env.ITCH_PROJECT_NAME}}:mac-release
        ./butler push android-release-v${{ github.event.inputs.export_version }}.zip ${{env.ITCH_USER_NAME}}/${{env.ITCH_PROJECT_NAME}}:android-release
-
-
-# Cleanup:
-#  needs: [Export, Release, Publish]
-#  runs-on: ubuntu-latest
-#  steps:
-#    - uses: geekyeggo/delete-artifact@v1
-#      with:
-#       name: VERSION
