@@ -56,24 +56,22 @@ _data = {
 &"show": SubResource("7")
 }
 
-[node name="Editor" type="Panel"]
+[node name="Editor" type="MarginContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme = ExtResource("1_qcjp6")
 script = ExtResource("1_ix08l")
 
+[node name="BackPanel" type="Panel" parent="."]
+layout_mode = 2
+
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = -12.0
-offset_bottom = -12.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 
 [node name="AutoSaveTimer" type="Timer" parent="VBoxContainer"]
 wait_time = 15.0
@@ -94,14 +92,12 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="ProjectTabs" type="Panel" parent="VBoxContainer"]
-custom_minimum_size = Vector2(0, 25)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 script = ExtResource("4_ejxk4")
 metadata/_edit_layout_mode = 1
 
 [node name="Tabs" type="TabBar" parent="VBoxContainer/ProjectTabs"]
-clip_contents = true
-custom_minimum_size = Vector2(950, 24)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -141,16 +137,10 @@ layout_mode = 2
 init_window = 1
 
 [node name="MessageLabel" type="Label" parent="."]
-visible = false
 modulate = Color(1, 1, 1, 0)
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -94.0
-offset_right = 94.0
-offset_bottom = 33.0
-grow_horizontal = 2
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
 text = "Undo/Redo action added"
 script = SubResource("6")
 

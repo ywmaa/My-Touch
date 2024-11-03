@@ -1,4 +1,4 @@
-extends Panel
+extends MarginContainer
 class_name MainWindow
 var quitting : bool = false
 
@@ -100,7 +100,34 @@ func _process(_delta):
 		touch_mode_switch()
 #	layout._update_layout_with_children()
 #	print(layout.get_tab_count())
-func _ready() -> void:
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	
+	## Mobile Notch
+	if OS.get_name() == "Android" || OS.get_name() ==  "iOS": 
+		var safe_area  = DisplayServer.get_display_safe_area()
+		var window_size = get_window().size
+		# SET BASE MARGINS (THE ONES YOU HAVE CURRENTLY IN YOUR MARGIN CONTAINER
+		var top = 0
+		var left = 0
+		var bottom = 0
+		var right = 0
+
+		# CALQULATE EXTRA PADDING REQUIRED TO SKIP NOTCH
+		if window_size.x >= safe_area.size.x or window_size.y >= safe_area.size.y:
+			top = max(top, safe_area.position.y)
+			left = max(left, safe_area.position.x)
+			bottom = max(bottom, abs(safe_area.end.y - window_size.y))
+			right = max(right, abs(safe_area.end.x - window_size.x))
+
+			# OVERRIDE MARGIN CONTAINER (HOSTS THIS SCRIPT)
+			add_theme_constant_override("margin_top", top)
+			add_theme_constant_override("margin_left",left)
+			add_theme_constant_override("margin_right",right)
+			add_theme_constant_override("margin_bottom",bottom)
+
 	set_physics_process(false)
 	get_tree().set_auto_accept_quit(false)
 	

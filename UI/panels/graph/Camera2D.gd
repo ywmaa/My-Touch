@@ -101,9 +101,9 @@ func _input(event: InputEvent) -> void:
 		offset = offset + event.delta.rotated(rotation) * 1/zoom * 2  # for moving the canvas
 	elif event is InputEventMagnifyGesture:  # Zoom Gesture on a Laptop touchpad
 		if event.factor < 1:
-			zoom_camera(-0.3)
+			zoom_camera(-0.2*event.factor)
 		else:
-			zoom_camera(0.3)
+			zoom_camera(0.2*event.factor)
 	elif event is InputEventMouseMotion && drag:
 		offset = offset - event.relative.rotated(rotation) * 1/zoom
 		update_transparent_checker_offset()

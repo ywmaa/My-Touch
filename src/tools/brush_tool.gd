@@ -118,48 +118,37 @@ func enable_tool(): # Save History and Enable Tool
 func cancel_tool(): # Redo Actions
 	super.cancel_tool()
 func confirm_tool(): # Confirm Actions
-	if brush_type != BRUSH_ERASE:
-		current_stroke.need_redraw = true
-		edited_object.main_object.queue_redraw()
-	else:
-		pass
-		#var undo_redo : UndoRedo = ToolsManager.current_project.undo_redo
-		#undo_redo.add_do_property(edited_object, "strokes", edited_object.strokes.duplicate(true))
-		#undo_redo.add_do_method(edited_object.main_object.queue_redraw)
-		#undo_redo.add_undo_method(func(): for stroke in edited_object.strokes: stroke.need_redraw=true)
-		#undo_redo.add_undo_method(edited_object.main_object.queue_redraw)
-		#undo_redo.commit_action(false)
 	super.confirm_tool()
 
 
 func start_drawing(_start_pos):
 	last_stroke_pos = _start_pos
 	
+	current_stroke = Stroke.new()
+	#last_drawn_index = 0
+	var undo_redo : UndoRedo = ToolsManager.current_project.undo_redo
+	undo_redo.create_action("Brush Stroke")
 	
-	if brush_type != BRUSH_ERASE:
-		current_stroke = Stroke.new()
-		last_drawn_index = 0
-		var undo_redo : UndoRedo = ToolsManager.current_project.undo_redo
-		undo_redo.create_action("Brush Stroke")
-		
-		undo_redo.add_undo_property(edited_object, "strokes", edited_object.strokes.duplicate())
-		edited_object.strokes.append(current_stroke)
-		undo_redo.add_do_property(edited_object, "strokes", edited_object.strokes.duplicate())
-		
-		undo_redo.add_do_method(edited_object.main_object.add_child.bind(current_stroke.stroke_node))
-		undo_redo.add_do_reference(current_stroke.stroke_node)
-		undo_redo.add_do_method(edited_object.main_object.queue_redraw)
-		
-		undo_redo.add_undo_method(edited_object.main_object.remove_child.bind(current_stroke.stroke_node))
-		undo_redo.add_undo_method(edited_object.main_object.queue_redraw)
-		
-		undo_redo.commit_action(false)
+	undo_redo.add_undo_property(edited_object, "strokes", edited_object.strokes.duplicate())
+	edited_object.strokes.append(current_stroke)
+	undo_redo.add_do_property(edited_object, "strokes", edited_object.strokes.duplicate())
+	
+	undo_redo.add_do_method(edited_object.main_object.add_child.bind(current_stroke.stroke_node))
+	undo_redo.add_do_reference(current_stroke.stroke_node)
+	undo_redo.add_do_method(edited_object.main_object.queue_redraw)
+	
+	undo_redo.add_undo_method(edited_object.main_object.remove_child.bind(current_stroke.stroke_node))
+	undo_redo.add_undo_method(edited_object.main_object.queue_redraw)
+	
+	undo_redo.commit_action(false)
+	current_stroke.need_redraw = true
+	edited_object.main_object.queue_redraw()
+
+	if brush_type == BRUSH_ERASE:
+		current_stroke.mode = Stroke.MODE.ERASE
 	else:
-		pass
-		#var undo_redo : UndoRedo = ToolsManager.current_project.undo_redo
-		#undo_redo.create_action("Erase Stroke")
-		#undo_redo.add_undo_property(edited_object, "strokes", edited_object.strokes.duplicate(true))
-		
+		current_stroke.mode = Stroke.MODE.DRAW
+
 	if brush_type == BRUSH_PENCIL:
 		current_stroke.type = Stroke.TYPE.LINE
 	else:
@@ -177,7 +166,7 @@ func mouse_moved(event : InputEventMouseMotion):
 	for i in pt_count:
 		var point : Vector2 = ToolsManager.current_mouse_position - event.relative * lerp_step * i
 		var draw_pos = last_stroke_pos.lerp(point,0.05) if ToolsManager.effect_scaling_factor == 0.25 else point
-		if draw_pos.distance_to(last_stroke_pos) < (brushsize * 0.25): # So we don't draw on the same place
+		if draw_pos.distance_to(last_stroke_pos) < (brushsize * 0.5): # So we don't draw on the same place
 			return
 		if event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0.0:
 			stroke(draw_pos, event.pressure)
@@ -197,58 +186,30 @@ func stroke(point:Vector2, pressure):
 	if current_stroke.type == Stroke.TYPE.PIXEL:
 		get_all_brush_pixels(radius, solid_radius)
 	var color : Color
-	if brush_type == BRUSH_ERASE:
-		color = Color(1,0,0,0.05)
+	#if brush_type == BRUSH_ERASE:
+		#color = Color(1,0,0,0.05)
 
-	elif pen_pressure_usage == pen_flag.tint:
-		color = lerp(drawing_color2, drawing_color1, pressure)
-	else:
-		color = drawing_color1
+	#elif pen_pressure_usage == pen_flag.tint:
+		#color = lerp(drawing_color2, drawing_color1, pressure)
+	#else:
+	color = drawing_color1
 
 	color.a *= opacity
 	if pen_pressure_usage == pen_flag.opacity:
 		color.a *= pressure
 
 	#point = point.floor() #+ Vector2(0.5, 0.5)
-	if brush_type != BRUSH_ERASE:
-		match current_stroke.type:
-			Stroke.TYPE.CIRCLE:
-				current_stroke.add_point(point, color, radius)
-			Stroke.TYPE.LINE:
-				current_stroke.add_point(point, color, radius)
-				current_stroke.aliasing = jaggies_removal
-			Stroke.TYPE.PIXEL:
-				for p in cached_pixels:
-					current_stroke.add_point(point+p, color, radius)
-				current_stroke.aliasing = jaggies_removal
-	else:
-		#var undo_redo : UndoRedo = ToolsManager.current_project.undo_redo
-		
-		for stroke in edited_object.strokes:
-			points_to_remove.clear()
-			for i in stroke.points.size():
-				if stroke.points[i].distance_squared_to(point) < radius*radius:
-					stroke.need_redraw = true
-					var point_color : Color = stroke.color[i]
-					point_color.a = clampf(point_color.a - opacity, 0.0, 1.0)
-					if point_color.a == 0:
-						points_to_remove.append(i)
-					else:
-						stroke.color[i] = point_color
-			#if stroke.need_redraw:
-				#var stroke_index : int = edited_object.strokes.find(stroke)
-				#undo_redo.add_do_method(set_stroke_to_redraw.bind(stroke_index))
-				#undo_redo.add_undo_method(func(): print(stroke_index);set_stroke_to_redraw(stroke_index))
-			var iter : int = 0
-			for i in points_to_remove:
-				i -= iter
-				stroke.remove_point(i)
-				edited_object.main_object.queue_redraw()
-				iter += 1
-				#for j in points_to_remove:
+	match current_stroke.type:
+		Stroke.TYPE.CIRCLE:
+			current_stroke.add_point(point, color, radius)
+		Stroke.TYPE.LINE:
+			current_stroke.add_point(point, color, radius)
+			current_stroke.aliasing = jaggies_removal
+		Stroke.TYPE.PIXEL:
+			for p in cached_pixels:
+				current_stroke.add_point(point+p, color, radius)
+			current_stroke.aliasing = jaggies_removal
 
-func set_stroke_to_redraw(index:int):
-	edited_object.strokes[index].need_redraw=true
 
 func get_all_brush_pixels(radius, solid_radius):
 		cached_pixels.clear()
@@ -336,21 +297,7 @@ func GetCircleSymmetry(x:int, y:int, x_center:int = 0, y_center:int = 0):
 		return pixels
 
 
-var redraw_time : float = 5.0
-var time_since_last_redraw : float = redraw_time
-var last_drawn_index : int = 0
 func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
-	if !current_stroke:
-		return
-	time_since_last_redraw -= ToolsManager.get_process_delta_time()
-	if time_since_last_redraw <= 0.0:
-		last_drawn_index = current_stroke.points.size()-1
-		current_stroke.need_redraw = true
-		edited_object.main_object.queue_redraw()
-		time_since_last_redraw = redraw_time
-
-	if edited_object and tool_active:
-		current_stroke.draw(image_view, last_drawn_index)
 
 	if brush_type == BRUSH_PENCIL:
 		if !ruler_mode:

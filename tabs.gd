@@ -130,6 +130,3 @@ func _on_auto_save_timer_timeout():
 	for i in range($Tabs.get_tab_count()):
 		if ProjectsManager.has_method("auto_save"):
 			ProjectsManager.auto_save()
-
-
-
