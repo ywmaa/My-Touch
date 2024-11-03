@@ -7,7 +7,7 @@
 
 [node name="Preferences" type="PopupPanel"]
 position = Vector2i(0, 36)
-size = Vector2i(355, 405)
+size = Vector2i(371, 405)
 visible = true
 exclusive = true
 unresizable = false
@@ -20,8 +20,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 351.0
-offset_bottom = 401.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -29,10 +29,12 @@ grow_vertical = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+current_tab = 0
 
 [node name="General" type="VBoxContainer" parent="VBoxContainer/TabContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+metadata/_tab_index = 0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TabContainer/General"]
 layout_mode = 2
@@ -83,11 +85,11 @@ text = "UI scale (0 = auto):"
 
 [node name="GuiScale" parent="VBoxContainer/TabContainer/General/GuiScale" instance=ExtResource("3")]
 layout_mode = 2
-config_variable = "ui_scale"
-value = 0.0
 max_value = 2.0
 step = 0.01
-float_only = true
+allow_greater = false
+allow_lesser = false
+config_variable = "ui_scale"
 
 [node name="Space2" type="Control" parent="VBoxContainer/TabContainer/General"]
 layout_mode = 2
@@ -107,12 +109,13 @@ text = "FPS limit:"
 
 [node name="FPSLimit" parent="VBoxContainer/TabContainer/General/FPSLimit" instance=ExtResource("3")]
 layout_mode = 2
-text = "145"
-config_variable = "fps_limit"
-value = 145.0
 min_value = 20.0
 max_value = 200.0
 step = 1.0
+value = 145.0
+allow_greater = false
+allow_lesser = false
+config_variable = "fps_limit"
 
 [node name="Space" type="Control" parent="VBoxContainer/TabContainer/General/FPSLimit"]
 layout_mode = 2
@@ -124,13 +127,13 @@ text = "Idle FPS limit:"
 
 [node name="IdleFPSLimit" parent="VBoxContainer/TabContainer/General/FPSLimit" instance=ExtResource("3")]
 layout_mode = 2
-text = "145"
-config_variable = "idle_fps_limit"
-value = 20.0
 min_value = 1.0
 max_value = 20.0
 step = 1.0
-float_only = true
+value = 20.0
+allow_greater = false
+allow_lesser = false
+config_variable = "idle_fps_limit"
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
 layout_mode = 2

@@ -183,8 +183,6 @@ func stroke(point:Vector2, pressure):
 	var unsolid_radius : float = (brushsize * 0.5) * (1.0 - hardness)
 	var radius : float = (brushsize * 0.5) * (pressure if pen_pressure_usage == pen_flag.size else 1.0)
 	var solid_radius : float = radius - unsolid_radius
-	if current_stroke.type == Stroke.TYPE.PIXEL:
-		get_all_brush_pixels(radius, solid_radius)
 	var color : Color
 	#if brush_type == BRUSH_ERASE:
 		#color = Color(1,0,0,0.05)
@@ -204,10 +202,6 @@ func stroke(point:Vector2, pressure):
 			current_stroke.add_point(point, color, radius)
 		Stroke.TYPE.LINE:
 			current_stroke.add_point(point, color, radius)
-			current_stroke.aliasing = jaggies_removal
-		Stroke.TYPE.PIXEL:
-			for p in cached_pixels:
-				current_stroke.add_point(point+p, color, radius)
 			current_stroke.aliasing = jaggies_removal
 
 

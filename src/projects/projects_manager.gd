@@ -245,7 +245,7 @@ func save_as() -> bool:
 			var dir = DirAccess.open(old_file.get_base_dir())
 			if dir.file_exists(old_file.get_file()): # Remove Old MT File
 				dir.remove(old_file.get_file())
-#			main_window.add_recent(save_path)
+			mt_globals.main_window.add_recent(current_project.save_path)
 			mt_globals.config.set_value("path", "current_project", current_project.save_path.get_base_dir())
 			return true
 	return false
