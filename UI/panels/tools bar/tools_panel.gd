@@ -41,18 +41,11 @@ func create_menu(menu_def : Array, object, menu:HFlowContainer):
 		tool_button.tooltip_text = menu_item_tip
 		menu.add_child(tool_button)
 		tool_button.connect("pressed", on_menu_item_pressed.bind(menu_def, object, i))
-		tool_button.connect("gui_input", tool_button_gui_input)
 var popup : PopupPanel = PopupPanel.new()
-
-func tool_button_gui_input(event: InputEvent, pos:Vector2 = get_global_mouse_position()):
-	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT):
-		create_temp_tool_settings_panel(pos)
 
 func create_temp_tool_settings_panel(p_position:Vector2):
 	if mt_globals.get_config("use_drawer"):
-		if !mt_globals.main_window.collapsible.is_closing() and\
-			!mt_globals.main_window.collapsible.is_opening():
-			mt_globals.main_window.collapsible.open_tween_toggle()
+		mt_globals.main_window.collapsible.open_tween_toggle.call_deferred()
 	else:
 		add_child(popup)
 		for child in popup.get_children():
@@ -70,9 +63,6 @@ func create_temp_tool_settings_panel(p_position:Vector2):
 
 func on_menu_item_pressed(menu_def, object, id) -> void:
 	if ToolsManager.current_tool == ToolsManager.TOOLS[id]:
-		if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
-			# we will toggle it with right click anyway
-			return
 		create_temp_tool_settings_panel(get_global_mouse_position())
 	else:
 		object.assign_tool(menu_def[id].tool_name, id)

@@ -99,6 +99,11 @@ func _process(_delta):
 		#current_screen_sensor = DisplayServer.screen_get_orientation()
 	if layout._layout.resource_name.contains("touch"):
 		touch_mode_switch()
+	collapsible.custom_minimum_size.x = DisplayServer.window_get_size().x * (1.0-ui_scale)
+	var y_minimum_size = DisplayServer.window_get_size().y/ 3.0 * (1.0/ui_scale)
+	collapsible.get_node(collapsible.sizing_node).custom_minimum_size.y = y_minimum_size
+	if collapsible.is_opened():
+		collapsible.custom_minimum_size.y = y_minimum_size
 #	layout._update_layout_with_children()
 #	print(layout.get_tab_count())
 
@@ -263,7 +268,7 @@ func create_temp_layers_panel(pos:Vector2 = get_global_mouse_position()):
 	popup.position = pos
 	popup.visible = true
 
-
+var ui_scale : float = 1.0
 func on_config_changed() -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if mt_globals.get_config("vsync") else DisplayServer.VSYNC_DISABLED)
 	# Convert FPS to microseconds per frame.
@@ -277,7 +282,7 @@ func on_config_changed() -> void:
 		get_tree().call_group("updated_from_locale", "update_from_locale")
 	
 	
-	var ui_scale = mt_globals.get_config("ui_scale")
+	ui_scale = mt_globals.get_config("ui_scale")
 	if ui_scale <= 0:
 		# If scale is set to 0 (auto), scale everything if the display requires it (crude hiDPI support).
 		# This prevents UI elements from being too small on hiDPI displays.
@@ -286,6 +291,8 @@ func on_config_changed() -> void:
 	get_tree().root.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_IGNORE
 	get_tree().root.content_scale_size = Vector2i()
 	get_tree().root.content_scale_factor = ui_scale
+	
+	#collapsible.get_node(collapsible.sizing_node).size.y = 500.0 * (2.1-ui_scale)
 	
 
 	
@@ -772,10 +779,10 @@ func on_files_dropped(files : PackedStringArray) -> void:
 
 ## Disconnects the collapsible tween_completed signal to continous_completed
 ## making the continous opening/closing toggle stop.
-func toggle_collapsible(open:bool) -> void:
-	if open and !collapsible.is_opened() and !collapsible.is_closing():
-		print("open")
-		collapsible.open_tween()
-	elif !open and !collapsible.is_closed() and !collapsible.is_opening():
-		print("close")
-		collapsible.close_tween()
+#func toggle_collapsible(open:bool) -> void:
+#	if open and !collapsible.is_opened() and !collapsible.is_closing():
+#		print("open")
+#		collapsible.open_tween()
+#	if !open and !collapsible.is_closed() and !collapsible.is_opening():
+#		print("close")
+#		collapsible.close_tween()

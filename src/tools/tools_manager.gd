@@ -27,6 +27,7 @@ var TOOLS : Array[ToolBase] = [
 	preload("res://src/tools/context_menu_tool.gd").new(),
 	preload("res://src/tools/layers_menu_tool.gd").new(),
 	preload("res://src/tools/properties_menu_tool.gd").new(),
+	preload("res://src/tools/drawer_menu_tool.gd").new(),
 ]
 var current_tool : ToolBase
 var shortcut_tool : ToolBase
@@ -105,6 +106,7 @@ func _input(_event):
 func assign_tool(_p_name: String, button: int) -> void:
 	if TOOLS[button].tool_name == "add_layer" or\
 	TOOLS[button].tool_name == "layer_properties" or\
+	TOOLS[button].tool_name == "toggle_drawer" or\
 	TOOLS[button].tool_name == "layers_panel" or\
 	TOOLS[button].tool_name == "undo" or\
 	TOOLS[button].tool_name == "redo":

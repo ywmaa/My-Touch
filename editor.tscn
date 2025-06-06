@@ -152,25 +152,25 @@ libraries = {
 }
 
 [node name="CollapsibleContainer" type="Control" parent="."]
+process_mode = 3
 editor_description = "
 			A custom/plugin Control node capable of hiding and revealing its children by folding and unfolding.
 			
 Give feedback at: https://github.com/ArshvirGoraya/Godot-Collapsible-Container"
-custom_minimum_size = Vector2(0, 400)
+custom_minimum_size = Vector2(1280, 500)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 8
+mouse_filter = 2
 script = ExtResource("9_2qtvm")
 starts_opened = false
 folding_direction_preset = 12
 sizing_constraint = 1
-auto_update_size = 0
-use_custom_open_size = true
-custom_open_size = Vector2(0, 400)
-use_custom_close_size = true
-tween_duration_sec = 0.25
+auto_update_size = 1
+sizing_node = NodePath("Tool Settings")
+custom_open_size = Vector2(1280, 500)
+tween_duration_sec = 0.2
 tween_transition_type = 5
-_preview_auto_update_size = 1
 
 [node name="Tool Settings" parent="CollapsibleContainer" instance=ExtResource("7_8bflp")]
 layout_mode = 1
