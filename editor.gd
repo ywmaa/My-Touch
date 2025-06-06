@@ -11,6 +11,7 @@ var need_update : bool = false
 
 #@onready var projects = $VBoxContainer/ProjectTabs
 @onready var app_render : SubViewport = $AppRender
+@export var collapsible : CollapsibleContainer
 @onready var layout : DockableContainer = $VBoxContainer/Layout
 const SAVED_LAYOUT_PATH := "user://layout.tres"
 var library
@@ -768,3 +769,13 @@ func on_files_dropped(files : PackedStringArray) -> void:
 				do_load_project(f)
 			"jpg", "jpeg", "png", "svg", "webp":
 				ProjectsManager.on_import_image_file(f)
+
+## Disconnects the collapsible tween_completed signal to continous_completed
+## making the continous opening/closing toggle stop.
+func toggle_collapsible(open:bool) -> void:
+	if open and !collapsible.is_opened() and !collapsible.is_closing():
+		print("open")
+		collapsible.open_tween()
+	elif !open and !collapsible.is_closed() and !collapsible.is_opening():
+		print("close")
+		collapsible.close_tween()

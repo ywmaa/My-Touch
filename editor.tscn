@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://8w67718v7rk"]
+[gd_scene load_steps=13 format=3 uid="uid://8w67718v7rk"]
 
 [ext_resource type="Script" uid="uid://vdtvbxf4m6wr" path="res://editor.gd" id="1_ix08l"]
 [ext_resource type="Theme" uid="uid://dl7dg81sapu26" path="res://UI/theme/dark.tres" id="1_qcjp6"]
@@ -8,6 +8,7 @@
 [ext_resource type="Resource" uid="uid://0wfawbv87br4" path="res://graph_only_layout.tres" id="6_upj0v"]
 [ext_resource type="PackedScene" uid="uid://di4qw4bosuns4" path="res://UI/windows/windows_manager/WindowsManager.tscn" id="7_8bflp"]
 [ext_resource type="Script" uid="uid://cvls8ttybunsx" path="res://UI/panels/graph/Canvas.gd" id="7_kirsr"]
+[ext_resource type="Script" uid="uid://3kec2nhqoenj" path="res://addons/collapsible_container/collapsible_elements/collapsible_container.gd" id="9_2qtvm"]
 
 [sub_resource type="GDScript" id="6"]
 script/source = "extends Label
@@ -56,7 +57,7 @@ _data = {
 &"show": SubResource("7")
 }
 
-[node name="Editor" type="MarginContainer"]
+[node name="Editor" type="MarginContainer" node_paths=PackedStringArray("collapsible")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -66,6 +67,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("1_qcjp6")
 script = ExtResource("1_ix08l")
+collapsible = NodePath("CollapsibleContainer")
 
 [node name="BackPanel" type="Panel" parent="."]
 layout_mode = 2
@@ -148,6 +150,31 @@ script = SubResource("6")
 libraries = {
 &"": SubResource("AnimationLibrary_21bw6")
 }
+
+[node name="CollapsibleContainer" type="Control" parent="."]
+editor_description = "
+			A custom/plugin Control node capable of hiding and revealing its children by folding and unfolding.
+			
+Give feedback at: https://github.com/ArshvirGoraya/Godot-Collapsible-Container"
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+script = ExtResource("9_2qtvm")
+starts_opened = false
+folding_direction_preset = 12
+sizing_constraint = 1
+auto_update_size = 0
+use_custom_open_size = true
+custom_open_size = Vector2(0, 400)
+use_custom_close_size = true
+tween_duration_sec = 0.25
+tween_transition_type = 5
+_preview_auto_update_size = 1
+
+[node name="Tool Settings" parent="CollapsibleContainer" instance=ExtResource("7_8bflp")]
+layout_mode = 1
+init_window = 3
 
 [node name="LeftCursor" type="Sprite2D" parent="."]
 visible = false

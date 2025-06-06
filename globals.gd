@@ -49,6 +49,7 @@ const DEFAULT_CONFIG = {
 	confirm_quit = true,
 	confirm_close_project = true,
 	save_inactive_project = true,
+	use_drawer = true,
 	vsync = true,
 	fps_limit = 145,
 	idle_fps_limit = 20,
