@@ -34,16 +34,16 @@ func _init():
 
 func draw():
 	for stroke in strokes:
+		if stroke.stroke_node and !stroke.stroke_node.get_parent():
+			# we need to get it back
+			main_object.add_child(stroke.stroke_node)
 		if !stroke.need_redraw:
 			continue
 		if !stroke.stroke_node:
-			stroke.stroke_node = Node2D.new()
-		main_object.add_child(stroke.stroke_node)
+			stroke.stroke_node = Line2D.new()
+			main_object.add_child(stroke.stroke_node)
 		stroke.update_line2D()
-		#stroke.stroke_node.draw.connect(func(): stroke.draw(stroke.stroke_node))
-		#stroke.stroke_node.queue_redraw()
 		stroke.need_redraw = false
-		#print("stroke id ", strokes.find(stroke), " redraw")
 
 
 func get_canvas_node() -> Node:

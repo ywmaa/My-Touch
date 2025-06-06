@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="SectionResource" load_steps=6 format=3 uid="uid://c7b7qxel3x0ar"]
 
-[ext_resource type="Script" path="res://addons/godot_style/section_resource.gd" id="1_44y3e"]
-[ext_resource type="Script" path="res://addons/godot_style/item_resource.gd" id="1_iw74d"]
+[ext_resource type="Script" uid="uid://d24na33w5hx1b" path="res://addons/godot_style/section_resource.gd" id="1_44y3e"]
+[ext_resource type="Script" uid="uid://lgfixyb6jrsd" path="res://addons/godot_style/item_resource.gd" id="1_iw74d"]
 
 [sub_resource type="Resource" id="Resource_kdrw6"]
 script = ExtResource("1_iw74d")

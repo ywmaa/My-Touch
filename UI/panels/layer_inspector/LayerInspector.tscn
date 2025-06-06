@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://csvl0avx42734"]
 
-[ext_resource type="Script" path="res://UI/panels/layer_inspector/LayerInspector.gd" id="1_ndj82"]
-[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/properties_box.gd" id="2_ipelq"]
+[ext_resource type="Script" uid="uid://dqd74tu85jrw0" path="res://UI/panels/layer_inspector/LayerInspector.gd" id="1_ndj82"]
+[ext_resource type="Script" uid="uid://bpwqcqlyv8eok" path="res://addons/tnowe_extra_controls/elements/properties_box.gd" id="2_ipelq"]
 
 [node name="ScrollContainer" type="ScrollContainer" node_paths=PackedStringArray("properties_box")]
 anchors_preset = 15

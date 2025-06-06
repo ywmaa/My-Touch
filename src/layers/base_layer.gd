@@ -154,6 +154,8 @@ func add_child(child:base_layer):
 	#print("added child", child)
 	children.append(child)
 	child.parent = self
+	child.parent_project = parent_project
+	
 
 func remove_child(child:base_layer):
 	var index = children.find(child)

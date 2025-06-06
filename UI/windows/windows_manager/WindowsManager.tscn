@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://di4qw4bosuns4"]
 
-[ext_resource type="Script" path="res://UI/windows/windows_manager/WindowsManager.gd" id="1_bm0d6"]
+[ext_resource type="Script" uid="uid://dyvuwk1svnbbc" path="res://UI/windows/windows_manager/WindowsManager.gd" id="1_bm0d6"]
 
 [node name="Control" type="Panel"]
 anchors_preset = 15

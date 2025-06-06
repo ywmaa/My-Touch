@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://c5f4nyml0nsld"]
 
-[ext_resource type="Script" path="res://UI/windows/about/about.gd" id="1"]
+[ext_resource type="Script" uid="uid://f3skotvby0c7" path="res://UI/windows/about/about.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://dfy6so7ye3xkk" path="res://UI/windows/about/github.png" id="2"]
 [ext_resource type="Texture2D" uid="uid://cea7i2k2monoj" path="res://UI/windows/about/twitter.png" id="3"]
 [ext_resource type="Texture2D" uid="uid://w3qqw5e5lfhf" path="res://UI/windows/about/icon.png" id="4"]

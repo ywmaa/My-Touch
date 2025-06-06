@@ -152,5 +152,3 @@ func drag_to(event_position: Vector2) -> void:
 	event_position.y *= -1
 	var target_size = (event_position - offset) * 2.0
 	size = target_size
-
-

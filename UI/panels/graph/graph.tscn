@@ -1,12 +1,12 @@
 [gd_scene load_steps=12 format=3 uid="uid://dg35jlqxnf8qy"]
 
-[ext_resource type="Script" path="res://UI/panels/graph/graph.gd" id="1_a3h74"]
+[ext_resource type="Script" uid="uid://cib1lmx7reihr" path="res://UI/panels/graph/graph.gd" id="1_a3h74"]
 [ext_resource type="PackedScene" uid="uid://bm0lg64mbtyim" path="res://UI/panels/tools bar/tools_panel.tscn" id="1_ys8hk"]
-[ext_resource type="Shader" path="res://UI/panels/graph/TransparentChecker.gdshader" id="2_ygg0t"]
-[ext_resource type="Script" path="res://UI/panels/graph/TransparentChecker.gd" id="3_khcqe"]
-[ext_resource type="Script" path="res://UI/panels/graph/Preview.gd" id="5_n10pt"]
-[ext_resource type="Script" path="res://UI/panels/graph/PixelGrid.gd" id="5_p4b4e"]
-[ext_resource type="Script" path="res://UI/panels/graph/Camera2D.gd" id="6_ge858"]
+[ext_resource type="Shader" uid="uid://bqaphlvnar78w" path="res://UI/panels/graph/TransparentChecker.gdshader" id="2_ygg0t"]
+[ext_resource type="Script" uid="uid://bisoaudxt3f1c" path="res://UI/panels/graph/TransparentChecker.gd" id="3_khcqe"]
+[ext_resource type="Script" uid="uid://bxtktcxa07gej" path="res://UI/panels/graph/Preview.gd" id="5_n10pt"]
+[ext_resource type="Script" uid="uid://m2bol3xouj5q" path="res://UI/panels/graph/PixelGrid.gd" id="5_p4b4e"]
+[ext_resource type="Script" uid="uid://bn54ieyux4wgi" path="res://UI/panels/graph/Camera2D.gd" id="6_ge858"]
 [ext_resource type="PackedScene" uid="uid://bk7yf4oyhhqyi" path="res://UI/panels/graph/resize_rect.tscn" id="8_giq5n"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_nodqv"]

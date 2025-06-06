@@ -1,0 +1,86 @@
+[gd_scene load_steps=5 format=3 uid="uid://cmmvcq6lya8g3"]
+
+[ext_resource type="Script" uid="uid://cqxwyxry4shjs" path="res://UI/windows/start_screen/start_screen.gd" id="1_y8qbx"]
+[ext_resource type="Texture2D" uid="uid://b5pepyrk5c6u5" path="res://icon.png" id="2_nt7cu"]
+[ext_resource type="Texture2D" uid="uid://cx0lb1q6v2xd4" path="res://UI/windows/start_screen/My-Touch_Artwork.png" id="2_y8qbx"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_y8qbx"]
+font_size = 28
+font_color = Color(0.718228, 0.718228, 0.718228, 1)
+
+[node name="start_menu" type="PopupPanel"]
+disable_3d = true
+transparent_bg = false
+handle_input_locally = false
+initial_position = 1
+size = Vector2i(700, 700)
+visible = true
+wrap_controls = false
+transient = false
+unresizable = false
+always_on_top = true
+transparent = false
+min_size = Vector2i(400, 200)
+script = ExtResource("1_y8qbx")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 696.0
+offset_bottom = 696.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TextureRect2" type="TextureRect" parent="HBoxContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+texture = ExtResource("2_nt7cu")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="RichTextLabel" type="RichTextLabel" parent="HBoxContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[font_size=25][color=white]My-Touch[/color][/font_size]
+[font_size=20]V0.4[/font_size]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 3
+vertical_alignment = 1
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer/VBoxContainer/PanelContainer"]
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 2
+texture = ExtResource("2_y8qbx")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/PanelContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+text = "By Artist Somaiya"
+label_settings = SubResource("LabelSettings_y8qbx")

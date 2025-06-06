@@ -169,7 +169,6 @@ func _ready():
 
 #	# Load recent projects
 	load_recents()
-#
 	# Create menus
 	mt_globals.menu_manager.create_menus(MENU, self, $VBoxContainer/TopBar/Menu)
 
@@ -181,6 +180,7 @@ func _ready():
 	
 	add_child(context_menu)
 	
+	
 	var saved_layout : DockableLayout = ResourceLoader.load(SAVED_LAYOUT_PATH)
 	if saved_layout:
 		layout.set_layout(saved_layout.clone())
@@ -190,7 +190,8 @@ func _ready():
 			graph_only_mode()
 		else:
 			default_mode_switch()
-		
+	await get_tree().process_frame
+	start_screen()
 
 var context_menu : PopupMenu = PopupMenu.new()
 
@@ -550,6 +551,7 @@ func edit_copy() -> void:
 func edit_paste() -> void:
 	if DisplayServer.clipboard_has_image():
 		ProjectsManager.on_import_image_clipboard()
+		return
 	ProjectsManager.paste()
 
 func edit_duplicate() -> void:
@@ -728,6 +730,12 @@ func about() -> void:
 
 
 
+func start_screen() -> void:
+	#replace with preload
+	var start_screen = load("res://UI/windows/start_screen/start_screen.tscn").instantiate()
+	add_child(start_screen)
+	start_screen.connect("popup_hide", start_screen.queue_free)
+	start_screen.popup_centered()
 
 
 

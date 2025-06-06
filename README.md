@@ -11,7 +11,7 @@
 
 # Notes for contributers
 
-The current version of Godot for the project is : Godot 4.2 Stable
+The current version of Godot for the project is : Godot 4.4.1 Stable
 
 # goals
 

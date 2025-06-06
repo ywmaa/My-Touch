@@ -18,8 +18,8 @@ func add_layer(new_layer:base_layer, parent:base_layer=null):
 func remove_layer(layer : base_layer) -> void:
 	var layers_array = find_parent_array(layer)
 	if layers_array:
+		deselect_layer(layer)
 		layers_array.erase(layer)
-#	layer.clear_image()
 		_on_layers_changed()
 
 func select_layer_name(layer_name):
@@ -41,7 +41,7 @@ func select_layer(layer : base_layer) -> void:
 	_on_layers_changed()
 
 func deselect_layer(layer : base_layer) -> void:
-	if layers.has(layer):
+	if selected_layers.has(layer):
 		selected_layers.erase(layer)
 	_on_layers_changed()
 
@@ -50,10 +50,21 @@ func _on_layers_changed() -> void:
 	ProjectsManager.refresh()
 	
 
-func duplicate_layer(source_layer) -> void:
+func duplicate_layer(source_layer, parent:base_layer=null) -> void:
+	ProjectsManager.select_none()
+	source_layer.parent = parent
+	source_layer.parent_project = ToolsManager.current_project
 	var layer = source_layer.get_copy(get_unused_layer_name())
-	select_layer(layer)
-	_on_layers_changed()
+	if source_layer == parent:
+		layer.children.clear()
+	var undo_redo : UndoRedo = ToolsManager.current_project.undo_redo
+	undo_redo.create_action("Layer duplication/paste action")
+	undo_redo.add_do_method(add_layer.bind(layer, parent))
+	undo_redo.add_do_method(select_layer.bind(layer))
+	#undo_redo.add_do_reference(layer)
+	
+	undo_redo.add_undo_method(remove_layer.bind(layer))
+	undo_redo.commit_action(true)
 
 
 

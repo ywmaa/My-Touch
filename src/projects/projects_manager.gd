@@ -75,32 +75,40 @@ func on_import_image_file(path:String):
 func remove_selection() -> void:
 	if !current_project:
 		return
+	
+	var undo_redo : UndoRedo = current_project.undo_redo
 	current_project.need_save = true
 	for selection in current_project.layers_container.selected_layers:
-		current_project.layers_container.remove_layer(selection)
+		undo_redo.create_action("Remove Selection")
+		undo_redo.add_do_method(current_project.layers_container.remove_layer.bind(selection))
 		
+		undo_redo.add_undo_method(current_project.layers_container.add_layer.bind(selection))
+		undo_redo.add_undo_method(current_project.layers_container.select_layer.bind(selection))
+		
+		undo_redo.commit_action(true)
+		
+
 func cut() -> void:
 	copy()
 	remove_selection()
+	
 
 func copy() -> void:
 	if !current_project:
 		return
-	var data : mt_clipboard = mt_clipboard.new()
-	data.layers = current_project.layers_container.selected_layers
-	ResourceSaver.save(data,clipboard_file_path)
+	var clipboard_data : mt_clipboard = mt_clipboard.new()
+	clipboard_data.layers = current_project.layers_container.selected_layers
+	ResourceSaver.save(clipboard_data, clipboard_file_path)
 
 func paste(duplicate:bool = false) -> void:
 	if !current_project:
 		return
 	current_project.need_save = true
-	var data = ResourceLoader.load(clipboard_file_path) as mt_clipboard
+	var clipboard_data = ResourceLoader.load(clipboard_file_path) as mt_clipboard
 	var paste_parent = current_project.layers_container.selected_layers.back().parent if duplicate else current_project.layers_container.selected_layers.back()
-	select_none()
-	for layer in data.layers:
-		layer.parent_project = current_project
-		layer.parent = paste_parent
-		current_project.layers_container.duplicate_layer(layer)
+	
+	for layer in clipboard_data.layers:
+		current_project.layers_container.duplicate_layer(layer, paste_parent)
 
 func duplicate_selected() -> void:
 	copy()

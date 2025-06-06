@@ -45,8 +45,7 @@ func _on_Duplicate_pressed():
 		layers.duplicate_layer(current.get_meta("layer"))
 
 func _on_Remove_pressed():
-	for layer in layers.selected_layers:
-		layers.remove_layer(layers.find_layer(layer.name))
+	ProjectsManager.remove_selection()
 
 
 func _on_Up_pressed():

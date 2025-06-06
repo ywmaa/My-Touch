@@ -73,6 +73,7 @@ func get_inspector_properties():
 	PropertiesView.append(PropertiesGroups)
 	PropertiesView.append(PropertiesToShow)
 	return PropertiesView
+	
 func update_tool_ui():
 	changed.emit()
 func switch_color():

@@ -24,12 +24,15 @@ func _draw() -> void:
 	draw_set_transform(position, rotation, scale)
 
 func rerender():
-	for child in get_children():
-		remove_child(child)
+	remove_children(self)
 	if current_project == null:
 		return
 	render(self, current_project.layers_container.layers)
 
+func remove_children(node: Node):
+	for child in node.get_children():
+		node.remove_child(child)
+		remove_children(child)
 
 func _process(_delta):
 #	if Input.is_action_just_pressed("mouse_left"):
@@ -42,7 +45,6 @@ func _process(_delta):
 		rerender()
 	if current_project and current_project.layers_container.layers.size() != get_child_count():
 		rerender()
-		
 	queue_redraw()
 	
 	if !ProjectsManager.current_project:
@@ -53,14 +55,11 @@ func _process(_delta):
 
 func render(p:Node, layers_array:Array[base_layer], _parent_layer:base_layer=null):
 	for layer in layers_array:
-		var instance
-		instance = layer.get_canvas_node()
-		layer.refresh()
+		var instance = layer.get_canvas_node()
 		if instance.get_parent():
 			instance.get_parent().remove_child(instance)
 		p.add_child(instance)
-		#if parent_layer:
-			#layer.parent = parent_layer
+		layer.refresh()
 		render(instance, layer.children, layer) # Add Children
 		instance.owner = self
 		if layer is project_layer:
