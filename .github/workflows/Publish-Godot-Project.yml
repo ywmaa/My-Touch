@@ -29,7 +29,7 @@ env:
  PROJECT_NAME: "My-Touch" # Needs to be added, PLEASE DON'T USE SPACES
  ITCH_PROJECT_NAME: "my-touch" # Needs to be added
  ITCH_USER_NAME: "ywmaa" # Needs to be added
- GODOT_VERSION: 4.4 # Needs to be added
+ GODOT_VERSION: "4.4.1" # Needs to be added
  GODOT_ANDROID_KEYSTORE_DEBUG_PATH: "/home/runner/work/My-Touch/My-Touch/android/debug.keystore" # Needs to be added
  GODOT_ANDROID_KEYSTORE_DEBUG_USER: "androiddebugkey" # Needs to be added
  GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: "android" # Needs to be added
@@ -54,7 +54,7 @@ jobs:
 
   - name: Download + Authorize Godot
     run: |
-       curl -L -o godot.zip https://downloads.tuxfamily.org/godotengine/${{ env.GODOT_VERSION }}/Godot_v${{ env.GODOT_VERSION }}-stable_linux.x86_64.zip
+       curl -L -o godot.zip https://github.com/godotengine/godot-builds/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_linux.x86_64.zip
        unzip godot.zip
        mv Godot_v${{ env.GODOT_VERSION }}-stable_linux.x86_64 godot
        ls
@@ -69,7 +69,7 @@ jobs:
        
   - name: Download Export Templates
     run: |
-     curl -L -o export_templates.zip https://downloads.tuxfamily.org/godotengine/${{ env.GODOT_VERSION }}/Godot_v${{ env.GODOT_VERSION }}-stable_export_templates.tpz
+     curl -L -o export_templates.zip https://github.com/godotengine/godot-builds/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_export_templates.tpz
      unzip export_templates.zip
   
   - name: Install Export Templates

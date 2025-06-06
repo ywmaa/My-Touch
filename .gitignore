@@ -11,3 +11,6 @@ export.cfg
 *.mt.tres
 *.mt.res
 exports/*
+
+# android build template not needed
+android/build/
