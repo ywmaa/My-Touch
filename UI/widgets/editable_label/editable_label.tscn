@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cnklugdj83gdx"]
 
-[ext_resource type="Script" path="res://UI/widgets/editable_label/editable_label.gd" id="1"]
+[ext_resource type="Script" uid="uid://556v1y4xl2il" path="res://UI/widgets/editable_label/editable_label.gd" id="1"]
 
 [node name="EditableLabel" type="HBoxContainer"]
 offset_right = 91.0

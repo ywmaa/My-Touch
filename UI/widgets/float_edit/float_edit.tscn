@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cuc4qcivfps74"]
 
-[ext_resource type="Script" path="res://UI/widgets/float_edit/float_edit.gd" id="1"]
+[ext_resource type="Script" uid="uid://dbhwpii0a7o4y" path="res://UI/widgets/float_edit/float_edit.gd" id="1"]
 
 [node name="FloatEdit" type="SpinBox"]
 anchors_preset = 11

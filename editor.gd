@@ -29,7 +29,9 @@ const EXPORT_TYPES = [ "png", "jpeg"]
 
 const MENU = [
 	{ menu="File/New Layer", command="create_add_context_menu", shortcut="Shift+A" },
+	{ menu="File/New Resource", command="create_add_resource_context_menu", shortcut="Shift+A" },
 	{ menu="File/New Canvas", command="new_project", shortcut="Control+N" },
+	{ menu="File/Create Custom Brush from Canvas", command="canvas_custom_brush" },
 	{ menu="File/Load", command="load_project", shortcut="Control+O" },
 	{ menu="File/Load recent", submenu="load_recent", standalone_only=true },
 	{ menu="File/-" },
@@ -245,7 +247,51 @@ func add_context_menu_item_pressed(id: int):
 			#var new_selection_layer = selection_layer.new()
 			#new_selection_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.current_project, base_layer.layer_type.mask)
 
+func create_add_resource_context_menu(pos: Vector2 = get_global_mouse_position()):
+	context_menu.clear()
+	context_menu.add_item("New Custom Brush")
+	
+	context_menu.connect("id_pressed",add_resource_context_menu_item_pressed)
+	context_menu.position = pos
+	context_menu.visible = true
 
+func add_resource_context_menu_item_pressed(id: int):
+	match id:
+		0: #import image
+			if !ProjectsManager.current_project:
+				return
+			var new_resource = brush_texture_resource.new()
+			new_resource.init(ProjectsManager.current_project.resources_container.get_unused_resource_name(), "default", ProjectsManager.default_icon.get_file(), ProjectsManager.current_project)
+			open_edit_resource_popup(new_resource)
+
+func open_edit_resource_popup(resource: base_resource) -> void:
+	var popup := PopupPanel.new()
+	#popup.always_on_top = true
+	popup.initial_position = Window.WINDOW_INITIAL_POSITION_CENTER_PRIMARY_SCREEN
+	popup.size = Vector2(500, 500)
+	var editor : ResourceInspector = preload("res://UI/windows/resource_dialog/ResourceInspector.tscn").instantiate()
+	add_child(popup)
+	popup.add_child(editor)
+	editor.current_resource = resource
+	popup.show()
+
+func canvas_custom_brush() -> void:
+	if !ProjectsManager.current_project:
+		return
+	var new_resource = brush_texture_resource.new()
+	var resource_name : String = ProjectsManager.current_project.resources_container.get_unused_resource_name()
+	var rendering_window : Viewport = $AppRender
+	var image : Image = Image.new() #create(graph_edit.canvas_size.x,graph_edit.canvas_size.y,true,Image.FORMAT_BPTC_RGBA)
+	# Wait until the frame has finished before getting the texture.
+	await RenderingServer.frame_post_draw
+	image = rendering_window.get_texture().get_image()
+	var image_file_name : String = resource_name + "canvas_image.png"
+	image.save_png(ProjectsManager.current_project.project_folder_abs_path + "/" + image_file_name)
+	new_resource.init(resource_name, "canvas brush", image_file_name, ProjectsManager.current_project)
+	open_edit_resource_popup(new_resource)
+	for tool in ToolsManager.TOOLS:
+		if tool.tool_name == "Brush Tool":
+			tool.current_brush_texture_resource = new_resource
 var popup : PopupPanel = PopupPanel.new()
 func create_temp_properties_panel(pos:Vector2 = get_global_mouse_position()):
 	add_child(popup)
@@ -282,11 +328,17 @@ func on_config_changed() -> void:
 		get_tree().call_group("updated_from_locale", "update_from_locale")
 	
 	
+	var default_scale : float
+	if OS.get_name() == "Android" || OS.get_name() ==  "iOS":
+		default_scale = 1.5
+	else:
+		default_scale = 1.0
+		
 	ui_scale = mt_globals.get_config("ui_scale")
 	if ui_scale <= 0:
 		# If scale is set to 0 (auto), scale everything if the display requires it (crude hiDPI support).
 		# This prevents UI elements from being too small on hiDPI displays.
-		ui_scale = 2 if DisplayServer.screen_get_dpi() >= 192 and DisplayServer.window_get_size().x >= 2048 else 1
+		ui_scale = 2 if DisplayServer.screen_get_dpi() >= 192 and DisplayServer.window_get_size().x >= 2048 else default_scale
 	get_tree().root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
 	get_tree().root.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_IGNORE
 	get_tree().root.content_scale_size = Vector2i()

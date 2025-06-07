@@ -135,7 +135,3 @@ func _on_tree_multi_selected(item, _column, selected):
 #		for selected_item in selected_items:
 #			selected_item.set_editable(0, true)
 	emit_signal("selection_changed", selected_items)
-
-
-
-

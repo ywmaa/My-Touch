@@ -277,9 +277,6 @@ border_color = Color(0.1, 0.115, 0.155, 1)
 
 [sub_resource type="FontFile" id="120"]
 fallbacks = Array[Font]([ExtResource("56")])
-face_index = null
-embolden = null
-transform = null
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0
@@ -846,6 +843,7 @@ PopupMenu/colors/font_color = Color(0.8, 0.8075, 0.8275, 1)
 PopupMenu/colors/font_color_accel = Color(1, 1, 1, 0.3)
 PopupMenu/colors/font_color_disabled = Color(1, 1, 1, 0.3)
 PopupMenu/colors/font_color_hover = Color(0.88, 0.8845, 0.8965, 1)
+PopupMenu/constants/icon_max_width = 64
 PopupMenu/constants/vseparation = 5
 PopupMenu/icons/checked = ExtResource("49")
 PopupMenu/icons/radio_checked = ExtResource("35")

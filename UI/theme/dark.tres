@@ -917,6 +917,7 @@ PopupMenu/colors/font_color_accel = Color(1, 1, 1, 0.3)
 PopupMenu/colors/font_color_disabled = Color(1, 1, 1, 0.3)
 PopupMenu/colors/font_color_hover = Color(0.872353, 0.872353, 0.872353, 1)
 PopupMenu/constants/hseparation = 4
+PopupMenu/constants/icon_max_width = 64
 PopupMenu/constants/vseparation = 5
 PopupMenu/fonts/font = ExtResource("1_wrg1w")
 PopupMenu/icons/checked = ExtResource("26_by3yy")

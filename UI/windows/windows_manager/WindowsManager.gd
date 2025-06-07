@@ -1,7 +1,7 @@
 extends Panel
 class_name window_manager
 
-@export_enum("Layers Panel", "Layer Inspector", "Graph", "Tool Settings", "Project Settings", "Reference Panel")\
+@export_enum("Layers Panel", "Layer Inspector", "Graph", "Tool Settings", "Project Settings", "Reference Panel", "Content Browser")\
 var init_window : int = 0
 
 
@@ -12,6 +12,7 @@ var windows = [
 	{scene=preload("res://UI/panels/tools bar/tool_settings.tscn"),name="Tool Settings"},
 	{scene=preload("res://UI/panels/graph/GraphSettings.tscn"),name="Project Settings"},
 	{scene=preload("res://UI/panels/reference/reference_panel.tscn"),name="Reference Panel"},
+	{scene=preload("res://UI/panels/content_browser/content_browser.tscn"),name="Content Browser"},
 ]
 
 @onready var window_button : OptionButton = $VBoxContainer/WindowOptions

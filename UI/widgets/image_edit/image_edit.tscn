@@ -1,0 +1,34 @@
+[gd_scene load_steps=4 format=3 uid="uid://bs42h6ph43q7g"]
+
+[ext_resource type="Script" uid="uid://dl3e3tt7rcjvj" path="res://UI/widgets/image_edit/image_edit.gd" id="1_achjm"]
+[ext_resource type="Texture2D" uid="uid://b5pepyrk5c6u5" path="res://icon.png" id="2_achjm"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_achjm"]
+
+[node name="image_edit" type="PanelContainer" node_paths=PackedStringArray("texture_rect", "image_name")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_achjm")
+texture_rect = NodePath("VBoxContainer/TextureRect")
+image_name = NodePath("VBoxContainer/Label")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+text = "Image Name"
+label_settings = SubResource("LabelSettings_achjm")
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("2_achjm")
+expand_mode = 3
+stretch_mode = 5

@@ -1,24 +1,40 @@
 extends ToolBase
 
-enum {
+enum E_BRUSH_TYPE {
   BRUSH_DRAW,
   BRUSH_ERASE,
-  BRUSH_PENCIL,
   BRUSH_CLONE,
   BRUSH_SHADING,
   BRUSH_NORMALMAP,
 }
 
-var brush_type := 0:
+enum E_BRUSH_SHAPE {
+  BRUSH_CIRCLE,
+  BRUSH_TEXTURE,
+  BRUSH_LINE
+}
+
+var brush_type : E_BRUSH_TYPE = E_BRUSH_TYPE.BRUSH_DRAW:
 	set(v):
 		brush_type = v
 		update_tool_ui.call_deferred()
-		
+
+var brush_shape : E_BRUSH_SHAPE = E_BRUSH_SHAPE.BRUSH_CIRCLE:
+	set(v):
+		brush_shape = v
+		update_tool_ui.call_deferred()
+
+# must have an initial type so the inspector knows the value type
+var current_brush_texture_resource : brush_texture_resource:
+	set(v):
+		current_brush_texture_resource = v
+		update_tool_ui.call_deferred()
+
 @export var crosshair_color := Color(1.0, 1.0, 1.0, 1.0)
 @export var crosshair_size := 3
 @export var crosshair_size_ruler := 32
 
-var brushsize := 20.0:
+var brushsize := 100.0:
 	set(x):
 		brushsize = x
 		brush_offset = Vector2(0.5, 0.5) * float(int(x) % 2)
@@ -44,32 +60,42 @@ func _init():
 	tool_button_shortcut = "Shift+B"
 	tool_desc = ""
 	tool_icon = get_icon_from_project_folder("brush")
+
 func get_inspector_properties():
+	if !current_brush_texture_resource:
+		for resource in ToolsManager.current_project.resources_container.resources:
+			if resource is brush_texture_resource: 
+				current_brush_texture_resource = resource
+				break
 	var PropertiesView : Array = []
 	var PropertiesGroups : Array[String] = []
 	PropertiesGroups.append("Settings")
-	if brush_type == BRUSH_DRAW or brush_type == BRUSH_ERASE or brush_type == BRUSH_PENCIL:
+	if brush_type == E_BRUSH_TYPE.BRUSH_DRAW or\
+	brush_type == E_BRUSH_TYPE.BRUSH_ERASE:
 		PropertiesGroups.append("Color")
-	if brush_type == BRUSH_PENCIL:
+	if brush_shape == E_BRUSH_SHAPE.BRUSH_LINE:
 		PropertiesGroups.append("Pencil")
+	if brush_shape == E_BRUSH_SHAPE.BRUSH_TEXTURE:
+		PropertiesGroups.append("Texture")
 	var PropertiesToShow : Dictionary = {}
-	if brush_type == BRUSH_DRAW or brush_type == BRUSH_ERASE or brush_type == BRUSH_PENCIL:
-		PropertiesToShow["brush_type,Draw,Erase,Pencil"] = "Settings"
-	if brush_type == BRUSH_CLONE:
+	if brush_type == E_BRUSH_TYPE.BRUSH_DRAW or brush_type == E_BRUSH_TYPE.BRUSH_ERASE:
+		PropertiesToShow["brush_type,Draw,Erase"] = "Settings"
+		PropertiesToShow["brush_shape,Circle,Texture,Line"] = "Settings"
+	if brush_type == E_BRUSH_TYPE.BRUSH_CLONE:
 		PropertiesToShow["copy_from_whole_canvas"] = "Settings"
-	if brush_type != BRUSH_PENCIL:
-		PropertiesToShow["brushsize:minvalue:1.0:maxvalue:1024.0:step:1.0"] = "Settings"
+	PropertiesToShow["brushsize:minvalue:1.0:maxvalue:1024.0:step:1.0"] = "Settings"
 	PropertiesToShow["hardness:minvalue:0.0:maxvalue:1.0:step:0.01"] = "Settings"
 	PropertiesToShow["opacity:minvalue:0.0:maxvalue:1.0:step:0.01"] = "Settings"
 	PropertiesToShow["pen_pressure_usage,size,opacity,tint"] = "Settings"
-	if brush_type == BRUSH_DRAW or brush_type == BRUSH_ERASE or brush_type == BRUSH_PENCIL:
+	if brush_type == E_BRUSH_TYPE.BRUSH_DRAW or brush_type == E_BRUSH_TYPE.BRUSH_ERASE:
 		PropertiesToShow["drawing_color1"] = "Color"
 		PropertiesToShow["drawing_color2"] = "Color"
 		PropertiesToShow["switch_color_function"] = "Color"
-	if brush_type == BRUSH_PENCIL:
+	if brush_shape == E_BRUSH_SHAPE.BRUSH_LINE:
 		PropertiesToShow["ruler_mode"] = "Pencil"
 		PropertiesToShow["jaggies_removal"] = "Pencil"
-
+	if brush_shape == E_BRUSH_SHAPE.BRUSH_TEXTURE:
+		PropertiesToShow["current_brush_texture_resource"] = "Texture"
 	PropertiesView.append(PropertiesGroups)
 	PropertiesView.append(PropertiesToShow)
 	return PropertiesView
@@ -145,15 +171,18 @@ func start_drawing(_start_pos):
 	current_stroke.need_redraw = true
 	edited_object.main_object.queue_redraw()
 
-	if brush_type == BRUSH_ERASE:
+	if brush_type == E_BRUSH_TYPE.BRUSH_ERASE:
 		current_stroke.mode = Stroke.MODE.ERASE
 	else:
 		current_stroke.mode = Stroke.MODE.DRAW
 
-	if brush_type == BRUSH_PENCIL:
+	if brush_shape == E_BRUSH_SHAPE.BRUSH_LINE:
 		current_stroke.type = Stroke.TYPE.LINE
-	else:
+	elif brush_shape == E_BRUSH_SHAPE.BRUSH_CIRCLE:
 		current_stroke.type = Stroke.TYPE.CIRCLE
+	elif brush_shape == E_BRUSH_SHAPE.BRUSH_TEXTURE:
+		current_stroke.type = Stroke.TYPE.TEXTURE
+		current_stroke.custom_texture = current_brush_texture_resource
 
 #var cached_to_draw_mouse_moves : PackedVector2Array
 func mouse_moved(event : InputEventMouseMotion):
@@ -164,10 +193,11 @@ func mouse_moved(event : InputEventMouseMotion):
 	#if ToolsManager.mouse_position_delta.length() > 0.0:
 	var pt_count = max(abs(event.relative.x), abs(event.relative.y))
 	var lerp_step = 0.01 / pt_count
+	var size_step_theshhold : float = 0.5 if brush_shape != E_BRUSH_SHAPE.BRUSH_TEXTURE else 0.25
 	for i in pt_count:
 		var point : Vector2 = ToolsManager.current_mouse_position - event.relative * lerp_step * i
 		var draw_pos = last_stroke_pos.lerp(point,0.05) if ToolsManager.effect_scaling_factor == 0.25 else point
-		if draw_pos.distance_to(last_stroke_pos) < (brushsize * 0.5): # So we don't draw on the same place
+		if draw_pos.distance_to(last_stroke_pos) < (brushsize * size_step_theshhold): # So we don't draw on the same place
 			return
 		if event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0.0:
 			stroke(draw_pos, event.pressure)
@@ -182,7 +212,7 @@ var solid_color_rect : Rect2i
 var points_to_remove: PackedInt32Array = []
 func stroke(point:Vector2, pressure):
 	var unsolid_radius : float = (brushsize * 0.5) * (1.0 - hardness)
-	var radius : float = (brushsize * 0.5) * (pressure if pen_pressure_usage == pen_flag.size else 1.0)
+	var radius : float = (brushsize * 0.5)
 	var solid_radius : float = radius - unsolid_radius
 	var color : Color
 	#if brush_type == BRUSH_ERASE:
@@ -198,12 +228,15 @@ func stroke(point:Vector2, pressure):
 		color.a *= pressure
 
 	#point = point.floor() #+ Vector2(0.5, 0.5)
+	var pressure_value : float = (pressure if pen_pressure_usage == pen_flag.size else 1.0)
 	match current_stroke.type:
 		Stroke.TYPE.CIRCLE:
-			current_stroke.add_point(point, color, radius)
+			current_stroke.add_point(point, color, radius, pressure_value)
 		Stroke.TYPE.LINE:
-			current_stroke.add_point(point, color, radius)
+			current_stroke.add_point(point, color, radius, pressure_value)
 			current_stroke.aliasing = jaggies_removal
+		Stroke.TYPE.TEXTURE:
+			current_stroke.add_point(point, color, radius, pressure_value)
 
 
 func get_all_brush_pixels(radius, solid_radius):
@@ -224,7 +257,7 @@ func get_all_brush_pixels(radius, solid_radius):
 		var r : int = radius
 		var current_point : Vector2i = Vector2i(0,r)
 		var d : int = 3 - 2 * r
-		if brush_type == BRUSH_DRAW or brush_type == BRUSH_ERASE:
+		if brush_type == E_BRUSH_TYPE.BRUSH_DRAW or brush_type == E_BRUSH_TYPE.BRUSH_ERASE:
 			var first_y_count : int = current_point.y-square_side
 			for y in first_y_count:
 				if square_side+y < current_point.x: # Ensure that pixel is not repeated
@@ -246,7 +279,7 @@ func get_all_brush_pixels(radius, solid_radius):
 				d = d + 4 * current_point.x + 6
 			
 			#Fill the circle
-			if brush_type == BRUSH_DRAW or brush_type == BRUSH_ERASE: # We Will Only Use the Rect Performance Enhacement with Draw/Erase
+			if brush_type == E_BRUSH_TYPE.BRUSH_DRAW or brush_type == E_BRUSH_TYPE.BRUSH_ERASE: # We Will Only Use the Rect Performance Enhacement with Draw/Erase
 				var y_count : int = current_point.y-square_side
 				for y in y_count:
 					if square_side+y < current_point.x: # Ensure that pixel is not repeated by excluding a coordinate almost less than 45 degrees from the X Axis
@@ -294,7 +327,7 @@ func GetCircleSymmetry(x:int, y:int, x_center:int = 0, y_center:int = 0):
 
 func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
 
-	if brush_type == BRUSH_PENCIL:
+	if brush_shape == E_BRUSH_SHAPE.BRUSH_LINE:
 		if !ruler_mode:
 			draw_crosshair(image_view, mouse_position, crosshair_size, crosshair_color)
 		else:

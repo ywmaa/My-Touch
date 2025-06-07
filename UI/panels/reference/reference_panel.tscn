@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://dhi5uspfra24x"]
 
-[ext_resource type="Script" path="res://UI/panels/reference/reference_panel.gd" id="1"]
+[ext_resource type="Script" uid="uid://5kjhf03dqini" path="res://UI/panels/reference/reference_panel.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b5uu7lqa3dwkc" path="res://UI/panels/reference/color_slot.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://ca1vy1mqeuhrl" path="res://UI/panels/reference/gradient_slot.tscn" id="3"]
 
@@ -21,9 +21,9 @@ void fragment() {
 
 [sub_resource type="ShaderMaterial" id="3"]
 shader = SubResource("1")
-shader_parameter/canvas_size = null
-shader_parameter/image_size = null
-shader_parameter/scale = null
+shader_parameter/canvas_size = Vector2(0, 0)
+shader_parameter/image_size = Vector2(0, 0)
+shader_parameter/scale = 0.0
 shader_parameter/center = Vector2(0.5, 0.5)
 
 [node name="ReferencePanel" type="Panel"]

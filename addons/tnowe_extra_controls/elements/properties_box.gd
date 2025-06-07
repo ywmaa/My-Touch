@@ -5,8 +5,10 @@ extends VBoxContainer
 
 signal value_changed(key : StringName, new_value : Variant)
 signal vector2_changed(key : StringName, new_value : Vector2)
+signal resource_changed(key : StringName, new_value : base_resource)
 signal number_changed(key : StringName, new_value : float)
 signal string_changed(key : StringName, new_value : String)
+signal image_changed(key : StringName, new_value : String)
 signal color_changed(key : StringName, new_value : Color)
 signal bool_changed(key : StringName, new_value : bool)
 signal button_pressed(key : StringName, new_value : Callable)
@@ -21,18 +23,21 @@ var _group_stack := []
 
 ## Removes all property editors.
 func clear():
-	for x in get_children():
-		x.queue_free()
-
 	_keys.clear()
 	_editors.clear()
 	_group_stack.clear()
+	for x in get_children():
+		x.queue_free()
+
 func update():
 	var index = 0
 	for key in _keys:
+		#print(_keys[key])
 		var editor = _editors[index]
-		if _keys[key] is Callable: continue
+		if _keys[key] is Callable: index += 1; continue
 		if editor is ColorPickerButton: editor.color = _keys[key]; index += 1; continue
+		if editor is ResourceEdit: index += 1;editor.current_resource = _keys[key]; editor._refresh(); continue
+		if editor is ImageEdit: index += 1;editor.init(_keys[key]); continue
 		if editor is Button: editor.button_pressed = _keys[key]; index += 1; continue
 		if editor is SpinBox: editor.value = _keys[key]; index += 1; continue
 		if editor is FloatEdit: editor.value = _keys[key]; index += 1; continue
@@ -46,17 +51,28 @@ func add_button(key : StringName, value : Callable):
 	var editor = Button.new()
 	editor.text = key
 	editor.pressed.connect(value)
-	_add_property_editor(key, editor, editor.pressed, _on_button_pressed)
+	_add_property_editor(key, value, editor, editor.pressed, _on_button_pressed)
 ## Adds a [CheckBox]. Retrieve the value with [method get_bool].
 func add_bool(key : StringName, value : bool = false):
 	var editor = CheckBox.new()
 	editor.button_pressed = value
-	_add_property_editor(key, editor, editor.toggled, _on_bool_changed)
+	_add_property_editor(key, value, editor, editor.toggled, _on_bool_changed)
 
 func add_color(key : StringName, value : Color = Color.RED):
 	var editor : ColorPickerButton = ColorPickerButton.new()
 	editor.color = value
-	_add_property_editor(key, editor, editor.color_changed, _on_color_changed)
+	_add_property_editor(key, value, editor, editor.color_changed, _on_color_changed)
+
+func add_resource(key : StringName, value : base_resource):
+	var editor : ResourceEdit = preload("res://UI/widgets/resource_edit/resource_edit.tscn").instantiate()
+	editor.init(value)
+	_add_property_editor(key, value, editor, editor.resource_changed, _on_resource_changed)
+
+func add_image_edit(key : StringName, value : String):
+	var editor : ImageEdit = preload("res://UI/widgets/image_edit/image_edit.tscn").instantiate()
+	editor.init(value)
+	_add_property_editor(key, value, editor, editor.image_path_changed, _on_image_changed)
+
 
 func add_vector2(key : StringName, value : Vector2 = Vector2.ZERO, lock_aspect_key : StringName = "", lock_aspect_value : bool = false):
 	var editor : Vector2Edit = preload("res://UI/widgets/vector2_edit/vector2_edit.tscn").instantiate()
@@ -64,7 +80,7 @@ func add_vector2(key : StringName, value : Vector2 = Vector2.ZERO, lock_aspect_k
 	if lock_aspect_key != "":
 		editor.lock_aspect = lock_aspect_value
 		editor.lock_aspect_changed.connect(_on_bool_changed.bind(lock_aspect_key))
-	_add_property_editor(key, editor, editor.value_changed, _on_vector2_changed)
+	_add_property_editor(key, value, editor, editor.value_changed, _on_vector2_changed)
 
 ## Adds a [SpinBox]. Retrieve the value with [method get_float] or [method get_int].
 ## If both [code]minvalue[/code] and [code]maxvalue[/code] are specified, also creates an [HSlider].
@@ -82,7 +98,7 @@ func add_float(key : StringName, value : float = 0.0, minvalue : float = -214748
 	editor.min_value = 0 if not is_slider else minvalue#minvalue
 	editor.max_value = 100 if not is_slider else maxvalue#maxvalue
 	editor.value = value
-	_add_property_editor(key, editor, editor.value_changed, _on_number_changed)
+	_add_property_editor(key, value, editor, editor.value_changed, _on_number_changed)
 #	if is_slider:
 #		var box = HBoxContainer.new()
 #		var slider = HSlider.new()
@@ -111,7 +127,7 @@ func add_string(key : StringName, value : String = ""):
 	editor.text = value
 	
 	editor.connect("focus_exited", focus_lost.bind(key, editor))
-	_add_property_editor(key, editor, editor.text_changed, _on_string_changed)
+	_add_property_editor(key, value, editor, editor.text_changed, _on_string_changed)
 
 func focus_lost(key, editor):
 	_on_string_changed(editor.text, key)
@@ -122,7 +138,7 @@ func add_label(key : StringName, value : String = ""):
 	editor.fit_content = true
 	editor.context_menu_enabled = true
 	editor.selection_enabled = true
-	_add_property_editor(key, editor, editor.child_entered_tree, _on_string_changed, false)
+	_add_property_editor(key, value, editor, editor.child_entered_tree, _on_string_changed, false)
 
 
 
@@ -138,7 +154,7 @@ func add_options(key : StringName, options : Array, default_value : int = 0, fla
 	editor.flags = flags
 	editor.options = options_cast
 	editor.value = default_value
-	_add_property_editor(key, editor, editor.value_changed, _on_number_changed)
+	_add_property_editor(key, default_value, editor, editor.value_changed, _on_number_changed)
 
 ## Adds an [UnfoldedOptionButton]. Retrieve the value with [method get_option].
 ## Option names are retrieved from a Locale Prefix, appending a 0-based index then translating.
@@ -200,6 +216,8 @@ func get_value(key : StringName) -> Variant:
 ## Retrieve a value of whatever type, from a property by its index in the box.
 func get_value_at(index : int) -> Variant:
 	var editor = _editors[index]
+	if editor is ResourceEdit: return editor.current_resource
+	if editor is ImageEdit: return editor.image_path
 	if editor is Button: return editor.pressed
 	if editor is SpinBox: return editor.value
 	if editor is FloatEdit: return editor.value
@@ -218,6 +236,11 @@ func get_button(key : StringName) -> bool:
 func get_bool(key : StringName) -> bool:
 	var editor = _editors[_keys[key]]
 	return editor.pressed
+
+## Retrieve a number.
+func get_resource(key : StringName) -> base_resource:
+	var editor = _editors[_keys[key]]
+	return editor.current_resource
 
 ## Retrieve a number.
 func get_vector2(key : StringName) -> Vector2:
@@ -264,8 +287,8 @@ func _get_box() -> Control:
 		return _group_stack[_group_stack.size() - 1]
 
 
-func _add_property_editor(key : StringName, editor : Control, editor_signal : Signal, signal_handler : Callable, editable:bool=true):
-	_keys[key] = _editors.size()
+func _add_property_editor(key : StringName, value, editor : Control, editor_signal : Signal, signal_handler : Callable, editable:bool=true):
+	_keys[key] = value
 	_editors.append(editor)
 
 	var box = HBoxContainer.new()
@@ -284,6 +307,14 @@ func _add_property_editor(key : StringName, editor : Control, editor_signal : Si
 
 func _on_vector2_changed(value : Vector2, key : StringName):
 	vector2_changed.emit(key, value)
+	value_changed.emit(key, value)
+
+func _on_resource_changed(value : base_resource, key : StringName):
+	resource_changed.emit(key, value)
+	value_changed.emit(key, value)
+
+func _on_image_changed(value : String, key : StringName):
+	image_changed.emit(key, value)
 	value_changed.emit(key, value)
 
 func _on_number_changed(value : float, key : StringName):

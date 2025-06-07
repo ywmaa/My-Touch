@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://brj4cfy2hipj8"]
+
+[ext_resource type="Shader" uid="uid://8sjam61f0np3" path="res://src/layers/shaders/texture_material.gdshader" id="1_e4ix2"]
+
+[resource]
+resource_local_to_scene = true
+shader = ExtResource("1_e4ix2")
+shader_parameter/texture_color = Vector3(0, 0, 0)

@@ -3,6 +3,7 @@ class_name Project
 
 @export var animations : Array[Animation]
 @export var layers_container : layers_manager
+@export var resources_container : resources_manager
 @export var canvas_size : Vector2:
 	set(value):
 		emit_signal("canvas_size_changed", canvas_size, value)
@@ -66,5 +67,10 @@ static func load_project(path:String) -> Project:
 		var project : Project = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_REUSE) as Project
 		for layer in project.layers_container.layers:
 			layer.parent_project = project
+		if project.resources_container: # check for compatibilty
+			for resource in project.resources_container.resources:
+				resource.parent_project = project
+		else:
+			project.resources_container = resources_manager.new()
 		return project 
 	return null

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b5uu7lqa3dwkc"]
 
-[ext_resource type="Script" path="res://UI/panels/reference/color_slot.gd" id="1_br8au"]
+[ext_resource type="Script" uid="uid://glq05d0jxd3o" path="res://UI/panels/reference/color_slot.gd" id="1_br8au"]
 
 [node name="ColorSlot" type="ColorRect"]
 script = ExtResource("1_br8au")

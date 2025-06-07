@@ -1,0 +1,90 @@
+[gd_scene load_steps=8 format=3 uid="uid://dxjq5lkwmt3cn"]
+
+[ext_resource type="Script" uid="uid://b30exj272r8ye" path="res://UI/panels/content_browser/content_browser.gd" id="1_j812t"]
+[ext_resource type="Texture2D" uid="uid://smcayrpruaar" path="res://UI/theme/icons/icons.svg" id="2_bt20g"]
+[ext_resource type="ButtonGroup" uid="uid://cd6dlkwi608k3" path="res://UI/panels/content_browser/content_item.tres" id="3_bt20g"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7cyw1"]
+atlas = ExtResource("2_bt20g")
+region = Rect2(32, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qjm6f"]
+atlas = ExtResource("2_bt20g")
+region = Rect2(48, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d5ube"]
+atlas = ExtResource("2_bt20g")
+region = Rect2(64, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3imb6"]
+atlas = ExtResource("2_bt20g")
+region = Rect2(0, 0, 16, 16)
+
+[node name="ContentBrowser" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_mode = 2
+mouse_filter = 0
+script = ExtResource("1_j812t")
+button_group = ExtResource("3_bt20g")
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+mouse_filter = 0
+
+[node name="Add" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 3
+texture_normal = SubResource("AtlasTexture_7cyw1")
+stretch_mode = 3
+
+[node name="Duplicate" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+texture_normal = SubResource("AtlasTexture_qjm6f")
+stretch_mode = 3
+
+[node name="Remove" type="TextureButton" parent="Buttons"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+texture_normal = SubResource("AtlasTexture_d5ube")
+stretch_mode = 3
+
+[node name="Config" type="TextureButton" parent="Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+texture_normal = SubResource("AtlasTexture_3imb6")
+stretch_mode = 3
+
+[node name="GroupOptionButton" type="OptionButton" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text_overrun_behavior = 1
+expand_icon = true
+fit_to_longest_item = false
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="FlowContainer" type="FlowContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[connection signal="pressed" from="Buttons/Add" to="." method="_on_Add_pressed"]
+[connection signal="pressed" from="Buttons/Duplicate" to="." method="_on_Duplicate_pressed"]
+[connection signal="pressed" from="Buttons/Remove" to="." method="_on_Remove_pressed"]
+[connection signal="pressed" from="Buttons/Config" to="." method="_on_Config_pressed"]

@@ -1,0 +1,34 @@
+[gd_scene load_steps=2 format=3 uid="uid://dgbgqs3l8gc88"]
+
+[ext_resource type="Script" uid="uid://4rxq48stf3ra" path="res://UI/widgets/resource_edit/resource_edit.gd" id="1_54a2m"]
+
+[node name="ResourceEdit" type="VBoxContainer" node_paths=PackedStringArray("option_button", "group_option_button")]
+process_thread_group = 2
+process_thread_group_order = 0
+process_thread_messages = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_mode = 1
+script = ExtResource("1_54a2m")
+option_button = NodePath("OptionButton")
+group_option_button = NodePath("GroupOptionButton")
+
+[node name="GroupOptionButton" type="OptionButton" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text_overrun_behavior = 1
+expand_icon = true
+fit_to_longest_item = false
+
+[node name="OptionButton" type="OptionButton" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text_overrun_behavior = 1
+expand_icon = true
+fit_to_longest_item = false

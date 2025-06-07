@@ -2,7 +2,7 @@ extends Panel
 
 var current_tab = -1 :
 	set(t):
-		if t < 0 or t >= $Tabs.get_tab_count():
+		if t < 0 or t > $Tabs.tab_count-1:
 			return
 		current_tab = t
 		$Tabs.current_tab = current_tab
@@ -12,24 +12,20 @@ signal tab_changed
 signal no_more_tabs
 
 func _process(_delta):
+	if $Tabs.tab_count != ProjectsManager.projects.size():
+		create_tabs()
 	for index in ProjectsManager.projects.size(): 
 		var project = ProjectsManager.projects[index]
 		var title : String = (project.save_path) + (" *" if project.need_save else "")
 		set_tab_title(index, title)
-	if current_tab != ProjectsManager.projects.find(ProjectsManager.current_project):
-		create_tabs()
-		current_tab = ProjectsManager.projects.find(ProjectsManager.current_project)
-	if $Tabs.tab_count == ProjectsManager.projects.size():
-		return
-	create_tabs()
-
 
 
 func create_tabs():
+	var current_project_index : int = ProjectsManager.projects.find(ProjectsManager.current_project)
 	$Tabs.clear_tabs()
 	for project in ProjectsManager.projects:
 		$Tabs.add_tab("[unnamed]" if project.save_path == "" else project.save_path + (" *" if project.need_save else "") )
-
+	current_tab = current_project_index
 
 func close_tab(tab = null) -> void:
 	if tab == null:
@@ -75,12 +71,13 @@ func check_save_tab(tab) -> bool:
 
 
 func do_close_tab(tab = 0) -> void:
+	var current_project_index : int = ProjectsManager.projects.find(ProjectsManager.current_project)
 	$Tabs.remove_tab(tab)
 	current_tab = -1
 	if $Tabs.get_tab_count() == 0:
 		emit_signal("no_more_tabs")
 	else:
-		current_tab = 0
+		current_tab = current_project_index
 
 func move_active_tab_to(idx_to) -> void:
 	$Tabs.move_tab(current_tab, idx_to)

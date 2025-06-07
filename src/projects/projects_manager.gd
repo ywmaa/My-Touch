@@ -1,7 +1,6 @@
 extends Node
 
 var projects : Array[Project]
-
 var current_project : Project:
 	set(value):
 		if current_project and mt_globals.get_config("save_inactive_project"):
@@ -11,23 +10,66 @@ var current_project : Project:
 			return
 		if !current_project.undo_redo:
 			current_project.undo_redo = UndoRedo.new()
+		refresh()
 var clipboard_file_path = "user://my_touch_clipboard.res"
-var default_icon = "res://icon.png"
+var default_icon = "res://icon512.png"
 
 func new_project() -> void:
 #	center_view()
-	current_project = Project.new()
-	current_project.canvas_size = Vector2(mt_globals.default_width,mt_globals.default_height)
-	current_project.layers_container = layers_manager.new()
-	projects.append(current_project)
-	current_project.save_path = project_get_unused_save_path()
+	var new_project = Project.new()
+	new_project.canvas_size = Vector2(mt_globals.default_width,mt_globals.default_height)
+	new_project.layers_container = layers_manager.new()
+	new_project.resources_container = resources_manager.new()
+	projects.append(new_project)
+	new_project.save_path = project_get_unused_save_path()
 	#default layer
 	#var new_layer : base_layer = base_layer.new()
-	var new_image_path : String = current_project.project_folder_abs_path + "/" + default_icon.get_file()
-	DirAccess.copy_absolute(default_icon, new_image_path)
-	image_layer.new().init(current_project.layers_container.get_unused_layer_name(), default_icon.get_file(), current_project)
-	#new_layer.init(current_project.layers_container.get_unused_layer_name(), default_icon.get_file(), current_project ,base_layer.layer_type.image)
-	
+	var new_image_path : String = new_project.project_folder_abs_path + "/" + default_icon.get_file()
+	var texture : Texture2D = load(default_icon)
+	texture.get_image().save_png(new_image_path)
+	#DirAccess.copy_absolute(default_icon, new_image_path)
+	image_layer.new().init(new_project.layers_container.get_unused_layer_name(), default_icon.get_file(), new_project)
+	#new_layer.init(new_project.layers_container.get_unused_layer_name(), default_icon.get_file(), new_project ,base_layer.layer_type.image)
+	brush_texture_resource.new().init("default brush texture", "default", default_icon.get_file(), new_project)
+	current_project = new_project
+	get_all_default_brushes()
+
+func get_all_default_brushes():
+	const main_brushes_path : String = "res://builtins/brushes"
+	var brush_directories: PackedStringArray = DirAccess.get_directories_at(main_brushes_path)
+	for folder in brush_directories:
+		var files : PackedStringArray = DirAccess.get_files_at(main_brushes_path + "/" + folder)
+		for file in files:
+			if file.get_extension() == "png":
+				var file_path : String = main_brushes_path + "/" + folder + "/" + file
+				var new_brush_path : String = current_project.project_folder_abs_path + "/" + file
+				# very costly in computation time
+				#var texture : Texture2D = load(file_path)
+				#texture.get_image().save_png(new_brush_path)
+				
+				#this works on both android and PC
+				copy_png_raw(file_path, new_brush_path)
+				
+				# only works for pc
+				#DirAccess.copy_absolute(file_path, new_brush_path)
+				brush_texture_resource.new().init(file.get_file().get_basename(), "default/" + folder, file.get_file(), current_project)
+
+func copy_png_raw(res_path: String, dest_path: String) -> bool:
+	var input = FileAccess.open(res_path, FileAccess.READ)
+	if not input:
+		print("❌ Could not open source: ", res_path)
+		return false
+	var data = input.get_buffer(input.get_length())
+	input.close()
+
+	var output = FileAccess.open(dest_path, FileAccess.WRITE)
+	if not output:
+		print("❌ Could not open destination: ", dest_path)
+		return false
+	output.store_buffer(data)
+	output.close()
+	return true
+
 func project_get_unused_save_path() -> String:
 	var naming = "unnamed"
 	var return_name : String
@@ -171,7 +213,8 @@ func save_selection() -> void:
 
 func do_save_selection(filename) -> bool:
 	var data : Project = Project.new()
-	data.layers = layers_manager.new()
+	data.layers_container = layers_manager.new()
+	data.resources_container = resources_manager.new()
 	data.layers.layers = current_project.layers_container.selected_layers
 	ResourceSaver.save(data,filename)
 	return true
@@ -200,6 +243,7 @@ func load_project_layer(filenames) -> void:
 func refresh():
 	if !current_project:
 		return
+	current_project.resources_container.refresh()
 	mt_globals.main_window.get_node("AppRender/Canvas").rerender()
 
 

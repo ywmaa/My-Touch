@@ -31,14 +31,19 @@ func create_ui():
 				if property.contains(","): # An Enum
 					var property_info : PackedStringArray = property.split(",")
 					var property_key = property_info[0]
+					var property_value = current_object.get(property_key)
 					property_info.remove_at(0)
-					properties_box.add_options(property_key, property_info)
+					properties_box.add_options(property_key, property_info, property_value)
 					continue
-					
 				
+				# a string but actually an image path property
 				var property_value = current_object.get(property.split(":")[0] if property.contains(":") else property)
+				if property.contains("image_path"):
+					properties_box.add_image_edit(property, property_value)
+					continue
 				if property_value is Callable:
 					properties_box.add_button(property, property_value)
+					continue
 				if property_value is int:
 					if property.contains(":"): # hardness_property:min:1.0:max:100.0
 						var property_info : PackedStringArray = property.split(":")
@@ -96,11 +101,13 @@ func create_ui():
 				if property_value is Color:
 					properties_box.add_color(property, property_value)
 					continue
+				if property_value is base_resource:
+					properties_box.add_resource(property, property_value)
+					continue
 		properties_box.end_group()
 	
 func update():
 	for k in properties_box._keys:
-		
 		properties_box._keys[k] = current_object.get(k)
 	properties_box.update()
 
@@ -108,3 +115,9 @@ func value_changed(property:String, value):
 	current_object.disconnect("changed",update)
 	current_object.set(property, value)
 	current_object.connect("changed",update)
+	if !current_object.get_inspector_properties():
+		return
+	var PropertiesView : Array = current_object.get_inspector_properties()
+	var PropertiesToShow : Dictionary = PropertiesView[1]
+	if PropertiesToShow.size() != properties_box._editors.size():
+		current_object_changed.emit()

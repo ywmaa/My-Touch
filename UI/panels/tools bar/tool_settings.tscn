@@ -1,9 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://cs5qad28mdkfi"]
+[gd_scene load_steps=3 format=3 uid="uid://cs5qad28mdkfi"]
 
 [ext_resource type="Script" uid="uid://b1yn7nutvhv5n" path="res://UI/panels/tools bar/tool_settings.gd" id="1_cmtfo"]
 [ext_resource type="Script" uid="uid://bpwqcqlyv8eok" path="res://addons/tnowe_extra_controls/elements/properties_box.gd" id="2_eocsg"]
-
-[sub_resource type="Gradient" id="Gradient_hmgg5"]
 
 [node name="Tool Options" type="ScrollContainer" node_paths=PackedStringArray("properties_box")]
 anchors_preset = 15
@@ -20,6 +18,3 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("2_eocsg")
-
-[node name="Line2D" type="Line2D" parent="."]
-gradient = SubResource("Gradient_hmgg5")
