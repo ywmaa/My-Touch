@@ -127,7 +127,7 @@ jobs:
       run: exit 1
     
     - name: Download Exports
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v8
       with:
        name: exports
        path: exports
@@ -214,7 +214,7 @@ jobs:
   runs-on: ubuntu-latest
   steps:
     - name: Download Exports
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
        name: exports
        path: exports
