@@ -66,18 +66,18 @@ func enable_tool(): # Save History and Enable Tool
 		ToolsManager.current_project.undo_redo.add_undo_property(selected,"rotation",selected.rotation)
 	super.enable_tool()
 func cancel_tool(): # Redo Actions
-	if ToolsManager.current_project.layers_container.selected_layers:
-		for selected in ToolsManager.current_project.layers_container.selected_layers:
-			ToolsManager.current_project.undo_redo.add_do_property(selected, "rotation", selected.rotation)
-		ToolsManager.current_project.undo_redo.commit_action()
-		for selected in ToolsManager.current_project.layers_container.selected_layers:
-			ToolsManager.current_project.undo_redo.undo()
+	if !tool_active:
+		return super.cancel_tool()
+	for selected in ToolsManager.current_project.layers_container.selected_layers:
+		ToolsManager.current_project.undo_redo.add_do_property(selected, "rotation", selected.rotation)
+	# Always close the action opened in enable_tool, then undo it once to restore the values
+	ToolsManager.current_project.undo_redo.commit_action()
+	ToolsManager.current_project.undo_redo.undo()
 	super.cancel_tool()
 func confirm_tool(): # Confirm Actions
-	if ToolsManager.current_project.layers_container.selected_layers:
-		for selected in ToolsManager.current_project.layers_container.selected_layers:
-			ToolsManager.current_project.undo_redo.add_do_property(selected, "rotation", selected.rotation)
-		ToolsManager.current_project.undo_redo.commit_action()
+	for selected in ToolsManager.current_project.layers_container.selected_layers:
+		ToolsManager.current_project.undo_redo.add_do_property(selected, "rotation", selected.rotation)
+	ToolsManager.current_project.undo_redo.commit_action() # Always close the action opened in enable_tool
 	super.confirm_tool()
 
 

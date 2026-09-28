@@ -100,7 +100,12 @@ func _process(_delta):
 	for c in active_canvas.values():
 		if c == true:
 			left_mouse_cursor_visible = mt_globals.show_left_tool_icon
-			for tool in TOOLS:
+			# A click that confirms active tools (e.g. moving with the G shortcut) must not
+			# also start the current tool, so only the active tools get it.
+			var active_tools : Array[ToolBase] = []
+			if Input.is_action_just_pressed("mouse_left"):
+				active_tools = TOOLS.filter(func(tool): return tool.tool_active)
+			for tool in (active_tools if !active_tools.is_empty() else TOOLS):
 				tool.shortcut_pressed()
 			break
 	mt_globals.main_window.left_cursor.visible = left_mouse_cursor_visible

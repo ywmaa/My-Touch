@@ -51,14 +51,7 @@ func get_inspector_properties():
 
 
 func shortcut_pressed():
-	if Input.is_action_just_pressed("move") and not Input.is_key_pressed(KEY_SHIFT) and not Input.is_key_pressed(KEY_CTRL) and not Input.is_key_pressed(KEY_ALT):
-		ToolsManager.shortcut_tool = self
-		if !tool_active:
-			enable_tool()
-			return
-		if tool_active:
-			confirm_tool()
-			return
+	# G ("move") belongs to the Move tool, handling it here too opened a second nested undo action.
 	if Input.is_action_just_pressed("mouse_left"):
 		if !tool_active and ToolsManager.current_tool == self:
 			enable_tool()
