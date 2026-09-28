@@ -78,6 +78,11 @@ layout_mode = 2
 text = "Use Drawer for quick tool access"
 config_variable = "use_drawer"
 
+[node name="KeepDrawerOpen" parent="VBoxContainer/TabContainer/General" instance=ExtResource("1")]
+layout_mode = 2
+text = "Keep the drawer open when touching outside it"
+config_variable = "keep_drawer_open"
+
 [node name="UseNativeFileDialog" parent="VBoxContainer/TabContainer/General" instance=ExtResource("1")]
 layout_mode = 2
 text = "Use the system file browser"

@@ -91,6 +91,22 @@ func _input(event: InputEvent) -> void:
 	for tool in ToolsManager.TOOLS:
 		if tool.tool_button_shortcut == event.as_text():
 			ToolsManager.assign_tool(tool.tool_name,ToolsManager.TOOLS.find(tool))
+	if event is InputEventMouseButton and event.pressed:
+		close_drawer_if_outside(event.position)
+
+## Touching/clicking outside the bottom drawer closes it, unless the user prefers to keep it open.
+## Presses inside popups opened from the drawer (e.g. a color picker) go to those windows, not here.
+func close_drawer_if_outside(pos: Vector2) -> void:
+	if mt_globals.get_config("keep_drawer_open") or !collapsible.is_opened():
+		return
+	if collapsible.get_global_rect().has_point(pos):
+		return
+	# The tools bar opens/toggles the drawer itself, let its buttons handle it
+	for tools_bar in find_children("*", "ScrollContainer", true, false):
+		if tools_bar.get_script() and tools_bar.get_script().resource_path.ends_with("tools_panel.gd") \
+				and tools_bar.is_visible_in_tree() and tools_bar.get_global_rect().has_point(pos):
+			return
+	collapsible.close_tween()
 
 func _enter_tree():
 	mt_globals.main_window = self
