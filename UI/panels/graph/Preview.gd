@@ -15,6 +15,9 @@ func _draw():
 	ToolsManager.call_thread_safe("draw_preview", self, get_local_mouse_position())
 
 func pass_event_to_tool(event) -> bool:
+	# Touch jumps the pointer on press, update the position now instead of waiting for _process.
+	if event is InputEventMouse:
+		ToolsManager.current_mouse_position = make_input_local(event).position
 	if Input.is_action_just_pressed("mouse_left"):
 		mouse_selection_check()
 	return ToolsManager.handle_image_input(event)

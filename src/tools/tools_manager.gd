@@ -20,6 +20,7 @@ var TOOLS : Array[ToolBase] = [
 	preload("res://src/tools/scale_tool.gd").new(),
 	preload("res://src/tools/crop_tool.gd").new(),
 	preload("res://src/tools/brush_tool.gd").new(),
+	preload("res://src/tools/gradient_tool.gd").new(),
 	#preload("res://src/tools/brush_clone_tool.gd").new(),
 	#preload("res://src/tools/bucket_tool.gd").new(),
 	preload("res://src/tools/undo_tool_button.gd").new(),
@@ -47,9 +48,16 @@ func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):
 func handle_image_input(event) -> bool:
 	
 	if event is InputEventKey: return false
-	
+
 	if !current_project:
 		return false
+
+	# A second finger means pinch/pan, not drawing.
+	if (event is InputEventScreenTouch and event.pressed and event.index > 0) \
+	or event is InputEventMagnifyGesture or event is InputEventPanGesture:
+		for tool in [current_tool, shortcut_tool]:
+			if tool and tool.has_method("multi_touch_started"):
+				tool.multi_touch_started()
 	
 	
 	if current_project.layers_container.selected_layers.is_empty():

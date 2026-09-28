@@ -40,7 +40,7 @@ func draw():
 		if !stroke.need_redraw:
 			continue
 		if !stroke.stroke_node:
-			stroke.stroke_node = Line2D.new()
+			stroke.stroke_node = stroke._create_stroke_node()
 			main_object.add_child(stroke.stroke_node)
 		stroke.update_line2D()
 		stroke.need_redraw = false
