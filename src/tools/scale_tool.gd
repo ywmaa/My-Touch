@@ -27,7 +27,7 @@ func shortcut_pressed():
 			return
 	if Input.is_action_just_pressed("mouse_left"):
 		if !tool_active and ToolsManager.current_tool == self:
-			enable_tool()
+			enable_from_press()
 			return
 		if tool_active:
 			confirm_tool()

@@ -14,6 +14,23 @@ var tool_disabled : bool = false
 ## Clicking the canvas with this tool selects the layers under the mouse.
 ## Only selection tools do this, drawing/transform tools keep the current selection.
 var selects_on_click : bool = false
+## Set when a touch press started the tool: it then works as hold and drag (lifting the finger
+## confirms) instead of the mouse's click to start, click to confirm.
+var started_by_touch : bool = false
+
+## Starts the tool from a left press, remembering whether it was a finger.
+func enable_from_press():
+	started_by_touch = ToolsManager.last_press_was_touch
+	enable_tool()
+
+## True once the finger that started the tool is lifted.
+func touch_drag_released() -> bool:
+	return tool_active and started_by_touch and !Input.is_action_pressed("mouse_left")
+
+## A second finger (pinch/pan): drop a touch drag instead of applying it.
+func multi_touch_started():
+	if tool_active and started_by_touch:
+		cancel_tool()
 
 func is_tool_disabled() -> bool:
 	return tool_disabled
@@ -70,10 +87,12 @@ func enable_tool(): # Save History and Enable Tool
 	tool_active = true
 func cancel_tool(): # Redo Actions
 	tool_active = false
+	started_by_touch = false
 func confirm_tool(): # Confirm Actions
 	ProjectsManager.send_changed_signal()
 	ToolsManager.get_node("/root/Editor/MessageLabel").show_step(ToolsManager.current_project.undo_redo.get_history_count())
 	tool_active = false
+	started_by_touch = false
 
 func draw_crosshair(image_view : CanvasItem, mouse_position : Vector2i, line_length : int, color : Color):
 	image_view.draw_rect(Rect2i(mouse_position + Vector2i(0, 4), Vector2(1, +line_length)).abs(), color)

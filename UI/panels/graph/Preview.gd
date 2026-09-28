@@ -53,6 +53,11 @@ func pass_event_to_tool(event) -> bool:
 	# Touch jumps the pointer on press, update the position now instead of waiting for _process.
 	if event is InputEventMouse:
 		ToolsManager.current_mouse_position = make_input_local(event).position
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		ToolsManager.last_press_was_touch = event.device == InputEvent.DEVICE_ID_EMULATION
+		# A finger lands anywhere: no movement since the previous touch, or dragged layers would jump
+		ToolsManager.previous_mouse_position = ToolsManager.current_mouse_position
+		ToolsManager.mouse_position_delta = Vector2.ZERO
 	# Only on the press itself, while a tool is active the click belongs to that tool.
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		# Ctrl (Cmd on macOS) + click selects only the top visible layer under the mouse

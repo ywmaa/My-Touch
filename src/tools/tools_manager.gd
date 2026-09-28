@@ -38,6 +38,8 @@ var current_project : Project
 var camera : Camera2D
 @export var smooth_mode : bool = false
 var current_mouse_position : Vector2
+## The last left press on the canvas came from a finger (touch emulated as mouse).
+var last_press_was_touch : bool = false
 var previous_mouse_position : Vector2
 var mouse_position_delta : Vector2
 
@@ -99,6 +101,9 @@ func _process(_delta):
 	if !current_project:
 		return
 	# Per-frame work that doesn't depend on the mouse being over the canvas
+	for tool in TOOLS:
+		if tool.touch_drag_released(): # Hold and drag on touch: lifting the finger confirms, anywhere
+			tool.confirm_tool()
 	if current_tool and current_tool.has_method("update_every_frame"):
 		current_tool.update_every_frame()
 	var left_mouse_cursor_visible : bool = false

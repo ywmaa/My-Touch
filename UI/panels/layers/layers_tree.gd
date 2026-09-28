@@ -19,6 +19,96 @@ signal selection_changed(new_selected)
 func _ready():
 	set_column_expand(1, false)
 	set_column_custom_minimum_width(1, 30)
+	drop_mode_flags = DROP_MODE_ON_ITEM | DROP_MODE_INBETWEEN # Also used by the touch reorder
+	set_process(false) # Only while waiting for a long press
+
+# Touch reorder. Godot's drag & drop only starts with the left button, but on Android a
+# long press becomes a right click (enable_long_press_as_right_click), and a quick drag scrolls
+# the tree. So a long press (the right click, or holding still) starts a reorder that follows
+# the finger and drops on release.
+const TOUCH_HOLD_TIME_MS := 450
+const TOUCH_MOVE_TOLERANCE := 12.0
+var _touch_hold_pending : bool = false
+var _touch_press_position : Vector2
+var _touch_press_time : int
+var _touch_reorder : bool = false
+var _touch_dragged : Array[base_layer] = []
+var _touch_position : Vector2
+
+func _gui_input(event : InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT and event.device == InputEvent.DEVICE_ID_EMULATION:
+			_touch_hold_pending = true
+			_touch_press_position = event.position
+			_touch_press_time = Time.get_ticks_msec()
+			set_process(true)
+		elif event.pressed and event.button_index == MOUSE_BUTTON_RIGHT and (event.device == InputEvent.DEVICE_ID_EMULATION or DisplayServer.is_touchscreen_available()):
+			_start_touch_reorder(event.position) # Long press on Android
+			accept_event()
+		elif !event.pressed:
+			_touch_hold_pending = false
+			if _touch_reorder:
+				_finish_touch_reorder(event.position)
+				accept_event()
+	elif event is InputEventMouseMotion:
+		if _touch_reorder:
+			_touch_position = event.position
+			queue_redraw()
+			accept_event() # Don't scroll the tree meanwhile
+		elif _touch_hold_pending and event.position.distance_to(_touch_press_position) > TOUCH_MOVE_TOLERANCE:
+			_touch_hold_pending = false # Moved: it's a scroll
+
+func _process(_delta : float) -> void:
+	if !_touch_hold_pending:
+		set_process(false)
+	elif Time.get_ticks_msec() - _touch_press_time >= TOUCH_HOLD_TIME_MS:
+		_touch_hold_pending = false
+		_start_touch_reorder(_touch_press_position)
+
+func _start_touch_reorder(at_position : Vector2) -> void:
+	var item : TreeItem = get_item_at_position(at_position)
+	if item == null or editing or layers == null:
+		return
+	_touch_hold_pending = false
+	_touch_dragged = _dragged_layers_for(item)
+	_touch_reorder = true
+	_touch_position = at_position
+	Input.vibrate_handheld(30)
+	queue_redraw()
+
+func _finish_touch_reorder(at_position : Vector2) -> void:
+	_touch_reorder = false
+	var target := _get_drop_target(at_position)
+	if _is_valid_drop(_touch_dragged, target):
+		move_layers_to(_touch_dragged, target)
+		_on_layers_changed()
+	_touch_dragged = []
+	queue_redraw()
+
+func _draw() -> void:
+	if !_touch_reorder:
+		return
+	var color : Color = ToolsManager.active_layer_color
+	var target := _get_drop_target(_touch_position)
+	var item : TreeItem = get_item_at_position(_touch_position)
+	if !_is_valid_drop(_touch_dragged, target):
+		color = Color(0.9, 0.2, 0.2)
+	# Where it will land: a box around the new parent, or a line between layers
+	if item:
+		var rect := get_item_area_rect(item)
+		rect.position.y -= get_scroll().y
+		match get_drop_section_at_position(_touch_position):
+			0: draw_rect(rect, color, false, 2.0)
+			-1: draw_line(rect.position, Vector2(rect.end.x, rect.position.y), color, 3.0)
+			1: draw_line(Vector2(rect.position.x, rect.end.y), rect.end, color, 3.0)
+	# The dragged layer name next to the finger
+	var font := get_theme_font("font")
+	var font_size := get_theme_font_size("font_size")
+	var text := _drag_label(_touch_dragged)
+	var text_position := _touch_position + Vector2(24, -24)
+	var text_size := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
+	draw_rect(Rect2(text_position - Vector2(6, text_size.y), text_size + Vector2(12, 8)), Color(0, 0, 0, 0.7))
+	draw_string(font, text_position, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
 
 func _make_custom_tooltip(for_text):
 	if for_text == "":
@@ -61,28 +151,37 @@ func _get_drag_data(at_position : Vector2):
 	var item : TreeItem = get_item_at_position(at_position)
 	if item == null or editing:
 		return null
+	var dragged := _dragged_layers_for(item)
+	var label := Label.new()
+	label.text = _drag_label(dragged)
+	set_drag_preview(label)
+	return { "type": DRAG_TYPE, "layers": dragged }
+
+## Dragging a selected layer drags the whole selection (in tree order, skipping layers whose
+## parent is dragged too), otherwise just that layer.
+func _dragged_layers_for(item : TreeItem) -> Array[base_layer]:
 	var dragged : Array[base_layer] = []
 	var item_layer : base_layer = item.get_meta("layer")
 	if layers and layers.selected_layers.has(item_layer):
-		# Drag the whole selection, keeping tree order, skipping layers whose parent is dragged too
 		for selected in _layers_in_tree_order():
 			if layers.selected_layers.has(selected) and !_has_dragged_ancestor(selected, layers.selected_layers):
 				dragged.append(selected)
 	else:
 		dragged.append(item_layer)
-	var label := Label.new()
-	label.text = dragged[0].name if dragged.size() == 1 else "%d layers" % dragged.size()
-	set_drag_preview(label)
-	return { "type": DRAG_TYPE, "layers": dragged }
+	return dragged
+
+func _drag_label(dragged : Array) -> String:
+	return dragged[0].name if dragged.size() == 1 else "%d layers" % dragged.size()
 
 func _can_drop_data(at_position : Vector2, data) -> bool:
 	if !(data is Dictionary) or data.get("type") != DRAG_TYPE or layers == null:
 		return false
-	drop_mode_flags = DROP_MODE_ON_ITEM | DROP_MODE_INBETWEEN
-	var target := _get_drop_target(at_position)
+	return _is_valid_drop(data.layers, _get_drop_target(at_position))
+
+func _is_valid_drop(dragged : Array, target : Dictionary) -> bool:
 	if target.is_empty():
 		return false
-	for layer in data.layers:
+	for layer in dragged:
 		# Can't move a layer into itself or its own children
 		if target.parent != null and layers.is_ancestor_of(layer, target.parent):
 			return false
