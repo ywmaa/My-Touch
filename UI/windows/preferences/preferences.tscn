@@ -78,6 +78,11 @@ layout_mode = 2
 text = "Use Drawer for quick tool access"
 config_variable = "use_drawer"
 
+[node name="UseNativeFileDialog" parent="VBoxContainer/TabContainer/General" instance=ExtResource("1")]
+layout_mode = 2
+text = "Use the system file browser"
+config_variable = "use_native_file_dialog"
+
 [node name="Space3" type="Control" parent="VBoxContainer/TabContainer/General"]
 layout_mode = 2
 

@@ -10,11 +10,22 @@ var android_native : bool = false
 signal return_paths(path_list)
 
 func _enter_tree() -> void:
-	if MTStorage.is_android():
+	if MTStorage.is_android() and !use_system_file_browser():
 		# Only the app's own storage is browsable in-app, anything else goes through the system picker.
 		root_subfolder = MTStorage.app_root_dir()
 
+## Preference "Use the system file browser", when the platform supports it.
+static func use_system_file_browser() -> bool:
+	return mt_globals.get_config("use_native_file_dialog") and DisplayServer.has_feature(DisplayServer.FEATURE_NATIVE_DIALOG_FILE)
+
 func _ready() -> void:
+	canceled.connect(_on_FileDialog_popup_hide)
+	if use_system_file_browser():
+		# Switching to native while visible opens the system browser right away,
+		# select_files() opens it again, so make sure it's hidden first.
+		hide()
+		use_native_dialog = true
+		return
 	if MTStorage.is_android():
 		if file_mode != FILE_MODE_OPEN_DIR:
 			add_button("Other Folder…", false, "other_folder")
@@ -73,6 +84,11 @@ func select_files() -> Array:
 		var files := await MTStorage.pick_files(filters, file_mode == FILE_MODE_OPEN_FILES)
 		queue_free()
 		return Array(files)
+	if MTStorage.is_android() and use_system_file_browser() and _is_project_dialog():
+		# A project's data folder sits next to it, a single picked file isn't enough on Android.
+		var result := await _pick_outside_app_folder()
+		queue_free()
+		return result
 	popup_centered()
 	var result = await return_paths
 	queue_free()
@@ -88,9 +104,12 @@ func _on_custom_action(action: StringName) -> void:
 	if action != "other_folder":
 		return
 	hide()
+	emit_signal("return_paths", await _pick_outside_app_folder())
+
+func _pick_outside_app_folder() -> Array:
 	match file_mode:
 		FILE_MODE_SAVE_FILE:
-			var file_name := MTStorage.sanitize_file_name(get_line_edit().text)
+			var file_name := MTStorage.sanitize_file_name(get_line_edit().text if get_line_edit().text != "" else current_file)
 			if file_name == "":
 				file_name = "unnamed"
 			var ext := _first_filter_extension()
@@ -98,16 +117,15 @@ func _on_custom_action(action: StringName) -> void:
 				file_name += ext
 			var folder := await MTStorage.pick_folder()
 			if folder == "":
-				emit_signal("return_paths", [ ])
-				return
-			emit_signal("return_paths", [ MTStorage.join(folder, file_name) ])
+				return []
+			return [ MTStorage.join(folder, file_name) ]
 		_:
 			var files : PackedStringArray
 			if _is_project_dialog():
 				files = await MTStorage.pick_project_files(file_mode == FILE_MODE_OPEN_FILES)
 			else:
 				files = await MTStorage.pick_files(filters, file_mode == FILE_MODE_OPEN_FILES)
-			emit_signal("return_paths", Array(files))
+			return Array(files)
 
 # ".mt.tres" from "*.mt.tres;My Touch text files"
 func _first_filter_extension() -> String:
