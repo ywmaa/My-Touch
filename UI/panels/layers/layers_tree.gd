@@ -58,12 +58,42 @@ func _gui_input(event : InputEvent) -> void:
 		elif _touch_hold_pending and event.position.distance_to(_touch_press_position) > TOUCH_MOVE_TOLERANCE:
 			_touch_hold_pending = false # Moved: it's a scroll
 
-func _process(_delta : float) -> void:
-	if !_touch_hold_pending:
+func _process(delta : float) -> void:
+	if _touch_reorder:
+		_auto_scroll(delta)
+	elif !_touch_hold_pending:
 		set_process(false)
 	elif Time.get_ticks_msec() - _touch_press_time >= TOUCH_HOLD_TIME_MS:
 		_touch_hold_pending = false
 		_start_touch_reorder(_touch_press_position)
+
+## Touch reorder near the top/bottom edge scrolls the list, faster closer to the edge.
+const AUTO_SCROLL_MARGIN := 48.0
+const AUTO_SCROLL_SPEED := 900.0 # Pixels per second at the very edge
+
+func _auto_scroll(delta : float) -> void:
+	var scroll_bar := _get_v_scroll_bar()
+	if scroll_bar == null or !scroll_bar.visible:
+		return # Everything fits, nothing to scroll
+	var margin : float = min(AUTO_SCROLL_MARGIN, size.y * 0.25)
+	var direction := 0.0
+	if _touch_position.y < margin:
+		direction = -(margin - _touch_position.y) / margin
+	elif _touch_position.y > size.y - margin:
+		direction = (_touch_position.y - (size.y - margin)) / margin
+	if direction == 0.0:
+		return
+	var previous : float = scroll_bar.value
+	scroll_bar.value += clampf(direction, -1.0, 1.0) * AUTO_SCROLL_SPEED * delta
+	if scroll_bar.value != previous:
+		queue_redraw() # The row under the finger changed
+
+## Tree has no API to set its scroll, its scroll bar is an internal child.
+func _get_v_scroll_bar() -> VScrollBar:
+	for child in get_children(true):
+		if child is VScrollBar:
+			return child
+	return null
 
 func _start_touch_reorder(at_position : Vector2) -> void:
 	var item : TreeItem = get_item_at_position(at_position)
@@ -73,6 +103,7 @@ func _start_touch_reorder(at_position : Vector2) -> void:
 	_touch_dragged = _dragged_layers_for(item)
 	_touch_reorder = true
 	_touch_position = at_position
+	set_process(true) # Auto scroll near the edges
 	Input.vibrate_handheld(30)
 	queue_redraw()
 
