@@ -74,7 +74,7 @@ const MENU = [
 	{ menu="View/Default Layout", command="default_mode_switch", shortcut="" },
 	{ menu="View/User Layout", command="user_mode_switch", shortcut="" },
 	{ menu="View/-" },
-	{ menu="View/New floating window", command="new_window", web_disabled=true }, # Browsers can't open separate windows
+	{ menu="View/New floating window", command="new_window", needs_subwindows=true }, # Not on web/Android/iOS: no separate windows
 	{ menu="View/New dockable window", command="new_dock_window" },
 	{ menu="View/Fullscreen", command="fullscreen", shortcut="F11"},
 
@@ -407,9 +407,23 @@ func _notification(what : int) -> void:
 			# Return to the normal FPS limit when the window is focused.
 # warning-ignore:narrowing_conversion
 			OS.low_processor_usage_mode_sleep_usec = (1.0 / clamp(mt_globals.get_config("fps_limit"), FPS_LIMIT_MIN, FPS_LIMIT_MAX)) * 1_000_000
+		MainLoop.NOTIFICATION_APPLICATION_RESUMED:
+			refresh_after_resume()
 		1006: # NOTIFICATION_WM_QUIT_REQUEST
 			await get_tree().process_frame
 			quit()
+
+## Coming back to the app (e.g. from the Android file/folder picker): the drawing surface is
+## recreated, but low processor mode only redraws on changes, which can leave a black screen.
+## Draw continuously for a moment, and drop an on-screen keyboard that no text field asked for.
+const RESUME_REDRAW_TIME := 1.0
+func refresh_after_resume() -> void:
+	OS.low_processor_usage_mode = false
+	get_tree().create_timer(RESUME_REDRAW_TIME).timeout.connect(func():
+		OS.low_processor_usage_mode = ProjectSettings.get_setting("application/run/low_processor_mode", true))
+	var focus_owner := get_viewport().gui_get_focus_owner()
+	if !(focus_owner is LineEdit or focus_owner is TextEdit):
+		DisplayServer.virtual_keyboard_hide()
 
 # -----------------------------------------------------------------------
 #                             File menu
@@ -817,7 +831,7 @@ func user_mode_switch() -> void:
 
 var window_packed_scene = preload("res://UI/windows/undocked_window/undocked_window.tscn")
 func new_window():
-	if OS.get_name() == "Web": # Separate windows aren't supported, and would break all popups
+	if !DisplayServer.has_feature(DisplayServer.FEATURE_SUBWINDOWS): # Web/Android/iOS: no separate windows, and it would break all popups
 		return
 	get_viewport().gui_embed_subwindows = false
 	var window : Window = window_packed_scene.instantiate()

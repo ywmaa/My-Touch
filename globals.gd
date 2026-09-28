@@ -68,6 +68,24 @@ func _enter_tree():
 func _exit_tree():
 	config.save("user://cache.ini")
 
+## Saves the config now-ish (once per frame at most). Mobile apps are often killed without
+## a clean exit, so settings must not wait for _exit_tree.
+var _save_queued : bool = false
+func save_config() -> void:
+	if _save_queued:
+		return
+	_save_queued = true
+	_do_save_config.call_deferred()
+
+func _do_save_config() -> void:
+	_save_queued = false
+	config.save("user://cache.ini")
+
+func _notification(what: int) -> void:
+	match what:
+		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_WM_CLOSE_REQUEST:
+			config.save("user://cache.ini") # Also keeps window size, recent folders... set elsewhere
+
 func _ready():
 	pass # Replace with function body.
 
@@ -82,3 +100,4 @@ func get_config(key : String):
 
 func set_config(key : String, value):
 	config.set_value("config", key, value)
+	save_config()

@@ -157,21 +157,11 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 8
 
-[node name="Apply" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="Close" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
-text = "Apply"
-
-[node name="OK" type="Button" parent="VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "OK"
-
-[node name="Cancel" type="Button" parent="VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "Cancel"
+text = "Close"
 
 [connection signal="about_to_popup" from="." to="." method="_on_Preferences_about_to_show"]
 [connection signal="popup_hide" from="." to="." method="queue_free"]
 [connection signal="minimum_size_changed" from="VBoxContainer" to="." method="_on_VBoxContainer_minimum_size_changed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/Apply" to="." method="_on_Apply_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/OK" to="." method="_on_OK_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/Cancel" to="." method="_on_Cancel_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Close" to="." method="queue_free"]

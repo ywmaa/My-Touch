@@ -17,25 +17,46 @@ func update_controls(p : Node) -> void:
 	for c in p.get_children():
 		if c.has_method("init_from_config"):
 			c.init_from_config(config)
+			_connect_option(c)
 		update_controls(c)
+
+## Every option applies and saves as soon as it changes, no Apply/OK needed.
+func _connect_option(option : Node) -> void:
+	var callback := _on_option_changed.bind(option).unbind(1)
+	if option is BaseButton and option.toggle_mode and !option.toggled.is_connected(callback):
+		option.toggled.connect(callback)
+	elif option is OptionButton and !option.item_selected.is_connected(callback):
+		option.item_selected.connect(callback)
+	elif option is Range and !option.value_changed.is_connected(callback):
+		option.value_changed.connect(callback)
+
+# Options waiting to be applied (number sliders apply once released)
+var _pending_options : Array[Node] = []
+
+func _on_option_changed(option : Node) -> void:
+	if !_pending_options.has(option):
+		_pending_options.append(option)
+	set_process(true)
+
+func _process(_delta : float) -> void:
+	if _pending_options.is_empty():
+		set_process(false)
+		return
+	for option in _pending_options:
+		if "sliding" in option and option.sliding:
+			return # Rescaling the UI under the finger while dragging would make the value jump
+	for option in _pending_options:
+		option.update_config(config)
+	_pending_options.clear()
+	set_process(false)
+	emit_signal("config_changed")
+	mt_globals.save_config()
 
 func update_config(p : Node) -> void:
 	for c in p.get_children():
 		if c.has_method("update_config"):
 			c.update_config(config)
 		update_config(c)
-
-func _on_Apply_pressed():
-	update_config($VBoxContainer/TabContainer/General)
-	emit_signal("config_changed")
-
-func _on_OK_pressed():
-	update_config($VBoxContainer/TabContainer/General)
-	emit_signal("config_changed")
-	queue_free()
-
-func _on_Cancel_pressed():
-	queue_free()
 
 
 func _on_Preferences_about_to_show():
