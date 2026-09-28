@@ -1,7 +1,7 @@
 extends Resource
 class_name base_layer
 
-enum LAYER_TYPE {BRUSH, IMAGE, PROJECT, MASK, TEXT, LIGHT, POST_PROCESS, BASE}
+enum LAYER_TYPE {BRUSH, IMAGE, PROJECT, MASK, TEXT, LIGHT, POST_PROCESS, BASE, GRADIENT} # Only append, saved projects store the index
 
 var parent_project : Project:
 	set(v):

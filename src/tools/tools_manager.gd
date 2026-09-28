@@ -98,6 +98,9 @@ func _process(_delta):
 	current_project = ProjectsManager.current_project
 	if !current_project:
 		return
+	# Per-frame work that doesn't depend on the mouse being over the canvas
+	if current_tool and current_tool.has_method("update_every_frame"):
+		current_tool.update_every_frame()
 	var left_mouse_cursor_visible : bool = false
 	for c in active_canvas.values():
 		if c == true:

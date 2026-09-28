@@ -210,15 +210,23 @@ func create_add_context_menu(pos: Vector2 = get_global_mouse_position()):
 	context_menu.add_item("Import Image")
 	context_menu.add_item("Load Project As Image")
 	context_menu.add_separator()
-	context_menu.add_item("Brush Layer")
+	context_menu.add_item("Brush Layer", 3)
+	context_menu.add_item("Gradient Layer", 7)
 	context_menu.add_separator()
-	context_menu.add_item("Text Layer")
-	context_menu.add_item("Selection Layer")
-	
-	
-	context_menu.connect("id_pressed",add_context_menu_item_pressed)
+	context_menu.add_item("Text Layer", 5)
+	context_menu.add_item("Selection Layer", 6)
+
+	_use_context_menu_handler(add_context_menu_item_pressed)
 	context_menu.position = pos
 	context_menu.visible = true
+
+## The layer and resource menus share one PopupMenu, only one handler may be connected.
+func _use_context_menu_handler(handler: Callable):
+	for other in [add_context_menu_item_pressed, add_resource_context_menu_item_pressed]:
+		if other != handler and context_menu.id_pressed.is_connected(other):
+			context_menu.id_pressed.disconnect(other)
+	if !context_menu.id_pressed.is_connected(handler):
+		context_menu.id_pressed.connect(handler)
 
 func add_context_menu_item_pressed(id: int):
 	match id:
@@ -248,12 +256,16 @@ func add_context_menu_item_pressed(id: int):
 			selection_layer.new().init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.current_project)
 			#var new_selection_layer = selection_layer.new()
 			#new_selection_layer.init(ProjectsManager.current_project.layers_container.get_unused_layer_name(),ProjectsManager.default_icon, ProjectsManager.current_project, base_layer.layer_type.mask)
+		7: #gradient layer
+			if !ProjectsManager.current_project:
+				return
+			gradient_layer.new().init(ProjectsManager.current_project.layers_container.get_unused_layer_name(), ProjectsManager.current_project)
 
 func create_add_resource_context_menu(pos: Vector2 = get_global_mouse_position()):
 	context_menu.clear()
 	context_menu.add_item("New Custom Brush")
 	
-	context_menu.connect("id_pressed",add_resource_context_menu_item_pressed)
+	_use_context_menu_handler(add_resource_context_menu_item_pressed)
 	context_menu.position = pos
 	context_menu.visible = true
 

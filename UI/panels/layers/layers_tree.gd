@@ -8,7 +8,8 @@ var editing : bool = false
 const ICON_LAYER_PAINT = preload("res://UI/panels/layers/icons/layer_paint.tres")
 const ICON_LAYER_PROC = preload("res://UI/panels/layers/icons/layer_proc.tres")
 const ICON_LAYER_MASK = preload("res://UI/panels/layers/icons/layer_mask.tres")
-const ICONS = [ ICON_LAYER_PAINT, ICON_LAYER_PROC, ICON_LAYER_PROC, ICON_LAYER_MASK, ICON_LAYER_PROC]
+# Indexed by base_layer.LAYER_TYPE
+const ICONS = [ ICON_LAYER_PAINT, ICON_LAYER_PROC, ICON_LAYER_PROC, ICON_LAYER_MASK, ICON_LAYER_PROC, ICON_LAYER_PROC, ICON_LAYER_PROC, ICON_LAYER_PROC, ICON_LAYER_PAINT ]
 
 var BUTTON_SHOWN = preload("res://UI/panels/layers/icons/visible.tres")
 var BUTTON_HIDDEN = preload("res://UI/panels/layers/icons/not_visible.tres")
