@@ -22,20 +22,31 @@ var _dragging := false
 
 func _draw() -> void:
 	var theme_class := SPLIT_THEME_CLASS[layout_split.direction]
+	if _dragging:
+		draw_rect(Rect2(Vector2.ZERO, size), Color(1, 1, 1, 0.15))
 	var icon := get_theme_icon("grabber", theme_class)
 	var autohide := bool(get_theme_constant("autohide", theme_class))
-	if not icon or (autohide and not _mouse_hovering):
+	# Touch screens have no hover, so always show where to grab
+	if not icon or (autohide and not _mouse_hovering and not _dragging and not DisplayServer.is_touchscreen_available()):
 		return
 
 	draw_texture(icon, (size - icon.get_size()) * 0.5)
 
 
 func _gui_input(event: InputEvent) -> void:
-	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and OS.get_name() != "Android" and OS.get_name() != "iOS") or event is InputEventScreenTouch:
+	# Touch is emulated as the left mouse button, so this handles fingers too: the press
+	# captures the drag and the following motion events come here until release.
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_dragging = event.is_pressed()
+		queue_redraw()
 		if event.double_click:
 			layout_split.percent = 0.5
-	elif _dragging and (event is InputEventMouseMotion or event is InputEventScreenTouch):
+		accept_event()
+	elif _dragging and event is InputEventMouseMotion:
+		if not (event.button_mask & MOUSE_BUTTON_MASK_LEFT):
+			_stop_dragging() # Released without us seeing it
+			return
+		accept_event()
 		var mouse_in_parent := get_parent_control().get_local_mouse_position()
 		if layout_split.is_horizontal():
 			layout_split.percent = (
@@ -45,6 +56,17 @@ func _gui_input(event: InputEvent) -> void:
 			layout_split.percent = (
 				(mouse_in_parent.y - _parent_rect.position.y) / _parent_rect.size.y
 			)
+
+
+## A release anywhere ends the resize, even if it didn't reach this handle.
+func _input(event: InputEvent) -> void:
+	if _dragging and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.is_pressed():
+		_stop_dragging()
+
+
+func _stop_dragging() -> void:
+	_dragging = false
+	queue_redraw()
 
 
 func _notification(what: int) -> void:

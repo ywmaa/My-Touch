@@ -136,6 +136,10 @@ func _ready():
 			add_theme_constant_override("margin_right",right)
 			add_theme_constant_override("margin_bottom",bottom)
 
+	## Wider gaps between docked panels on phones, so fingers can grab them to resize
+	if OS.get_name() == "Android" || OS.get_name() == "iOS":
+		layout.theme = get_touch_layout_theme()
+
 	set_physics_process(false)
 	get_tree().set_auto_accept_quit(false)
 	
@@ -202,6 +206,15 @@ func _ready():
 			default_mode_switch()
 	await get_tree().process_frame
 	start_screen()
+
+const TOUCH_SPLIT_SEPARATION := 24
+
+## Only overrides the split separation, everything else still comes from the app theme.
+func get_touch_layout_theme() -> Theme:
+	var touch_theme := Theme.new()
+	for split_class in ["HSplitContainer", "VSplitContainer"]:
+		touch_theme.set_constant("separation", split_class, TOUCH_SPLIT_SEPARATION)
+	return touch_theme
 
 var context_menu : PopupMenu = PopupMenu.new()
 
