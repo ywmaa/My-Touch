@@ -33,3 +33,8 @@ func get_copy(_name: String = "copy"):
 	for k in get_inspector_properties()[1].keys(): # Copy Properties
 		layer.set(k, get(k))
 	return layer
+
+func get_local_bounds() -> Rect2:
+	if project:
+		return Rect2(Vector2.ZERO, project.canvas_size)
+	return Rect2()

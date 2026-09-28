@@ -169,3 +169,12 @@ func remove_child_index(index:int):
 
 func get_rect() -> Rect2:
 	return Rect2(position-(size*scale)/2, size*scale)
+
+## Bounds in the canvas node's own space (before its position/rotation/scale),
+## used to draw the selection outline. Empty when the layer has no visible area.
+func get_local_bounds() -> Rect2:
+	if main_object is Sprite2D:
+		return (main_object as Sprite2D).get_rect()
+	if main_object is Control:
+		return Rect2(Vector2.ZERO, (main_object as Control).size)
+	return Rect2()

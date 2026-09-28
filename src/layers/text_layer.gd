@@ -49,6 +49,9 @@ func get_copy(_name: String = "copy"):
 		layer.set(k, get(k))
 	return layer
 
+func get_local_bounds() -> Rect2:
+	return Rect2(Vector2.ZERO, Vector2(text_label.get_content_width(), text_label.get_content_height()))
+
 func get_rect() -> Rect2:
 	var text_size = Vector2(text_label.get_content_width(),text_label.get_content_height())
 	return Rect2(position,text_size*scale)

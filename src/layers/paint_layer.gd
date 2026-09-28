@@ -63,6 +63,24 @@ func get_copy(_name: String = "copy"):
 	return layer
 func get_rect() -> Rect2:
 	return Rect2()
+
+## Area covered by the strokes (gradients cover the whole canvas).
+func get_local_bounds() -> Rect2:
+	var bounds := Rect2()
+	var has_bounds := false
+	for stroke in strokes:
+		if stroke.type == Stroke.TYPE.GRADIANT:
+			if parent_project:
+				return Rect2(Vector2.ZERO, parent_project.canvas_size)
+			continue
+		if stroke.mode == Stroke.MODE.ERASE:
+			continue
+		var half := stroke.size * 0.5
+		for point in stroke.points:
+			var point_rect := Rect2(point - Vector2(half, half), Vector2(stroke.size, stroke.size))
+			bounds = point_rect if !has_bounds else bounds.merge(point_rect)
+			has_bounds = true
+	return bounds
 ##	var graph : MTGraph = mt_globals.main_window.get_current_graph_edit()
 #	var camera = graph.camera
 #	var canvas_position : Vector2 = graph.size/2-camera.offset*(camera.zoom)

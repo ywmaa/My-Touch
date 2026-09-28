@@ -12,7 +12,33 @@ func _process(delta):
 	ToolsManager.previous_mouse_position = get_local_mouse_position()
 	
 func _draw():
+	draw_selection_highlight()
 	ToolsManager.call_thread_safe("draw_preview", self, get_local_mouse_position())
+
+## Outlines the selected layers. Drawn on the preview only, so it never shows up in exports.
+func draw_selection_highlight():
+	if !ProjectsManager.current_project:
+		return
+	var screen_scale := get_global_transform_with_canvas().get_scale().x
+	var pixel := 1.0 / screen_scale if screen_scale > 0.0 else 1.0 # One screen pixel, in canvas pixels
+	for layer in ProjectsManager.current_project.layers_container.selected_layers:
+		var node := layer.main_object as CanvasItem
+		if node == null or !node.is_inside_tree() or !node.is_visible_in_tree():
+			continue
+		var bounds : Rect2 = layer.get_local_bounds()
+		if bounds.size == Vector2.ZERO:
+			continue
+		# Through the node's transform so rotated/scaled/parented layers are outlined exactly
+		var xform := node.get_global_transform_with_canvas()
+		var corners := PackedVector2Array([
+			xform * bounds.position,
+			xform * Vector2(bounds.end.x, bounds.position.y),
+			xform * bounds.end,
+			xform * Vector2(bounds.position.x, bounds.end.y),
+			xform * bounds.position,
+		])
+		draw_polyline(corners, Color(0, 0, 0, 0.6), 3.0 * pixel)
+		draw_polyline(corners, ToolsManager.selected_tool_color, 1.5 * pixel)
 
 func pass_event_to_tool(event) -> bool:
 	# Touch jumps the pointer on press, update the position now instead of waiting for _process.
