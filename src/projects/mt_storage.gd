@@ -139,6 +139,22 @@ static func image_file_name(path: String) -> String:
 		ext = "bmp"
 	return file_name + "." + ext
 
+## Loads an image from any path, including SAF URIs without an extension.
+static func load_image(path: String) -> Image:
+	var data := FileAccess.get_file_as_bytes(path)
+	if data.is_empty():
+		return null
+	var image := Image.new()
+	var error : Error
+	match image_file_name(path).get_extension().to_lower():
+		"jpg", "jpeg": error = image.load_jpg_from_buffer(data)
+		"webp": error = image.load_webp_from_buffer(data)
+		"svg": error = image.load_svg_from_buffer(data)
+		"tga": error = image.load_tga_from_buffer(data)
+		"bmp": error = image.load_bmp_from_buffer(data)
+		_: error = image.load_png_from_buffer(data)
+	return image if error == OK else null
+
 static func _saf_cache_path(path: String) -> String:
 	DirAccess.make_dir_recursive_absolute("user://saf_cache")
 	return "user://saf_cache/%d.%s" % [path.hash(), path.get_extension()]

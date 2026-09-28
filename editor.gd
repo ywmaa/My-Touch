@@ -826,10 +826,14 @@ func import_image() -> void:
 	add_child(dialog)
 	var files = await dialog.select_files()
 	if files.size() > 0:
-		on_files_dropped(files)
+		open_files(files)
 
 #Handle dropped files
 func on_files_dropped(files : PackedStringArray) -> void:
+	# Images dropped on the project tabs open as new projects instead of layers.
+	open_files(files, $VBoxContainer/ProjectTabs.get_global_rect().has_point(get_drop_position()))
+
+func open_files(files : PackedStringArray, as_new_projects : bool = false) -> void:
 	for f in files:
 		var extension : String
 		if MTStorage.is_saf(f):
@@ -846,7 +850,16 @@ func on_files_dropped(files : PackedStringArray) -> void:
 			"tres":
 				do_load_project(f)
 			"jpg", "jpeg", "png", "svg", "webp":
-				ProjectsManager.on_import_image_file(f)
+				if as_new_projects:
+					ProjectsManager.new_project_from_image(f)
+				else:
+					ProjectsManager.on_import_image_file(f)
+
+## Where files were dropped, in this window's canvas coordinates.
+## Asks the OS for the pointer since the window may not get mouse motion during a drag.
+func get_drop_position() -> Vector2:
+	var window_pos := Vector2(DisplayServer.mouse_get_position() - get_window().position)
+	return get_viewport().get_canvas_transform().affine_inverse() * (window_pos / get_tree().root.content_scale_factor)
 
 ## Disconnects the collapsible tween_completed signal to continous_completed
 ## making the continous opening/closing toggle stop.

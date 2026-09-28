@@ -14,21 +14,22 @@ var current_project : Project:
 var clipboard_file_path = "user://my_touch_clipboard.res"
 var default_icon = "res://icon512.png"
 
-func new_project() -> void:
+func new_project(canvas_size: Vector2 = Vector2(mt_globals.default_width,mt_globals.default_height), add_default_layer: bool = true, project_name: String = "unnamed") -> void:
 #	center_view()
 	var new_project = Project.new()
-	new_project.canvas_size = Vector2(mt_globals.default_width,mt_globals.default_height)
+	new_project.canvas_size = canvas_size
 	new_project.layers_container = layers_manager.new()
 	new_project.resources_container = resources_manager.new()
 	projects.append(new_project)
-	new_project.save_path = project_get_unused_save_path()
+	new_project.save_path = project_get_unused_save_path(project_name)
 	#default layer
 	#var new_layer : base_layer = base_layer.new()
 	var new_image_path : String = new_project.project_folder_abs_path + "/" + default_icon.get_file()
 	var texture : Texture2D = load(default_icon)
 	texture.get_image().save_png(new_image_path)
 	#DirAccess.copy_absolute(default_icon, new_image_path)
-	image_layer.new().init(new_project.layers_container.get_unused_layer_name(), default_icon.get_file(), new_project)
+	if add_default_layer:
+		image_layer.new().init(new_project.layers_container.get_unused_layer_name(), default_icon.get_file(), new_project)
 	#new_layer.init(new_project.layers_container.get_unused_layer_name(), default_icon.get_file(), new_project ,base_layer.layer_type.image)
 	brush_texture_resource.new().init("default brush texture", "default", default_icon.get_file(), new_project)
 	current_project = new_project
@@ -70,8 +71,20 @@ func copy_png_raw(res_path: String, dest_path: String) -> bool:
 	output.close()
 	return true
 
-func project_get_unused_save_path() -> String:
-	var naming = "unnamed"
+## Creates a new project sized to the image, with the image filling the canvas.
+func new_project_from_image(path: String) -> bool:
+	var image := MTStorage.load_image(path)
+	if image == null or image.is_empty():
+		return false
+	var file_name := MTStorage.image_file_name(path)
+	new_project(Vector2(image.get_size()), false, MTStorage.sanitize_file_name(file_name.get_basename()))
+	MTStorage.copy_file(path, current_project.project_folder_abs_path + "/" + file_name)
+	var layer := image_layer.new()
+	layer.init(file_name.get_basename(), file_name, current_project)
+	layer.position = current_project.canvas_size / 2 # Sprites are centered
+	return true
+
+func project_get_unused_save_path(naming: String = "unnamed") -> String:
 	var return_name : String
 	var count = 0
 	return_name = naming
