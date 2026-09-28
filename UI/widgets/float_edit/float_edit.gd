@@ -53,6 +53,12 @@ func _set_focusable(focusable: bool) -> void:
 	get_line_edit().focus_mode = mode
 	focus_mode = mode
 
+var touch_keyboard_suppressed : bool = false
+
+func _restore_virtual_keyboard() -> void:
+	touch_keyboard_suppressed = false
+	get_line_edit().virtual_keyboard_enabled = true
+
 ## A deliberate tap: edit the value with the on-screen keyboard.
 func _start_touch_typing() -> void:
 	_set_focusable(true)
@@ -147,6 +153,10 @@ func _input(event : InputEvent) -> void:
 				# doesn't open the keyboard, but still reaches the panel so it can scroll.
 				if !get_line_edit().has_focus():
 					_set_focusable(false)
+				# LineEdit also shows the keyboard on every release it gets, so keep it off until
+				# we know this is a tap (not a slide or a scroll)
+				get_line_edit().virtual_keyboard_enabled = false
+				touch_keyboard_suppressed = true
 				touch_pending = true
 				touch_press_position = event.position
 				return
@@ -158,7 +168,11 @@ func _input(event : InputEvent) -> void:
 		else:
 			if touch_pending and !event.is_pressed():
 				touch_pending = false
+				_restore_virtual_keyboard()
 				_start_touch_typing() # A tap, not a drag
+			elif touch_keyboard_suppressed and !event.is_pressed():
+				# Slide/scroll ended: turn the keyboard back on only after LineEdit got this release
+				_restore_virtual_keyboard.call_deferred()
 			sliding = false
 			editable = true
 			#Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
