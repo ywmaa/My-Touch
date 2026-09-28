@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://8w67718v7rk"]
+[gd_scene format=3 uid="uid://8w67718v7rk"]
 
 [ext_resource type="Script" uid="uid://vdtvbxf4m6wr" path="res://editor.gd" id="1_ix08l"]
 [ext_resource type="Theme" uid="uid://dl7dg81sapu26" path="res://UI/theme/dark.tres" id="1_qcjp6"]
@@ -57,7 +57,7 @@ _data = {
 &"show": SubResource("7")
 }
 
-[node name="Editor" type="MarginContainer" node_paths=PackedStringArray("collapsible")]
+[node name="Editor" type="MarginContainer" unique_id=857202774 node_paths=PackedStringArray("collapsible")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -69,37 +69,37 @@ theme = ExtResource("1_qcjp6")
 script = ExtResource("1_ix08l")
 collapsible = NodePath("CollapsibleContainer")
 
-[node name="BackPanel" type="Panel" parent="."]
+[node name="BackPanel" type="Panel" parent="." unique_id=228762415]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1454840734]
 layout_mode = 2
 
-[node name="AutoSaveTimer" type="Timer" parent="VBoxContainer"]
+[node name="AutoSaveTimer" type="Timer" parent="VBoxContainer" unique_id=1991074745]
 wait_time = 15.0
 autostart = true
 
-[node name="TopBar" type="HBoxContainer" parent="VBoxContainer"]
+[node name="TopBar" type="HBoxContainer" parent="VBoxContainer" unique_id=1182869702]
 custom_minimum_size = Vector2(0, 25)
 layout_mode = 2
 
-[node name="Menu" type="HBoxContainer" parent="VBoxContainer/TopBar"]
+[node name="Menu" type="HBoxContainer" parent="VBoxContainer/TopBar" unique_id=260921091]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VSeparator" type="VSeparator" parent="VBoxContainer/TopBar"]
+[node name="VSeparator" type="VSeparator" parent="VBoxContainer/TopBar" unique_id=1766898339]
 layout_mode = 2
 
-[node name="RenderCounter" parent="VBoxContainer/TopBar" instance=ExtResource("3_dljtu")]
+[node name="RenderCounter" parent="VBoxContainer/TopBar" unique_id=1859639317 instance=ExtResource("3_dljtu")]
 layout_mode = 2
 
-[node name="ProjectTabs" type="Panel" parent="VBoxContainer"]
+[node name="ProjectTabs" type="Panel" parent="VBoxContainer" unique_id=593143946]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 script = ExtResource("4_ejxk4")
 metadata/_edit_layout_mode = 1
 
-[node name="Tabs" type="TabBar" parent="VBoxContainer/ProjectTabs"]
+[node name="Tabs" type="TabBar" parent="VBoxContainer/ProjectTabs" unique_id=1168518755]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -109,36 +109,36 @@ grow_vertical = 2
 tab_close_display_policy = 1
 drag_to_rearrange_enabled = true
 
-[node name="Layout" type="Container" parent="VBoxContainer"]
+[node name="Layout" type="Container" parent="VBoxContainer" unique_id=2024903507]
 layout_mode = 2
 size_flags_vertical = 3
 script = ExtResource("6_jlrni")
 layout = ExtResource("6_upj0v")
 
-[node name="Tool Settings" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
+[node name="Tool Settings" parent="VBoxContainer/Layout" unique_id=874234470 instance=ExtResource("7_8bflp")]
 visible = false
 layout_mode = 2
 init_window = 3
 
-[node name="Project Settings" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
+[node name="Project Settings" parent="VBoxContainer/Layout" unique_id=1409048136 instance=ExtResource("7_8bflp")]
 visible = false
 layout_mode = 2
 init_window = 4
 
-[node name="Graph" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
+[node name="Graph" parent="VBoxContainer/Layout" unique_id=458226342 instance=ExtResource("7_8bflp")]
 layout_mode = 2
 init_window = 2
 
-[node name="Layers Panel" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
+[node name="Layers Panel" parent="VBoxContainer/Layout" unique_id=960667069 instance=ExtResource("7_8bflp")]
 visible = false
 layout_mode = 2
 
-[node name="Layer Inspector" parent="VBoxContainer/Layout" instance=ExtResource("7_8bflp")]
+[node name="Layer Inspector" parent="VBoxContainer/Layout" unique_id=1318051886 instance=ExtResource("7_8bflp")]
 visible = false
 layout_mode = 2
 init_window = 1
 
-[node name="MessageLabel" type="Label" parent="."]
+[node name="MessageLabel" type="Label" parent="." unique_id=1549721298]
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -146,19 +146,19 @@ size_flags_vertical = 0
 text = "Undo/Redo action added"
 script = SubResource("6")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="MessageLabel"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MessageLabel" unique_id=1967315447]
 libraries = {
 &"": SubResource("AnimationLibrary_21bw6")
 }
 
-[node name="CollapsibleContainer" type="Control" parent="."]
+[node name="CollapsibleContainer" type="Control" parent="." unique_id=378405300]
 process_mode = 3
 editor_description = "
 			A custom/plugin Control node capable of hiding and revealing its children by folding and unfolding.
 			
 Give feedback at: https://github.com/ArshvirGoraya/Godot-Collapsible-Container"
-clip_contents = true
 custom_minimum_size = Vector2(1280, 500)
+clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 8
@@ -173,14 +173,14 @@ custom_open_size = Vector2(1280, 500)
 tween_duration_sec = 0.2
 tween_transition_type = 5
 
-[node name="Tool Settings" parent="CollapsibleContainer" instance=ExtResource("7_8bflp")]
+[node name="Tool Settings" parent="CollapsibleContainer" unique_id=1067882144 instance=ExtResource("7_8bflp")]
 layout_mode = 1
 init_window = 3
 
-[node name="LeftCursor" type="Sprite2D" parent="."]
+[node name="LeftCursor" type="Sprite2D" parent="." unique_id=811409137]
 visible = false
 
-[node name="AppRender" type="SubViewport" parent="."]
+[node name="AppRender" type="SubViewport" parent="." unique_id=1616592954]
 disable_3d = true
 transparent_bg = true
 snap_2d_transforms_to_pixel = true
@@ -188,10 +188,10 @@ snap_2d_vertices_to_pixel = true
 physics_object_picking = true
 render_target_update_mode = 4
 
-[node name="Canvas" type="Node2D" parent="AppRender"]
+[node name="Canvas" type="Node2D" parent="AppRender" unique_id=149823415]
 script = ExtResource("7_kirsr")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="AppRender/Canvas"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="AppRender/Canvas" unique_id=1431475126]
 
 [connection signal="timeout" from="VBoxContainer/AutoSaveTimer" to="VBoxContainer/ProjectTabs" method="_on_auto_save_timer_timeout"]
 [connection signal="active_tab_rearranged" from="VBoxContainer/ProjectTabs/Tabs" to="VBoxContainer/ProjectTabs" method="move_active_tab_to"]

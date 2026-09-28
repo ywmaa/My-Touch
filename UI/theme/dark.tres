@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=125 format=3 uid="uid://dl7dg81sapu26"]
+[gd_resource type="Theme" format=3 uid="uid://dl7dg81sapu26"]
 
 [ext_resource type="FontFile" path="res://UI/theme/font.tres" id="1_wrg1w"]
 [ext_resource type="Texture2D" uid="uid://dasip4t1uva83" path="res://UI/theme/dark/checkbox_checked.png" id="2_w18e2"]
@@ -334,6 +334,15 @@ border_color = Color(0.0745098, 0.0745098, 0.0745098, 1)
 
 [sub_resource type="FontFile" id="120"]
 fallbacks = Array[Font]([ExtResource("15_q7pbt")])
+cache/0/variation_coordinates = {}
+cache/0/face_index = 0
+cache/0/embolden = 0.0
+cache/0/transform = Transform2D(1, 0, 0, 1, 0, 0)
+cache/0/spacing_top = 0
+cache/0/spacing_bottom = 0
+cache/0/spacing_space = 0
+cache/0/spacing_glyph = 0
+cache/0/baseline_offset = 0.0
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0

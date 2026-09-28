@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=27 format=3 uid="uid://bnprm4dgmteqb"]
+[gd_resource type="Theme" format=3 uid="uid://bnprm4dgmteqb"]
 
 [ext_resource type="FontFile" uid="uid://b7nq4h3s5efly" path="res://addons/godot_style/markdown/Noto_Sans/NotoSans-Bold.ttf" id="1_t5ug4"]
 [ext_resource type="FontFile" uid="uid://db2ad2pr5gp55" path="res://addons/godot_style/markdown/Noto_Sans/NotoSans-BoldItalic.ttf" id="2_vn0tc"]

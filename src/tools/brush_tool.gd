@@ -199,10 +199,8 @@ func mouse_moved(event : InputEventMouseMotion):
 		var draw_pos = last_stroke_pos.lerp(point,0.05) if ToolsManager.effect_scaling_factor == 0.25 else point
 		if draw_pos.distance_to(last_stroke_pos) < (brushsize * size_step_theshhold): # So we don't draw on the same place
 			return
-		if event.button_mask & MOUSE_BUTTON_MASK_LEFT != 0.0:
-			stroke(draw_pos, event.pressure)
-		else:
-			stroke(draw_pos, 1.0)
+		# Mice (and some platforms) report no pressure at all, which would make an invisible stroke.
+		stroke(draw_pos, event.pressure if event.pressure > 0.0 else 1.0)
 		last_stroke_pos = draw_pos
 
 var current_stroke : Stroke
@@ -210,23 +208,22 @@ var last_stroke_pos : Vector2
 var cached_pixels : PackedVector2Array = []
 var solid_color_rect : Rect2i
 var points_to_remove: PackedInt32Array = []
-func stroke(point:Vector2, pressure):
-	var unsolid_radius : float = (brushsize * 0.5) * (1.0 - hardness)
+func stroke(point:Vector2, pressure:float):
+	#var unsolid_radius : float = (brushsize * 0.5) * (1.0 - hardness)
 	var radius : float = (brushsize * 0.5)
-	var solid_radius : float = radius - unsolid_radius
+	#var solid_radius : float = radius - unsolid_radius
 	var color : Color
 	#if brush_type == BRUSH_ERASE:
 		#color = Color(1,0,0,0.05)
 
-	#elif pen_pressure_usage == pen_flag.tint:
-		#color = lerp(drawing_color2, drawing_color1, pressure)
+		#color = 
 	#else:
 	color = drawing_color1
-
 	color.a *= opacity
 	if pen_pressure_usage == pen_flag.opacity:
 		color.a *= pressure
-
+	elif pen_pressure_usage == pen_flag.tint:
+		color = lerp(drawing_color2, drawing_color1, pressure)
 	#point = point.floor() #+ Vector2(0.5, 0.5)
 	var pressure_value : float = (pressure if pen_pressure_usage == pen_flag.size else 1.0)
 	match current_stroke.type:
@@ -237,92 +234,6 @@ func stroke(point:Vector2, pressure):
 			current_stroke.aliasing = jaggies_removal
 		Stroke.TYPE.TEXTURE:
 			current_stroke.add_point(point, color, radius, pressure_value)
-
-
-func get_all_brush_pixels(radius, solid_radius):
-		cached_pixels.clear()
-		
-		
-		# for performance, we create a rect2i containing all pixels
-		# that will not blend with the background and have same color
-		# so we use Image.fill_rect() to improve performance
-		
-		# Let's assume a Square Side is called A
-		# then its value would be like this : A^2 + A^2 = D^2
-		# where D is the diagonal, and our diagonal in this case is actually the circle radius
-		var square_side = sqrt(pow(solid_radius,2)/2)-2
-		solid_color_rect = Rect2i(0-square_side, 0-square_side, square_side*2,square_side*2)
-		
-		#use Bresenham's algorithm
-		var r : int = radius
-		var current_point : Vector2i = Vector2i(0,r)
-		var d : int = 3 - 2 * r
-		if brush_type == E_BRUSH_TYPE.BRUSH_DRAW or brush_type == E_BRUSH_TYPE.BRUSH_ERASE:
-			var first_y_count : int = current_point.y-square_side
-			for y in first_y_count:
-				if square_side+y < current_point.x: # Ensure that pixel is not repeated
-					continue
-				cached_pixels.append_array(GetCircleSymmetry(current_point.x,2+square_side+y))
-		else:
-			var first_y_count : int = current_point.y
-			for y in first_y_count:
-				if y < current_point.x: # Ensure that pixel is not repeated
-					continue
-				cached_pixels.append_array(GetCircleSymmetry(current_point.x,y))
-		while current_point.y >= current_point.x:
-			current_point.x += 1
-
-			if (d > 0):
-				current_point.y -= 1
-				d = d + 4 * (current_point.x-current_point.y) + 10
-			else:
-				d = d + 4 * current_point.x + 6
-			
-			#Fill the circle
-			if brush_type == E_BRUSH_TYPE.BRUSH_DRAW or brush_type == E_BRUSH_TYPE.BRUSH_ERASE: # We Will Only Use the Rect Performance Enhacement with Draw/Erase
-				var y_count : int = current_point.y-square_side
-				for y in y_count:
-					if square_side+y < current_point.x: # Ensure that pixel is not repeated by excluding a coordinate almost less than 45 degrees from the X Axis
-						continue
-					cached_pixels.append_array(GetCircleSymmetry(current_point.x,2+square_side+y))
-			else:
-				var y_count : int = current_point.y
-				for y in y_count:
-					if y < current_point.x: # Ensure that pixel is not repeated
-						continue
-					cached_pixels.append_array(GetCircleSymmetry(current_point.x,y))
-
-
-func GetCircleSymmetry(x:int, y:int, x_center:int = 0, y_center:int = 0):
-	var pixels : PackedVector2Array = []
-	if x == 0:
-		pixels.append(Vector2i(x_center, y_center+y))
-		pixels.append(Vector2i(x_center, y_center-y))
-		pixels.append(Vector2i(x_center+y, y_center))
-		pixels.append(Vector2i(x_center-y, y_center))
-		return pixels
-	elif y == 0:
-		pixels.append(Vector2i(x_center, y_center+x))
-		pixels.append(Vector2i(x_center, y_center-x))
-		pixels.append(Vector2i(x_center+x, y_center))
-		pixels.append(Vector2i(x_center-x, y_center))
-		return pixels
-	elif y == x:
-		pixels.append(Vector2i(x_center+x, y_center+y))
-		pixels.append(Vector2i(x_center+x, y_center-y))
-		pixels.append(Vector2i(x_center-x, y_center+y))
-		pixels.append(Vector2i(x_center-x, y_center-y))
-		return pixels
-	else:
-		pixels.append(Vector2i(x_center+x, y_center+y))
-		pixels.append(Vector2i(x_center-x, y_center+y))
-		pixels.append(Vector2i(x_center+x, y_center-y))
-		pixels.append(Vector2i(x_center-x, y_center-y))
-		pixels.append(Vector2i(x_center+y, y_center+x))
-		pixels.append(Vector2i(x_center-y, y_center+x))
-		pixels.append(Vector2i(x_center+y, y_center-x))
-		pixels.append(Vector2i(x_center-y, y_center-x))
-		return pixels
 
 
 func draw_preview(image_view : CanvasItem, mouse_position : Vector2i):

@@ -139,10 +139,10 @@ func _ready():
 	set_physics_process(false)
 	get_tree().set_auto_accept_quit(false)
 	
-	if OS.get_name() == "Android":
-		OS.request_permissions()
-	
-	
+	# No storage permission is requested on Android: projects are saved in the app's own folder,
+	# anything outside of it goes through the system picker (see MTStorage).
+
+
 	if mt_globals.get_config("locale") == "":
 		mt_globals.set_config("locale", TranslationServer.get_locale())
 	
@@ -383,15 +383,26 @@ func load_project() -> void:
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
 	dialog.add_filter("*.mt.tres;My Touch text files")
 	add_child(dialog)
-	if mt_globals.config.has_section_key("path", "project"):
-		dialog.current_dir = mt_globals.config.get_value("path", "project")
+	dialog.current_dir = get_project_dialog_dir()
 	var files = await dialog.select_files()
 	if files.size() > 0:
 		do_load_projects(files)
 
+## Folder the project open dialogs start in.
+func get_project_dialog_dir() -> String:
+	var dir : String = mt_globals.config.get_value("path", "project", "")
+	if dir == "" or !DirAccess.dir_exists_absolute(dir):
+		return MTStorage.projects_dir()
+	return dir
+
 func do_load_projects(filenames) -> void:
 	var file_name : String = ""
 	for f in filenames:
+		if MTStorage.is_saf(f):
+			if !MTStorage.file_exists(f):
+				continue
+			do_load_project(f)
+			continue
 		var file = FileAccess.open(f, FileAccess.READ)
 		if file == null:
 			continue
@@ -505,6 +516,7 @@ func export_png_image():
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.png;PNG image file")
 	add_child(dialog)
+	dialog.current_dir = MTStorage.pictures_dir()
 	var files = await dialog.select_files()
 	if files.size() != 1:
 		return
@@ -526,6 +538,7 @@ func export_jpeg_image():
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.jpeg;JPEG image file")
 	add_child(dialog)
+	dialog.current_dir = MTStorage.pictures_dir()
 	var files = await dialog.select_files()
 	if files.size() != 1:
 		return
@@ -540,7 +553,7 @@ func refresh():
 	ProjectsManager.refresh()
 func open_file_location():
 	if ProjectsManager.current_project != null:
-		if ProjectsManager.current_project.save_path != "":
+		if ProjectsManager.current_project.save_path != "" and !MTStorage.is_saf(ProjectsManager.current_project.save_path):
 			var path = ProjectsManager.current_project.save_path
 			var path_array = path.split("/")
 			path_array.remove_at(path_array.size()-1)
@@ -643,8 +656,7 @@ func edit_load_selection() -> void:
 	dialog.add_filter("*.mt.tres;My Touch text files")
 	add_child(dialog)
 	
-	if mt_globals.config.has_section_key("path", "project"):
-		dialog.current_dir = mt_globals.config.get_value("path", "project")
+	dialog.current_dir = get_project_dialog_dir()
 	var files = await dialog.select_files()
 	if files.size() > 0:
 		ProjectsManager.load_selection(files)
@@ -659,8 +671,7 @@ func edit_load_project_as_image() -> void:
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
 	dialog.add_filter("*.mt.tres;My Touch text files")
 	add_child(dialog)
-	if mt_globals.config.has_section_key("path", "project"):
-		dialog.current_dir = mt_globals.config.get_value("path", "project")
+	dialog.current_dir = get_project_dialog_dir()
 	var files = await dialog.select_files()
 	if files.size() > 0:
 		ProjectsManager.load_project_layer(files)
@@ -811,6 +822,7 @@ func import_image() -> void:
 	dialog.add_filter("*.svg;SVG Image")
 	dialog.add_filter("*.tga;TGA Image")
 	dialog.add_filter("*.webp;WebP Image")
+	dialog.android_native = true # Photos come from the system picker, no storage permission needed
 	add_child(dialog)
 	var files = await dialog.select_files()
 	if files.size() > 0:
@@ -819,11 +831,18 @@ func import_image() -> void:
 #Handle dropped files
 func on_files_dropped(files : PackedStringArray) -> void:
 	for f in files:
-		var file = FileAccess.open(f, FileAccess.READ)
-		if file == null:
-			continue
-		f = file.get_path_absolute()
-		match f.get_extension():
+		var extension : String
+		if MTStorage.is_saf(f):
+			if !MTStorage.file_exists(f):
+				continue
+			extension = "tres" if f.ends_with(".tres") else MTStorage.image_file_name(f).get_extension().to_lower()
+		else:
+			var file = FileAccess.open(f, FileAccess.READ)
+			if file == null:
+				continue
+			f = file.get_path_absolute()
+			extension = f.get_extension().to_lower()
+		match extension:
 			"tres":
 				do_load_project(f)
 			"jpg", "jpeg", "png", "svg", "webp":

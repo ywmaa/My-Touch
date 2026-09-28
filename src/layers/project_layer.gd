@@ -23,7 +23,7 @@ func get_canvas_node() -> Node:
 func refresh():
 	if project:
 		return
-	var data = ResourceLoader.load(name,"",ResourceLoader.CACHE_MODE_REUSE) as Project
+	var data = MTStorage.load_resource(name, ResourceLoader.CACHE_MODE_REUSE) as Project
 	if data != null:
 		project = data
 

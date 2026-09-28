@@ -29,6 +29,7 @@ func _gui_input(event: InputEvent) -> void:
 		dialog.add_filter("*.svg;SVG Image")
 		dialog.add_filter("*.tga;TGA Image")
 		dialog.add_filter("*.webp;WebP Image")
+		dialog.android_native = true
 		add_child(dialog)
 		var files = await dialog.select_files()
 		if files.size() > 0:
@@ -39,8 +40,8 @@ func on_import_image_file(path:String):
 	if !ToolsManager.current_project:
 		return
 	var current_project := ToolsManager.current_project
-	var new_image_path : String = current_project.project_folder_abs_path + "/" + path.get_file()
-	DirAccess.copy_absolute(path, new_image_path) # Move Image to Project Folder
+	var new_image_path : String = current_project.project_folder_abs_path + "/" + MTStorage.image_file_name(path)
+	MTStorage.copy_file(path, new_image_path) # Copy Image to Project Folder
 	image_path = new_image_path
 	image_name.text = new_image_path.get_file()
 	image_path_changed.emit(image_path)

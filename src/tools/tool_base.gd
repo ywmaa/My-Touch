@@ -15,7 +15,7 @@ var tool_disabled : bool = false
 func is_tool_disabled() -> bool:
 	return tool_disabled
 
-func get_icon_from_project_folder(icon_name:String) -> ImageTexture:
+func get_icon_from_project_folder(icon_name:String) -> Texture2D:
 	return load("res://UI/graphics/tools/%s.png" % icon_name.to_lower())
 
 func is_out_of_bounds(pos : Vector2i, rect_size : Vector2i):

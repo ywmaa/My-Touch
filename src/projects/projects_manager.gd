@@ -107,8 +107,8 @@ func on_import_image_file(path:String):
 	if !current_project:
 		return
 	#var new_layer : base_layer = base_layer.new()
-	var new_image_path : String = current_project.project_folder_abs_path + "/" + path.get_file()
-	DirAccess.copy_absolute(path, new_image_path) # Move Image to Project Folder
+	var new_image_path : String = current_project.project_folder_abs_path + "/" + MTStorage.image_file_name(path)
+	MTStorage.copy_file(path, new_image_path) # Copy Image to Project Folder
 	image_layer.new().init(current_project.layers_container.get_unused_layer_name(), new_image_path.get_file(), current_project)
 	#new_layer.init(current_project.layers_container.get_unused_layer_name(), new_image_path.get_file(), current_project, base_layer.layer_type.image)
 
@@ -178,11 +178,10 @@ func load_selection(filenames) -> void:
 		return
 	var file_name : String = ""
 	for f in filenames:
-		var file = FileAccess.open(f, FileAccess.READ)
-		if file == null:
+		if !MTStorage.file_exists(f):
 			continue
-		file_name = file.get_path_absolute()
-		var data = ResourceLoader.load(file_name) as Project
+		file_name = f
+		var data = MTStorage.load_resource(file_name) as Project
 		if data != null:
 			current_project.layers_container.layers.append_array(data.layers.layers)
 			current_project.need_save = true
@@ -203,8 +202,7 @@ func save_selection() -> void:
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.mt.tres;My Touch text files")
 	add_child(dialog)
-	if mt_globals.config.has_section_key("path", "current_project"):
-		dialog.current_dir = mt_globals.config.get_value("path", "current_project")
+	dialog.current_dir = get_last_project_dir()
 	var files = await dialog.select_files()
 	if files.size() == 1:
 		if do_save_selection(files[0]):
@@ -216,7 +214,7 @@ func do_save_selection(filename) -> bool:
 	data.layers_container = layers_manager.new()
 	data.resources_container = resources_manager.new()
 	data.layers.layers = current_project.layers_container.selected_layers
-	ResourceSaver.save(data,filename)
+	MTStorage.save_resource(data, filename)
 	return true
 
 func load_project_layer(filenames) -> void:
@@ -224,11 +222,10 @@ func load_project_layer(filenames) -> void:
 		return
 	var file_name : String = ""
 	for f in filenames:
-		var file = FileAccess.open(f, FileAccess.READ)
-		if file == null:
+		if !MTStorage.file_exists(f):
 			continue
-		file_name = file.get_path_absolute()
-		var data = ResourceLoader.load(file_name,"",ResourceLoader.CACHE_MODE_IGNORE) as Project
+		file_name = f
+		var data = MTStorage.load_resource(file_name, ResourceLoader.CACHE_MODE_IGNORE) as Project
 		if data != null:
 			project_layer.new().init(file_name, file_name, current_project)
 			#var new_project_layer = project_layer.new()
@@ -270,11 +267,19 @@ func save() -> bool:
 	if !current_project:
 		return false
 	var status
-	if current_project.save_path != "":
+	# Unsaved projects live in a temporary user:// folder that is removed on close, ask where to save.
+	if current_project.save_path != "" and !current_project.save_path.begins_with("user://"):
 		status = current_project.save_project()
 	else:
 		status = await save_as()
 	return status
+
+## Folder the save/open dialogs start in.
+func get_last_project_dir() -> String:
+	var dir : String = mt_globals.config.get_value("path", "current_project", "")
+	if dir == "" or MTStorage.is_saf(dir) or !DirAccess.dir_exists_absolute(dir):
+		return MTStorage.projects_dir()
+	return dir
 
 func save_as() -> bool:
 	if !current_project:
@@ -287,18 +292,23 @@ func save_as() -> bool:
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.add_filter("*.mt.tres;My Touch text files")
 	add_child(dialog)
-	if mt_globals.config.has_section_key("path", "current_project"):
-		dialog.current_dir = mt_globals.config.get_value("path", "current_project")
+	dialog.current_dir = get_last_project_dir()
+	var project_name : String = MTStorage.display_name(current_project.save_path)
+	if project_name != "":
+		dialog.current_file = project_name
 	var files = await dialog.select_files()
 	if files.size() == 1:
-		var old_file = ProjectSettings.globalize_path(current_project.save_path)
+		var old_file = current_project.save_path
 		current_project.save_path = files[0]
 		if current_project.save_project():
-			var dir = DirAccess.open(old_file.get_base_dir())
-			if dir.file_exists(old_file.get_file()): # Remove Old MT File
-				dir.remove(old_file.get_file())
+			if !MTStorage.is_saf(old_file) and old_file != current_project.save_path:
+				old_file = ProjectSettings.globalize_path(old_file)
+				var dir = DirAccess.open(old_file.get_base_dir())
+				if dir and dir.file_exists(old_file.get_file()): # Remove Old MT File
+					dir.remove(old_file.get_file())
 			mt_globals.main_window.add_recent(current_project.save_path)
-			mt_globals.config.set_value("path", "current_project", current_project.save_path.get_base_dir())
+			if !MTStorage.is_saf(current_project.save_path):
+				mt_globals.config.set_value("path", "current_project", current_project.save_path.get_base_dir())
 			return true
 	return false
 

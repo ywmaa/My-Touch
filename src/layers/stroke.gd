@@ -63,19 +63,20 @@ func update():
 
 func update_line2D():
 	size_curve.clear_points()
-	color_gradiant.offsets.clear()
-	color_gradiant.colors = color
 	size_curve.max_value = 1.0
 	size_curve.max_domain = 1.0
-	var max_size_length : int = size_pressure.size()-1
-	size
+	var max_size_length : int = max(size_pressure.size()-1, 1)
+	# offsets is returned by value, so build it and assign it once.
+	var offsets : PackedFloat32Array = []
 	for i in size_pressure.size():
 		size_curve.add_point( Vector2( ( float(i) / float(max_size_length) ), size_pressure[i]) )
-		color_gradiant.offsets.append( float(i) / float(max_size_length) )
-	
+		offsets.append( float(i) / float(max_size_length) )
+	color_gradiant.colors = color
+	color_gradiant.offsets = offsets
+
 	stroke_node.width = size
 	stroke_node.width_curve =  size_curve
-	stroke_node.gradient =  color_gradiant
+	stroke_node.gradient = color_gradiant
 	match mode:
 		MODE.DRAW:
 			if type == TYPE.TEXTURE:

@@ -5,4 +5,3 @@
 [resource]
 resource_local_to_scene = true
 shader = ExtResource("1_27xgt")
-shader_parameter/texture_color = Vector3(0, 0, 0)

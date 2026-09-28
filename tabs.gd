@@ -16,7 +16,7 @@ func _process(_delta):
 		create_tabs()
 	for index in ProjectsManager.projects.size(): 
 		var project = ProjectsManager.projects[index]
-		var title : String = (project.save_path) + (" *" if project.need_save else "")
+		var title : String = MTStorage.display_path(project.save_path) + (" *" if project.need_save else "")
 		set_tab_title(index, title)
 
 
@@ -24,7 +24,7 @@ func create_tabs():
 	var current_project_index : int = ProjectsManager.projects.find(ProjectsManager.current_project)
 	$Tabs.clear_tabs()
 	for project in ProjectsManager.projects:
-		$Tabs.add_tab("[unnamed]" if project.save_path == "" else project.save_path + (" *" if project.need_save else "") )
+		$Tabs.add_tab("[unnamed]" if project.save_path == "" else MTStorage.display_path(project.save_path) + (" *" if project.need_save else "") )
 	current_tab = current_project_index
 
 func close_tab(tab = null) -> void:
@@ -48,7 +48,7 @@ func check_save_tab(tab) -> bool:
 	if project.need_save and mt_globals.get_config("confirm_close_project"):
 		var dialog = preload("res://UI/windows/accept_dialog/accept_dialog.tscn").instantiate()
 		var save_path = project.save_path
-		dialog.dialog_text = "Save "+save_path+" before closing?"
+		dialog.dialog_text = "Save "+MTStorage.display_path(save_path)+" before closing?"
 		#dialog.dialog_autowrap = true
 		dialog.get_ok_button().text = "Save and close"
 		dialog.add_button("Discard changes", true, "discard")
@@ -57,7 +57,12 @@ func check_save_tab(tab) -> bool:
 		var result = await dialog.ask()
 		match result:
 			"ok":
-				var status = project.save_project()
+				var status : bool
+				if project.save_path.begins_with("user://"): # Never saved, ask where to save
+					ProjectsManager.current_project = project
+					status = await ProjectsManager.save_as()
+				else:
+					status = project.save_project()
 				if !status:
 					return false
 			"cancel":

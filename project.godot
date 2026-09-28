@@ -12,7 +12,7 @@ config_version=5
 
 config/name="My Touch"
 run/main_scene="res://editor.tscn"
-config/features=PackedStringArray("4.4")
+config/features=PackedStringArray("4.7")
 run/low_processor_mode=true
 boot_splash/image="res://iconbanner.png"
 config/icon="res://icon.png"
@@ -195,6 +195,7 @@ focus={
 
 pointing/android/enable_long_press_as_right_click=true
 pointing/android/enable_pan_and_scale_gestures=true
+pen_tablet/driver.windows="auto"
 
 [rendering]
 
