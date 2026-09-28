@@ -21,24 +21,33 @@ func draw_selection_highlight():
 		return
 	var screen_scale := get_global_transform_with_canvas().get_scale().x
 	var pixel := 1.0 / screen_scale if screen_scale > 0.0 else 1.0 # One screen pixel, in canvas pixels
-	for layer in ProjectsManager.current_project.layers_container.selected_layers:
-		var node := layer.main_object as CanvasItem
-		if node == null or !node.is_inside_tree() or !node.is_visible_in_tree():
-			continue
-		var bounds : Rect2 = layer.get_local_bounds()
-		if bounds.size == Vector2.ZERO:
-			continue
-		# Through the node's transform so rotated/scaled/parented layers are outlined exactly
-		var xform := node.get_global_transform_with_canvas()
-		var corners := PackedVector2Array([
-			xform * bounds.position,
-			xform * Vector2(bounds.end.x, bounds.position.y),
-			xform * bounds.end,
-			xform * Vector2(bounds.position.x, bounds.end.y),
-			xform * bounds.position,
-		])
-		draw_polyline(corners, Color(0, 0, 0, 0.6), 3.0 * pixel)
-		draw_polyline(corners, ToolsManager.selected_tool_color, 1.5 * pixel)
+	var layers_container := ProjectsManager.current_project.layers_container
+	var active := layers_container.get_active_layer()
+	for layer in layers_container.selected_layers:
+		if layer != active:
+			draw_layer_outline(layer, ToolsManager.selected_tool_color, 1.5 * pixel)
+	# The active layer (the one tools apply to) on top, in its own color and thicker
+	if active:
+		draw_layer_outline(active, ToolsManager.active_layer_color, 2.5 * pixel)
+
+func draw_layer_outline(layer: base_layer, color: Color, width: float):
+	var node := layer.main_object as CanvasItem
+	if node == null or !node.is_inside_tree() or !node.is_visible_in_tree():
+		return
+	var bounds : Rect2 = layer.get_local_bounds()
+	if bounds.size == Vector2.ZERO:
+		return
+	# Through the node's transform so rotated/scaled/parented layers are outlined exactly
+	var xform := node.get_global_transform_with_canvas()
+	var corners := PackedVector2Array([
+		xform * bounds.position,
+		xform * Vector2(bounds.end.x, bounds.position.y),
+		xform * bounds.end,
+		xform * Vector2(bounds.position.x, bounds.end.y),
+		xform * bounds.position,
+	])
+	draw_polyline(corners, Color(0, 0, 0, 0.6), width * 2.0)
+	draw_polyline(corners, color, width)
 
 func pass_event_to_tool(event) -> bool:
 	# Touch jumps the pointer on press, update the position now instead of waiting for _process.

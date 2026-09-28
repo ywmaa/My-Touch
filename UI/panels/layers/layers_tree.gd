@@ -44,6 +44,10 @@ func do_update_from_layers(layers_array : Array, selected_layers:Array[base_laye
 		if l in selected_layers:
 			new_item.select(0)
 			selected_items.append(new_item)
+		if !selected_layers.is_empty() and l == selected_layers[0]:
+			# Active layer: the one tools apply to
+			new_item.set_custom_color(0, ToolsManager.active_layer_color)
+			new_item.set_custom_bg_color(0, Color(ToolsManager.active_layer_color, 0.18))
 		if l.children.size() > 0:
 			do_update_from_layers(l.children, selected_layers, new_item)
 

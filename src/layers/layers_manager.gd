@@ -40,6 +40,10 @@ func select_layer(layer : base_layer) -> void:
 		selected_layers.append(layer)
 	_on_layers_changed()
 
+## The layer tools apply to: the first selected one (see ToolsManager.handle_image_input).
+func get_active_layer() -> base_layer:
+	return selected_layers[0] if !selected_layers.is_empty() else null
+
 func deselect_layer(layer : base_layer) -> void:
 	if selected_layers.has(layer):
 		selected_layers.erase(layer)

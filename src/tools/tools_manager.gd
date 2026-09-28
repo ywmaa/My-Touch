@@ -10,6 +10,8 @@ var horizontal_mirror := false
 var vertical_mirror := false
 var pixel_perfect := false
 var selected_tool_color := Color("0086cf")
+## Highlight of the active layer (the one tools apply to), in the graph and the layers tree.
+var active_layer_color := Color("ffa41b")
 var effect_scaling_factor : float = 1.0
 var current_color1 : Color
 var current_color2 : Color
