@@ -26,6 +26,7 @@ func _init():
 	tool_button_shortcut = ""
 	tool_desc = ""
 	tool_icon = get_icon_from_project_folder("select")
+	selects_on_click = true
 
 func deselect():
 	print("test")

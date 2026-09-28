@@ -63,6 +63,9 @@ func mouse_selection_check(only_top_layer: bool = false):
 	if ToolsManager.current_tool:
 		if ToolsManager.current_tool.tool_active:
 			return
+		# Drawing/transform tools work on the current selection, only selection tools pick layers
+		if !ToolsManager.current_tool.selects_on_click:
+			return
 	if ToolsManager.shortcut_tool:
 		if ToolsManager.shortcut_tool.tool_active:
 			return

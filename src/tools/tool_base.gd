@@ -11,6 +11,9 @@ var selection : BitMap
 @export_enum("None", "When Drawing", "When Active") var image_hide_mode := 0
 ## Tool can't be used and won't be able to press
 var tool_disabled : bool = false
+## Clicking the canvas with this tool selects the layers under the mouse.
+## Only selection tools do this, drawing/transform tools keep the current selection.
+var selects_on_click : bool = false
 
 func is_tool_disabled() -> bool:
 	return tool_disabled
