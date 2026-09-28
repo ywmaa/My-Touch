@@ -51,13 +51,13 @@ func _move_data_folder(old_path: String, new_path: String) -> void:
 		for file in files:
 			if MTStorage.file_exists(old_data_folder+"/"+file):
 				MTStorage.copy_file(old_data_folder+"/"+file, new_data_folder+"/"+file)
-		if old_data_folder.contains("user://") and DirAccess.dir_exists_absolute(old_data_folder):
+		if MTStorage.is_temp_path(old_path) and DirAccess.dir_exists_absolute(old_data_folder):
 			for file in DirAccess.get_files_at(old_data_folder):
 				DirAccess.remove_absolute(old_data_folder+"/"+file)
 			DirAccess.remove_absolute(old_data_folder)
 		return
 	if DirAccess.dir_exists_absolute(old_data_folder):
-		if old_data_folder.contains("user://"):  # Can't delete a user folder without deleting the files first
+		if MTStorage.is_temp_path(old_path):  # Can't delete a user folder without deleting the files first
 			DirAccess.make_dir_absolute(new_data_folder)
 			for file in DirAccess.get_files_at(old_data_folder):
 				DirAccess.copy_absolute(old_data_folder+"/"+file, new_data_folder+"/"+file)
@@ -66,7 +66,7 @@ func _move_data_folder(old_path: String, new_path: String) -> void:
 		else:
 			DirAccess.rename_absolute(old_data_folder, new_data_folder) # Moves the folder
 	else:
-		if new_data_folder.contains("user://"):
+		if MTStorage.is_temp_path(new_path):
 			if DirAccess.dir_exists_absolute(new_data_folder):
 				for file in DirAccess.get_files_at(new_data_folder):
 					DirAccess.remove_absolute(new_data_folder+"/"+file)
@@ -90,6 +90,7 @@ func get_data_files() -> PackedStringArray:
 func save_project() -> bool:
 	var error = MTStorage.save_resource(self, save_path)
 	if error == OK:
+		MTStorage.sync_web_storage()
 		project_saved.emit()
 		need_save = false
 		return true

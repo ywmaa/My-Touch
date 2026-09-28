@@ -32,6 +32,8 @@ func create_menu(menu_def : Array, object : Object, menu : PopupMenu, menu_name 
 	for i in menu_def.size():
 		if menu_def[i].has("standalone_only") and menu_def[i].standalone_only and Engine.is_editor_hint():
 			continue
+		if menu_def[i].has("web_disabled") and menu_def[i].web_disabled and OS.get_name() == "Web":
+			continue
 		if menu_def[i].has("editor_only") and menu_def[i].editor_only and !Engine.is_editor_hint():
 			continue
 		if menu_def[i].has("mode") and menu_def[i].mode != mode:

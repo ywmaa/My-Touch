@@ -228,6 +228,7 @@ func do_save_selection(filename) -> bool:
 	data.resources_container = resources_manager.new()
 	data.layers.layers = current_project.layers_container.selected_layers
 	MTStorage.save_resource(data, filename)
+	MTStorage.finish_save(filename)
 	return true
 
 func load_project_layer(filenames) -> void:
@@ -281,7 +282,7 @@ func save() -> bool:
 		return false
 	var status
 	# Unsaved projects live in a temporary user:// folder that is removed on close, ask where to save.
-	if current_project.save_path != "" and !current_project.save_path.begins_with("user://"):
+	if current_project.save_path != "" and !MTStorage.is_temp_path(current_project.save_path):
 		status = current_project.save_project()
 	else:
 		status = await save_as()
@@ -319,6 +320,7 @@ func save_as() -> bool:
 				var dir = DirAccess.open(old_file.get_base_dir())
 				if dir and dir.file_exists(old_file.get_file()): # Remove Old MT File
 					dir.remove(old_file.get_file())
+			MTStorage.finish_save(current_project.save_path)
 			mt_globals.main_window.add_recent(current_project.save_path)
 			if !MTStorage.is_saf(current_project.save_path):
 				mt_globals.config.set_value("path", "current_project", current_project.save_path.get_base_dir())

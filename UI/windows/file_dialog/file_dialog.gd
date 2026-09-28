@@ -4,14 +4,15 @@ extends FileDialog
 var left_panel = null
 var volume_option = null
 
-## On Android, skip the in-app dialog and use the system picker directly (e.g. for photos).
-var android_native : bool = false
+## On Android and the web, skip the in-app dialog and use the system/browser picker directly (e.g. for photos).
+var system_picker : bool = false
 
 signal return_paths(path_list)
 
 func _enter_tree() -> void:
-	if MTStorage.is_android() and !use_system_file_browser():
+	if (MTStorage.is_android() or MTStorage.is_web()) and !use_system_file_browser():
 		# Only the app's own storage is browsable in-app, anything else goes through the system picker.
+		# On the web that's the browser storage, files from the computer are uploaded/downloaded.
 		root_subfolder = MTStorage.app_root_dir()
 
 ## Preference "Use the system file browser", when the platform supports it.
@@ -30,6 +31,13 @@ func _ready() -> void:
 		if file_mode != FILE_MODE_OPEN_DIR:
 			add_button("Other Folder…", false, "other_folder")
 			custom_action.connect(_on_custom_action)
+		return
+	if MTStorage.is_web():
+		if file_mode == FILE_MODE_SAVE_FILE:
+			add_button("Download…", false, "download")
+		elif file_mode != FILE_MODE_OPEN_DIR:
+			add_button("Upload…", false, "upload")
+		custom_action.connect(_on_custom_action)
 		return
 	if OS.get_name() == "iOS":
 		return
@@ -80,7 +88,7 @@ func _on_FileDialog_popup_hide() -> void:
 	emit_signal("return_paths", [ ])
 
 func select_files() -> Array:
-	if MTStorage.is_android() and android_native:
+	if (MTStorage.is_android() or MTStorage.is_web()) and system_picker:
 		var files := await MTStorage.pick_files(filters, file_mode == FILE_MODE_OPEN_FILES)
 		queue_free()
 		return Array(files)
@@ -100,21 +108,41 @@ func add_favorite():
 	left_panel.add_favorite(get_full_current_dir())
 
 # Saving or opening outside the app folder (Android), only the chosen folder/files get shared.
+# On the web: upload from / download to the computer.
 func _on_custom_action(action: StringName) -> void:
-	if action != "other_folder":
-		return
-	hide()
-	emit_signal("return_paths", await _pick_outside_app_folder())
+	match action:
+		"other_folder":
+			hide()
+			emit_signal("return_paths", await _pick_outside_app_folder())
+		"download":
+			# Saved in the browser storage as usual, then downloaded (see MTStorage.finish_save)
+			hide()
+			var path := get_current_dir().path_join(_typed_file_name())
+			MTStorage.request_download(path)
+			emit_signal("return_paths", [ path ])
+		"upload":
+			hide()
+			var files : PackedStringArray
+			if _is_project_dialog():
+				files = await MTStorage.web_pick_projects(file_mode == FILE_MODE_OPEN_FILES)
+			else:
+				files = await MTStorage.web_pick_files(filters, file_mode == FILE_MODE_OPEN_FILES)
+			emit_signal("return_paths", Array(files))
+
+## File name typed in the save dialog, with the filter's extension.
+func _typed_file_name() -> String:
+	var file_name := MTStorage.sanitize_file_name(get_line_edit().text if get_line_edit().text != "" else current_file)
+	if file_name == "":
+		file_name = "unnamed"
+	var ext := _first_filter_extension()
+	if ext != "" and !file_name.to_lower().ends_with(ext):
+		file_name += ext
+	return file_name
 
 func _pick_outside_app_folder() -> Array:
 	match file_mode:
 		FILE_MODE_SAVE_FILE:
-			var file_name := MTStorage.sanitize_file_name(get_line_edit().text if get_line_edit().text != "" else current_file)
-			if file_name == "":
-				file_name = "unnamed"
-			var ext := _first_filter_extension()
-			if ext != "" and !file_name.to_lower().ends_with(ext):
-				file_name += ext
+			var file_name := _typed_file_name()
 			var folder := await MTStorage.pick_folder()
 			if folder == "":
 				return []

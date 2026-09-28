@@ -74,7 +74,7 @@ const MENU = [
 	{ menu="View/Default Layout", command="default_mode_switch", shortcut="" },
 	{ menu="View/User Layout", command="user_mode_switch", shortcut="" },
 	{ menu="View/-" },
-	{ menu="View/New floating window", command="new_window" },
+	{ menu="View/New floating window", command="new_window", web_disabled=true }, # Browsers can't open separate windows
 	{ menu="View/New dockable window", command="new_dock_window" },
 	{ menu="View/Fullscreen", command="fullscreen", shortcut="F11"},
 
@@ -141,6 +141,8 @@ func _ready():
 	
 	# No storage permission is requested on Android: projects are saved in the app's own folder,
 	# anything outside of it goes through the system picker (see MTStorage).
+	if MTStorage.is_web() and !OS.is_userfs_persistent():
+		MTStorage._show_message.call_deferred("Storage not available", "This browser doesn't allow saving projects (private mode or blocked storage). Use \"Download…\" when saving to keep your work.")
 
 
 	if mt_globals.get_config("locale") == "":
@@ -382,6 +384,7 @@ func load_project() -> void:
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
 	dialog.add_filter("*.mt.tres;My Touch text files")
+	dialog.add_filter("*.zip;My Touch project package")
 	add_child(dialog)
 	dialog.current_dir = get_project_dialog_dir()
 	var files = await dialog.select_files()
@@ -417,6 +420,11 @@ func do_load_project(file_name) -> bool:
 	match file_name.get_extension():
 		"tres":
 			status = do_load_mt(file_name)
+		"zip": # Project package (e.g. downloaded from the web version), unpack and open it
+			var project_path := MTStorage.unpack_project(file_name, MTStorage.package_dest_dir(file_name))
+			if project_path == "":
+				return false
+			return do_load_project(project_path)
 	if status:
 		add_recent(file_name)
 	else:
@@ -509,6 +517,10 @@ func _on_export_id_pressed(id) -> void:
 func export_png_image():
 	if !ProjectsManager.current_project:
 		return
+	if MTStorage.is_web(): # Browsers can't pick a save location, download it
+		await RenderingServer.frame_post_draw
+		MTStorage.web_download($AppRender.get_texture().get_image().save_png_to_buffer(), get_export_file_name("png"))
+		return
 	# Prompt for a target PNG file
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	dialog.min_size = Vector2(500, 500)
@@ -531,6 +543,10 @@ func export_png_image():
 func export_jpeg_image():
 	if !ProjectsManager.current_project:
 		return
+	if MTStorage.is_web(): # Browsers can't pick a save location, download it
+		await RenderingServer.frame_post_draw
+		MTStorage.web_download($AppRender.get_texture().get_image().save_jpg_to_buffer(), get_export_file_name("jpeg"))
+		return
 	# Prompt for a target PNG file
 	var dialog = preload("res://UI/windows/file_dialog/file_dialog.tscn").instantiate()
 	dialog.min_size = Vector2(500, 500)
@@ -549,6 +565,12 @@ func export_jpeg_image():
 	await RenderingServer.frame_post_draw
 	image = rendering_window.get_texture().get_image()
 	image.save_jpg(files[0])
+
+## Project name with [param extension], used for web downloads.
+func get_export_file_name(extension: String) -> String:
+	var project_name := MTStorage.display_name(ProjectsManager.current_project.save_path).trim_suffix(".mt.tres")
+	return (project_name if project_name != "" else "image") + "." + extension
+
 func refresh():
 	ProjectsManager.refresh()
 func open_file_location():
@@ -754,6 +776,8 @@ func user_mode_switch() -> void:
 
 var window_packed_scene = preload("res://UI/windows/undocked_window/undocked_window.tscn")
 func new_window():
+	if OS.get_name() == "Web": # Separate windows aren't supported, and would break all popups
+		return
 	get_viewport().gui_embed_subwindows = false
 	var window : Window = window_packed_scene.instantiate()
 	add_child(window)
@@ -822,7 +846,7 @@ func import_image() -> void:
 	dialog.add_filter("*.svg;SVG Image")
 	dialog.add_filter("*.tga;TGA Image")
 	dialog.add_filter("*.webp;WebP Image")
-	dialog.android_native = true # Photos come from the system picker, no storage permission needed
+	dialog.system_picker = true # Photos come from the system picker, no storage permission needed
 	add_child(dialog)
 	var files = await dialog.select_files()
 	if files.size() > 0:
@@ -839,7 +863,7 @@ func open_files(files : PackedStringArray, as_new_projects : bool = false) -> vo
 		if MTStorage.is_saf(f):
 			if !MTStorage.file_exists(f):
 				continue
-			extension = "tres" if f.ends_with(".tres") else MTStorage.image_file_name(f).get_extension().to_lower()
+			extension = f.get_extension() if f.ends_with(".tres") or f.ends_with(".zip") else MTStorage.image_file_name(f).get_extension().to_lower()
 		else:
 			var file = FileAccess.open(f, FileAccess.READ)
 			if file == null:
@@ -847,7 +871,7 @@ func open_files(files : PackedStringArray, as_new_projects : bool = false) -> vo
 			f = file.get_path_absolute()
 			extension = f.get_extension().to_lower()
 		match extension:
-			"tres":
+			"tres", "zip":
 				do_load_project(f)
 			"jpg", "jpeg", "png", "svg", "webp":
 				if as_new_projects:

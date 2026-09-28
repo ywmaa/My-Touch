@@ -58,7 +58,7 @@ func check_save_tab(tab) -> bool:
 		match result:
 			"ok":
 				var status : bool
-				if project.save_path.begins_with("user://"): # Never saved, ask where to save
+				if MTStorage.is_temp_path(project.save_path): # Never saved, ask where to save
 					ProjectsManager.current_project = project
 					status = await ProjectsManager.save_as()
 				else:
@@ -67,7 +67,7 @@ func check_save_tab(tab) -> bool:
 					return false
 			"cancel":
 				return false
-	if project.save_path.contains("user://"):
+	if MTStorage.is_temp_path(project.save_path):
 		for file in DirAccess.get_files_at(project.project_folder_abs_path):
 			DirAccess.remove_absolute(project.project_folder_abs_path+"/"+file)
 		DirAccess.remove_absolute(project.project_folder_abs_path)

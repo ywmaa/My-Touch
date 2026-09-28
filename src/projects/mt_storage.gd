@@ -15,30 +15,52 @@ const GRANTED_FOLDERS_KEY := "granted_folders"
 static func is_android() -> bool:
 	return OS.get_name() == "Android"
 
+static func is_web() -> bool:
+	return OS.get_name() == "Web"
+
 static func is_saf(path: String) -> bool:
 	return path.begins_with(CONTENT_PREFIX)
 
-## App-specific root folder, accessible without any permission on Android.
+## Unsaved projects live in user:// and are deleted when closed.
+## Saved projects never use a user:// path (on the web they use the absolute browser storage path).
+static func is_temp_path(path: String) -> bool:
+	return path.begins_with("user://")
+
+## Absolute path in the app data folder. On the web that is the browser's persistent storage (IndexedDB behind user://).
+static func _app_data_dir(sub_dir: String) -> String:
+	return OS.get_user_data_dir().path_join(sub_dir)
+
+## Root folder of the in-app file browser on platforms that can't browse the real filesystem.
 static func app_root_dir() -> String:
+	if is_web():
+		return projects_dir()
 	return OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS, false).get_base_dir()
 
 ## Default folder for saving projects.
 static func projects_dir() -> String:
 	var dir : String
-	if is_android():
+	if is_web():
+		dir = _app_data_dir("projects")
+	elif is_android():
 		dir = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS, false)
 	else:
 		dir = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
+	if dir == "": # Some systems have no Documents folder configured
+		dir = _app_data_dir("projects")
 	DirAccess.make_dir_recursive_absolute(dir)
 	return dir
 
 ## Default folder for exported images.
 static func pictures_dir() -> String:
 	var dir : String
-	if is_android():
+	if is_web():
+		dir = _app_data_dir("exports")
+	elif is_android():
 		dir = OS.get_system_dir(OS.SYSTEM_DIR_PICTURES, false)
 	else:
 		dir = OS.get_system_dir(OS.SYSTEM_DIR_PICTURES)
+	if dir == "":
+		dir = _app_data_dir("exports")
 	DirAccess.make_dir_recursive_absolute(dir)
 	return dir
 
@@ -207,6 +229,8 @@ static func _show_picker(title: String, mode: DisplayServer.FileDialogMode, filt
 ## Lets the user pick files anywhere through the system picker.
 ## Only the picked files are shared with the app.
 static func pick_files(filters: PackedStringArray, multiple: bool = true) -> PackedStringArray:
+	if is_web():
+		return await web_pick_files(filters, multiple)
 	var mode := DisplayServer.FILE_DIALOG_MODE_OPEN_FILES if multiple else DisplayServer.FILE_DIALOG_MODE_OPEN_FILE
 	return await _show_picker("Open", mode, filters)
 
@@ -296,3 +320,201 @@ static func _globals() -> Node:
 
 static func _config() -> ConfigFile:
 	return _globals().config
+
+
+# -----------------------------------------------------------------------
+#          Project packages (.zip with the project and its data)
+# -----------------------------------------------------------------------
+
+const PROJECT_EXTENSION := ".mt.tres"
+const DATA_FOLDER_SUFFIX := " Project Data"
+
+## Packs a saved project and its data folder into a zip, for downloading or sharing.
+static func pack_project(project_path: String) -> PackedByteArray:
+	var project_name := display_name(project_path)
+	var data_folder := project_path + DATA_FOLDER_SUFFIX
+	var temp := "user://_project_package.zip"
+	var packer := ZIPPacker.new()
+	if packer.open(temp) != OK:
+		return PackedByteArray()
+	packer.start_file(project_name)
+	packer.write_file(FileAccess.get_file_as_bytes(project_path))
+	packer.close_file()
+	if dir_exists(data_folder):
+		for file in DirAccess.get_files_at(data_folder):
+			packer.start_file(project_name + DATA_FOLDER_SUFFIX + "/" + file)
+			packer.write_file(FileAccess.get_file_as_bytes(data_folder.path_join(file)))
+			packer.close_file()
+	packer.close()
+	var bytes := FileAccess.get_file_as_bytes(temp)
+	DirAccess.remove_absolute(temp)
+	return bytes
+
+## Extracts a project package into [param dest_dir], renaming it if a project with that name exists.
+## Returns the extracted project path, or "" if the zip has no project.
+static func unpack_project(zip_path: String, dest_dir: String) -> String:
+	if dest_dir == "":
+		push_error("No folder to unpack the project to")
+		return ""
+	var reader := ZIPReader.new()
+	if reader.open(zip_path) != OK:
+		return ""
+	var entries := reader.get_files()
+	var project_file := ""
+	for entry in entries:
+		if entry.ends_with(PROJECT_EXTENSION) and !entry.contains("/"):
+			project_file = entry
+			break
+	if project_file == "":
+		reader.close()
+		return ""
+	# Pick a name that doesn't overwrite an existing project
+	var base_name := project_file.trim_suffix(PROJECT_EXTENSION)
+	var new_name := project_file
+	var count := 1
+	while FileAccess.file_exists(dest_dir.path_join(new_name)) or DirAccess.dir_exists_absolute(dest_dir.path_join(new_name + DATA_FOLDER_SUFFIX)):
+		new_name = "%s (%d)%s" % [base_name, count, PROJECT_EXTENSION]
+		count += 1
+	DirAccess.make_dir_recursive_absolute(dest_dir.path_join(new_name + DATA_FOLDER_SUFFIX))
+	for entry in entries:
+		var target : String
+		if entry == project_file:
+			target = new_name
+		elif entry.begins_with(project_file + DATA_FOLDER_SUFFIX + "/"):
+			var file := entry.get_file()
+			if file == "":
+				continue # Folder entry
+			target = new_name + DATA_FOLDER_SUFFIX + "/" + sanitize_file_name(file)
+		else:
+			continue
+		var output := FileAccess.open(dest_dir.path_join(target), FileAccess.WRITE)
+		if output:
+			output.store_buffer(reader.read_file(entry))
+			output.close()
+	reader.close()
+	sync_web_storage()
+	return dest_dir.path_join(new_name)
+
+## Where project packages get unpacked when opened.
+static func package_dest_dir(zip_path: String) -> String:
+	if is_web() or is_android() or is_saf(zip_path) or zip_path.begins_with("/tmp"):
+		return projects_dir()
+	return zip_path.get_base_dir() # Desktop: next to the zip
+
+
+# -----------------------------------------------------------------------
+#                    Web (browser file picker / downloads)
+# -----------------------------------------------------------------------
+
+## Browser storage is written to IndexedDB asynchronously, flush it after saving.
+static func sync_web_storage() -> void:
+	if is_web():
+		JavaScriptBridge.force_fs_sync()
+
+const _WEB_PICKER_JS := """
+window.mtPickFiles = function(accept, multiple, onFile, onDone) {
+	var input = document.createElement('input');
+	input.type = 'file';
+	input.accept = accept;
+	input.multiple = multiple;
+	input.style.display = 'none';
+	var finished = false;
+	var finish = function() {
+		if (finished) return;
+		finished = true;
+		input.remove();
+		onDone();
+	};
+	input.addEventListener('change', async function() {
+		for (var i = 0; i < input.files.length; i++) {
+			var file = input.files[i];
+			onFile(file.name, await file.arrayBuffer());
+		}
+		finish();
+	});
+	input.addEventListener('cancel', finish);
+	document.body.appendChild(input);
+	input.click();
+};
+"""
+
+class _WebPickerWaiter extends RefCounted:
+	signal done(paths: PackedStringArray)
+	var paths := PackedStringArray()
+	var folder : String
+	# Keep the JS callbacks alive while the picker is open
+	var on_file_callback : JavaScriptObject
+	var on_done_callback : JavaScriptObject
+	func on_file(args: Array) -> void:
+		var file_path := folder.path_join(MTStorage.sanitize_file_name(str(args[0])))
+		var output := FileAccess.open(file_path, FileAccess.WRITE)
+		if output:
+			output.store_buffer(JavaScriptBridge.js_buffer_to_packed_byte_array(args[1]))
+			output.close()
+			paths.append(file_path)
+	func on_done(_args: Array) -> void:
+		done.emit(paths)
+
+## "*.png,*.jpg;PNG Image" filters to the browser's ".png,.jpg" accept list.
+static func _filters_to_accept(filters: PackedStringArray) -> String:
+	var extensions : PackedStringArray = []
+	for f in filters:
+		for pattern in f.get_slice(";", 0).split(","):
+			extensions.append(pattern.strip_edges().trim_prefix("*"))
+	return ",".join(extensions)
+
+## Opens the browser's file picker. Picked files are copied to the in-memory /tmp folder
+## (not the persistent storage) and their paths returned.
+static func web_pick_files(filters: PackedStringArray, multiple: bool) -> PackedStringArray:
+	if JavaScriptBridge.eval("typeof window.mtPickFiles") != "function":
+		JavaScriptBridge.eval(_WEB_PICKER_JS, true)
+	var waiter := _WebPickerWaiter.new()
+	waiter.folder = "/tmp/mt_uploads/%d" % Time.get_ticks_usec()
+	DirAccess.make_dir_recursive_absolute(waiter.folder)
+	waiter.on_file_callback = JavaScriptBridge.create_callback(waiter.on_file)
+	waiter.on_done_callback = JavaScriptBridge.create_callback(waiter.on_done)
+	var window = JavaScriptBridge.get_interface("window") # Untyped, mtPickFiles is a JS function
+	window.mtPickFiles(_filters_to_accept(filters), multiple, waiter.on_file_callback, waiter.on_done_callback)
+	return await waiter.done
+
+## Uploads project packages and unpacks them into the browser storage.
+static func web_pick_projects(multiple: bool) -> PackedStringArray:
+	var result := PackedStringArray()
+	for zip in await web_pick_files(PackedStringArray(["*.zip;My Touch project package"]), multiple):
+		var project := unpack_project(zip, projects_dir())
+		if project == "":
+			await _show_message("Load failed!", "\"%s\" is not a My Touch project package." % zip.get_file())
+			continue
+		result.append(project)
+	return result
+
+static func _mime_type(file_name: String) -> String:
+	match file_name.get_extension().to_lower():
+		"png": return "image/png"
+		"jpg", "jpeg": return "image/jpeg"
+		"webp": return "image/webp"
+		"zip": return "application/zip"
+	return "application/octet-stream"
+
+## Sends data to the browser as a file download.
+static func web_download(data: PackedByteArray, file_name: String) -> void:
+	JavaScriptBridge.download_buffer(data, file_name, _mime_type(file_name))
+
+static var _pending_downloads : PackedStringArray = []
+
+## The file dialog asks for [param path] to be downloaded once the caller has saved it.
+static func request_download(path: String) -> void:
+	if !_pending_downloads.has(path):
+		_pending_downloads.append(path)
+
+## Called after saving [param path]; downloads it if the user chose "Download…".
+## Projects are downloaded as a package with their data folder.
+static func finish_save(path: String) -> void:
+	sync_web_storage()
+	if !is_web() or !_pending_downloads.has(path):
+		return
+	_pending_downloads.erase(path)
+	if path.ends_with(PROJECT_EXTENSION):
+		web_download(pack_project(path), display_name(path).trim_suffix(PROJECT_EXTENSION) + ".zip")
+	else:
+		web_download(FileAccess.get_file_as_bytes(path), display_name(path))

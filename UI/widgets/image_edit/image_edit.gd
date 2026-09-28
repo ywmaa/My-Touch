@@ -29,7 +29,7 @@ func _gui_input(event: InputEvent) -> void:
 		dialog.add_filter("*.svg;SVG Image")
 		dialog.add_filter("*.tga;TGA Image")
 		dialog.add_filter("*.webp;WebP Image")
-		dialog.android_native = true
+		dialog.system_picker = true
 		add_child(dialog)
 		var files = await dialog.select_files()
 		if files.size() > 0:
