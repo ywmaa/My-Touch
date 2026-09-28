@@ -48,53 +48,104 @@ func do_update_from_layers(layers_array : Array, selected_layers:Array[base_laye
 			do_update_from_layers(l.children, selected_layers, new_item)
 
 
-func get_drag_data(_position : Vector2):
-	var l = get_selected().get_meta("layer")
-	var label : Label = Label.new()
-	label.text = l.name
+# Drag & drop to reorder or reparent layers.
+# The tree is rebuilt every frame, so the drag carries the layers, not the TreeItems.
+const DRAG_TYPE := "layers_tree_layers"
+
+func _get_drag_data(at_position : Vector2):
+	var item : TreeItem = get_item_at_position(at_position)
+	if item == null or editing:
+		return null
+	var dragged : Array[base_layer] = []
+	var item_layer : base_layer = item.get_meta("layer")
+	if layers and layers.selected_layers.has(item_layer):
+		# Drag the whole selection, keeping tree order, skipping layers whose parent is dragged too
+		for selected in _layers_in_tree_order():
+			if layers.selected_layers.has(selected) and !_has_dragged_ancestor(selected, layers.selected_layers):
+				dragged.append(selected)
+	else:
+		dragged.append(item_layer)
+	var label := Label.new()
+	label.text = dragged[0].name if dragged.size() == 1 else "%d layers" % dragged.size()
 	set_drag_preview(label)
-	return get_selected()
+	return { "type": DRAG_TYPE, "layers": dragged }
 
-func item_is_child(i1 : TreeItem, i2 : TreeItem):
-	while i1 != null:
-		if i1 == i2:
-			return true
-		i1 = i1.get_parent()
-	return false
-
-func can_drop_data(p_position : Vector2, data):
+func _can_drop_data(at_position : Vector2, data) -> bool:
+	if !(data is Dictionary) or data.get("type") != DRAG_TYPE or layers == null:
+		return false
 	drop_mode_flags = DROP_MODE_ON_ITEM | DROP_MODE_INBETWEEN
-	var target_item = get_item_at_position(p_position)
-	if target_item != null and !item_is_child(target_item, data):
-		return true
+	var target := _get_drop_target(at_position)
+	if target.is_empty():
+		return false
+	for layer in data.layers:
+		# Can't move a layer into itself or its own children
+		if target.parent != null and layers.is_ancestor_of(layer, target.parent):
+			return false
+	return true
+
+func _drop_data(at_position : Vector2, data) -> void:
+	if !_can_drop_data(at_position, data):
+		return
+	move_layers_to(data.layers, _get_drop_target(at_position))
+
+## Moves [param dragged] layers, in order, to [param target] ({parent, index}), as one undo step.
+func move_layers_to(dragged : Array, target : Dictionary) -> void:
+	var index : int = target.index
+	var undo_redo : UndoRedo = ProjectsManager.current_project.undo_redo
+	undo_redo.create_action("Move Layers")
+	var undo_calls : Array[Callable] = []
+	for layer in dragged:
+		var from_array : Array = layers.find_parent_array(layer)
+		var from_index : int = from_array.find(layer)
+		var to_array : Array = target.parent.children if target.parent else layers.layers
+		var final_index : int = to_array.size() if index < 0 else index
+		if to_array == from_array and final_index > from_index:
+			final_index -= 1 # The layer itself is removed first
+		undo_redo.add_do_method(layers._place_layer.bind(layer, target.parent, final_index))
+		undo_calls.append(layers._place_layer.bind(layer, layer.parent, from_index))
+		layers._place_layer(layer, target.parent, final_index)
+		if index >= 0:
+			index = final_index + 1 # Keep the dropped layers together, in order
+	# Undo puts them back in reverse order, so each saved index is valid again
+	undo_calls.reverse()
+	for call in undo_calls:
+		undo_redo.add_undo_method(call)
+	undo_redo.commit_action(false)
+	_on_layers_changed()
+
+## Where a drop at [param at_position] goes: {parent: base_layer or null, index: int (-1 = last)}.
+func _get_drop_target(at_position : Vector2) -> Dictionary:
+	var item : TreeItem = get_item_at_position(at_position)
+	if item == null:
+		return { "parent": null, "index": -1 } # Empty space: end of the top level
+	var item_layer : base_layer = item.get_meta("layer")
+	match get_drop_section_at_position(at_position):
+		0: # On the item: make it the parent
+			if item_layer is project_layer:
+				return {} # Project layers show another project's layers
+			return { "parent": item_layer, "index": -1 }
+		-1, 1: # Before/after the item, with the same parent
+			var siblings : Array = layers.find_parent_array(item_layer)
+			var index : int = siblings.find(item_layer)
+			if get_drop_section_at_position(at_position) == 1:
+				index += 1
+			return { "parent": item_layer.parent, "index": index }
+	return {}
+
+func _layers_in_tree_order(layers_array : Array = layers.layers) -> Array[base_layer]:
+	var result : Array[base_layer] = []
+	for l in layers_array:
+		result.append(l)
+		result.append_array(_layers_in_tree_order(l.children))
+	return result
+
+func _has_dragged_ancestor(layer : base_layer, dragged : Array) -> bool:
+	var p : base_layer = layer.parent
+	while p != null:
+		if dragged.has(p):
+			return true
+		p = p.parent
 	return false
-
-static func get_item_index(item : TreeItem) -> int:
-	var rv : int = 0
-	while item.get_prev() != null:
-		item = item.get_prev()
-		rv += 1
-	return rv
-
-func drop_data(p_position : Vector2, data):
-	var target_item : TreeItem = get_item_at_position(p_position)
-	if data != null and target_item != null and !item_is_child(target_item, data):
-		var layer = data.get_meta("layer")
-		match get_drop_section_at_position(p_position):
-			0:
-				layers.move_layer_into(layer, target_item.get_meta("layer"))
-			-1:
-				if target_item.get_parent() != null:
-					
-					layers.move_layer_into(layer, target_item.get_parent().get_meta("layer"), LayersTree.get_item_index(target_item))
-				else:
-					print("Cannot move item")
-			1:
-				if target_item.get_parent() != null:
-					layers.move_layer_into(layer, target_item.get_parent().get_meta("layer"), LayersTree.get_item_index(target_item)+1)
-				else:
-					print("Cannot move item")
-		_on_layers_changed()
 
 func _on_tree_button_clicked(item, _column, _id, _mouse_button_index):
 	var l = item.get_meta("layer")
