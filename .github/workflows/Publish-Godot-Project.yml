@@ -29,7 +29,7 @@ env:
  PROJECT_NAME: "My-Touch" # Needs to be added, PLEASE DON'T USE SPACES
  ITCH_PROJECT_NAME: "my-touch" # Needs to be added
  ITCH_USER_NAME: "ywmaa" # Needs to be added
- GODOT_VERSION: "4.7.0" # Needs to be added
+ GODOT_VERSION: "4.7" # Godot tags x.y.0 releases as "x.y" (4.7-stable), patch releases as "x.y.z"
  GODOT_ANDROID_KEYSTORE_DEBUG_PATH: "/home/runner/work/My-Touch/My-Touch/android/debug.keystore" # Needs to be added
  GODOT_ANDROID_KEYSTORE_DEBUG_USER: "androiddebugkey" # Needs to be added
  GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: "android" # Needs to be added
@@ -60,7 +60,9 @@ jobs:
        ls
        chmod +x godot
        mkdir ~/.config/godot/
-       cat <<EOT >> ~/.config/godot/editor_settings-4.tres
+       # Godot 4.3+ reads editor_settings-<major.minor>.tres
+       SETTINGS_VERSION=$(echo "${{ env.GODOT_VERSION }}" | cut -d. -f1,2)
+       cat <<EOT >> ~/.config/godot/editor_settings-${SETTINGS_VERSION}.tres
        [gd_resource type="EditorSettings" format=3]
 
        [resource]
@@ -100,7 +102,13 @@ jobs:
     run: |
      mkdir -p ./exports
      ./godot --headless --path ./ --export-release "Android" ./exports/${{ env.PROJECT_NAME }}.apk
-    
+
+  - name: Export Web
+    run: |
+     mkdir -p ./exports/web
+     ./godot --headless --path ./ --export-release "Web" ./exports/web/index.html
+     test -f ./exports/web/index.html
+
     
 
   - uses: actions/upload-artifact@v4
@@ -111,7 +119,8 @@ jobs:
   
  Release:
   needs: Export
-  if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_github_page
+  # Inputs are strings, compare explicitly ("false" would otherwise count as true)
+  if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_github_page == 'true'
   runs-on: ubuntu-latest
   steps:
     - uses: actions/checkout@v2
@@ -146,7 +155,8 @@ jobs:
        zip -r ${{ env.PROJECT_NAME }}-linux-release-v${{ github.event.inputs.export_version }}.zip ${{ env.PROJECT_NAME }}.x86_64
        zip -r ${{ env.PROJECT_NAME }}-macos-release-v${{ github.event.inputs.export_version }}.zip ${{ env.PROJECT_NAME }}.app.zip
        zip -r ${{ env.PROJECT_NAME }}-android-release-v${{ github.event.inputs.export_version }}.zip ${{ env.PROJECT_NAME }}.apk
-    
+       (cd exports/web && zip -r ../../${{ env.PROJECT_NAME }}-web-release-v${{ github.event.inputs.export_version }}.zip .)
+
     - name: Create Github Release
       id: create_release
       uses: actions/create-release@v1
@@ -197,6 +207,16 @@ jobs:
        asset_name: ${{ env.PROJECT_NAME }}-android-release-v${{ github.event.inputs.export_version }}.zip
        asset_content_type: application/zip
 
+    - name: Upload Web Artifact
+      uses: actions/upload-release-asset@v1
+      env:
+       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+       upload_url: ${{ steps.create_release.outputs.upload_url }}
+       asset_path: ./${{ env.PROJECT_NAME }}-web-release-v${{ github.event.inputs.export_version }}.zip
+       asset_name: ${{ env.PROJECT_NAME }}-web-release-v${{ github.event.inputs.export_version }}.zip
+       asset_content_type: application/zip
+
     - uses: frdrwrt/write-to-file@v1.3
       with:
        filepath: ./VERSION.txt
@@ -208,9 +228,37 @@ jobs:
        name: VERSION
        path: ./VERSION.txt
  
+ Pages:
+  # Publishes the web build to GitHub Pages on releases.
+  # Needs Settings > Pages > Source set to "GitHub Actions" once.
+  needs: Release
+  if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_github_page == 'true'
+  runs-on: ubuntu-latest
+  permissions:
+   pages: write
+   id-token: write
+  environment:
+   name: github-pages
+   url: ${{ steps.deployment.outputs.page_url }}
+  steps:
+    - name: Download Exports
+      uses: actions/download-artifact@v8
+      with:
+       name: exports
+       path: exports
+
+    - name: Upload Pages Artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+       path: exports/web
+
+    - name: Deploy To GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
  Publish:
   needs: Release
-  if: github.event_name == 'workflow_dispatch' && github.event.inputs.itch_io
+  if: github.event_name == 'workflow_dispatch' && github.event.inputs.itch_io == 'true'
   runs-on: ubuntu-latest
   steps:
     - name: Download Exports
@@ -250,3 +298,5 @@ jobs:
        ./butler push linux-release-v${{ github.event.inputs.export_version }}.zip ${{env.ITCH_USER_NAME}}/${{env.ITCH_PROJECT_NAME}}:linux-release
        ./butler push mac-release-v${{ github.event.inputs.export_version }}.zip ${{env.ITCH_USER_NAME}}/${{env.ITCH_PROJECT_NAME}}:mac-release
        ./butler push android-release-v${{ github.event.inputs.export_version }}.zip ${{env.ITCH_USER_NAME}}/${{env.ITCH_PROJECT_NAME}}:android-release
+       # Web build folder (index.html at its root). On itch, mark this upload as "played in the browser" once.
+       ./butler push exports/web ${{env.ITCH_USER_NAME}}/${{env.ITCH_PROJECT_NAME}}:html5 --userversion ${{ github.event.inputs.export_version }}
