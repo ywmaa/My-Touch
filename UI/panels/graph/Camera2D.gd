@@ -97,13 +97,15 @@ func _input(event: InputEvent) -> void:
 		if !drag:
 			zoom_camera(1)
 	elif event is InputEventPanGesture:
-		# Pan Gesture on a Laptop touchpad
-		offset = offset + event.delta.rotated(rotation) * 1/zoom * 2  # for moving the canvas
-	elif event is InputEventMagnifyGesture:  # Zoom Gesture on a Laptop touchpad
-		if event.factor < 1:
-			zoom_camera(-0.2*event.factor)
-		else:
-			zoom_camera(0.2*event.factor)
+		# Two finger pan on Android, or pan gesture on a laptop touchpad.
+		# Android reports the finger movement divided by 5, scale it back so the canvas follows the fingers.
+		var pan_scale := 5.0 if OS.get_name() == "Android" else 2.0
+		offset = offset + event.delta.rotated(rotation) * 1/zoom * pan_scale
+		update_transparent_checker_offset()
+	elif event is InputEventMagnifyGesture:  # Pinch zoom (Android) or touchpad zoom
+		# factor is the scale change since the last event, applying it directly (no tween)
+		# makes the zoom follow the fingers and stop exactly when they stop.
+		zoom_camera_at(zoom.x * event.factor, event.position)
 	elif event is InputEventMouseMotion && drag:
 		offset = offset - event.relative.rotated(rotation) * 1/zoom
 		update_transparent_checker_offset()
@@ -162,6 +164,18 @@ func zoom_camera(dir: float) -> void:
 
 		#offset = offset + ((viewport_size * 0.5) - mouse_pos).rotated(rotation) * -(zoom - prev_zoom)
 		zoom_changed()
+
+
+## Sets the zoom immediately, keeping the canvas point under [param screen_pos] in place.
+func zoom_camera_at(new_zoom: float, screen_pos: Vector2) -> void:
+	new_zoom = clamp(new_zoom, zoom_min.x, zoom_max.x)
+	var old_zoom := zoom.x
+	if is_equal_approx(new_zoom, old_zoom):
+		return
+	var from_center := screen_pos - get_viewport_rect().size * 0.5
+	offset += from_center.rotated(rotation) * (1.0 / old_zoom - 1.0 / new_zoom)
+	zoom = Vector2(new_zoom, new_zoom)
+	zoom_changed()
 
 
 func zoom_camera_percent(value: float) -> void:
