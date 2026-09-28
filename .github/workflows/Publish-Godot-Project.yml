@@ -40,17 +40,20 @@ jobs:
  Export:
   runs-on: ubuntu-latest
   steps:
-  - uses: actions/checkout@v4
-  
+  - uses: actions/checkout@v5
+
   - name: Set up JDK 17
     id: setup-java
-    uses: actions/setup-java@v4
+    uses: actions/setup-java@v5
     with:
       distribution: 'temurin'
       java-version: 17
 
   - name: Setup Android SDK
-    uses: android-actions/setup-android@v2
+    # v2 tried to install the removed "tools" package. Godot needs apksigner from build-tools.
+    uses: android-actions/setup-android@v4
+    with:
+      packages: 'platform-tools build-tools;35.0.0'
 
   - name: Download + Authorize Godot
     run: |
@@ -111,7 +114,7 @@ jobs:
 
     
 
-  - uses: actions/upload-artifact@v4
+  - uses: actions/upload-artifact@v7
     with:
      name: exports
      path: exports
@@ -123,7 +126,7 @@ jobs:
   if: github.event_name == 'workflow_dispatch' && github.event.inputs.release_github_page == 'true'
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
    
     - name: Version
       id: tag_version
@@ -223,7 +226,7 @@ jobs:
        content: v${{ github.event.inputs.export_version }}
        mode: 0655
     
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
        name: VERSION
        path: ./VERSION.txt
