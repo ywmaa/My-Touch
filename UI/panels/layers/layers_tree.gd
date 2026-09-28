@@ -86,22 +86,19 @@ func _finish_touch_reorder(at_position : Vector2) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	# Mouse drag & drop: highlight where it will land (Godot's own indicator doesn't survive
+	# the tree being rebuilt every frame)
+	var drag_data = get_viewport().gui_get_drag_data()
+	if drag_data is Dictionary and drag_data.get("type") == DRAG_TYPE:
+		var mouse := get_local_mouse_position()
+		if Rect2(Vector2.ZERO, size).has_point(mouse):
+			_draw_drop_indicator(mouse, drag_data.layers)
+		return
 	if !_touch_reorder:
 		return
-	var color : Color = ToolsManager.active_layer_color
-	var target := _get_drop_target(_touch_position)
-	var item : TreeItem = get_item_at_position(_touch_position)
-	if !_is_valid_drop(_touch_dragged, target):
-		color = Color(0.9, 0.2, 0.2)
-	# Where it will land: a box around the new parent, or a line between layers
-	if item:
-		var rect := get_item_area_rect(item)
-		rect.position.y -= get_scroll().y
-		match get_drop_section_at_position(_touch_position):
-			0: draw_rect(rect, color, false, 2.0)
-			-1: draw_line(rect.position, Vector2(rect.end.x, rect.position.y), color, 3.0)
-			1: draw_line(Vector2(rect.position.x, rect.end.y), rect.end, color, 3.0)
+	_draw_drop_indicator(_touch_position, _touch_dragged)
 	# The dragged layer name next to the finger
+	var color : Color = ToolsManager.active_layer_color if _is_valid_drop(_touch_dragged, _get_drop_target(_touch_position)) else DROP_INVALID_COLOR
 	var font := get_theme_font("font")
 	var font_size := get_theme_font_size("font_size")
 	var text := _drag_label(_touch_dragged)
@@ -109,6 +106,62 @@ func _draw() -> void:
 	var text_size := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
 	draw_rect(Rect2(text_position - Vector2(6, text_size.y), text_size + Vector2(12, 8)), Color(0, 0, 0, 0.7))
 	draw_string(font, text_position, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+
+const DROP_INVALID_COLOR := Color(0.9, 0.2, 0.2)
+
+## Shows where a drop at [param at_position] goes: a filled box on the new parent (as child),
+## a line between layers (reorder), or a line after the last layer (end of the list).
+func _draw_drop_indicator(at_position : Vector2, dragged : Array) -> void:
+	var target := _get_drop_target(at_position)
+	var color : Color = ToolsManager.active_layer_color if _is_valid_drop(dragged, target) else DROP_INVALID_COLOR
+	var item : TreeItem = get_item_at_position(at_position)
+	var width := 3.0
+	if item == null:
+		# Empty space: after the last top level layer
+		var last : TreeItem = get_root().get_child(get_root().get_child_count() - 1) if get_root() and get_root().get_child_count() > 0 else null
+		if last:
+			var last_rect := _item_rect(_last_visible_descendant(last))
+			_draw_between_line(Vector2(0, last_rect.end.y), size.x, color, width)
+		return
+	var rect := _item_rect(item)
+	match _drop_section(at_position):
+		0: # Into the layer
+			draw_rect(rect, Color(color, 0.25), true)
+			draw_rect(rect.grow(-1), color, false, 2.0)
+		-1: # Before it, at its level
+			_draw_between_line(Vector2(_item_indent(item), rect.position.y), rect.end.x, color, width)
+		1: # After it, at its level
+			_draw_between_line(Vector2(_item_indent(item), rect.end.y), rect.end.x, color, width)
+
+func _draw_between_line(from : Vector2, to_x : float, color : Color, width : float) -> void:
+	draw_line(from, Vector2(to_x, from.y), color, width)
+	draw_circle(from + Vector2(4, 0), 4.0, color)
+
+## Row rectangle of [param item], in the tree's own coordinates.
+func _item_rect(item : TreeItem) -> Rect2:
+	return get_item_area_rect(item)
+
+## Left edge of an item's text, so the line shows the level it will be moved to.
+func _item_indent(item : TreeItem) -> float:
+	return _item_rect(item).position.x + get_theme_constant("item_margin") * _item_depth(item)
+
+func _item_depth(item : TreeItem) -> int:
+	var depth := 0
+	var parent_item := item.get_parent()
+	while parent_item != null and parent_item != get_root():
+		depth += 1
+		parent_item = parent_item.get_parent()
+	return depth
+
+func _last_visible_descendant(item : TreeItem) -> TreeItem:
+	while !item.collapsed and item.get_child_count() > 0:
+		item = item.get_child(item.get_child_count() - 1)
+	return item
+
+## Tree resets drop_mode_flags when a drag ends, so set them before every section query.
+func _drop_section(at_position : Vector2) -> int:
+	drop_mode_flags = DROP_MODE_ON_ITEM | DROP_MODE_INBETWEEN
+	return get_drop_section_at_position(at_position)
 
 func _make_custom_tooltip(for_text):
 	if for_text == "":
@@ -176,6 +229,7 @@ func _drag_label(dragged : Array) -> String:
 func _can_drop_data(at_position : Vector2, data) -> bool:
 	if !(data is Dictionary) or data.get("type") != DRAG_TYPE or layers == null:
 		return false
+	queue_redraw() # Drop indicator follows the mouse
 	return _is_valid_drop(data.layers, _get_drop_target(at_position))
 
 func _is_valid_drop(dragged : Array, target : Dictionary) -> bool:
@@ -223,7 +277,7 @@ func _get_drop_target(at_position : Vector2) -> Dictionary:
 	if item == null:
 		return { "parent": null, "index": -1 } # Empty space: end of the top level
 	var item_layer : base_layer = item.get_meta("layer")
-	match get_drop_section_at_position(at_position):
+	match _drop_section(at_position):
 		0: # On the item: make it the parent
 			if item_layer is project_layer:
 				return {} # Project layers show another project's layers
@@ -231,7 +285,7 @@ func _get_drop_target(at_position : Vector2) -> Dictionary:
 		-1, 1: # Before/after the item, with the same parent
 			var siblings : Array = layers.find_parent_array(item_layer)
 			var index : int = siblings.find(item_layer)
-			if get_drop_section_at_position(at_position) == 1:
+			if _drop_section(at_position) == 1:
 				index += 1
 			return { "parent": item_layer.parent, "index": index }
 	return {}
